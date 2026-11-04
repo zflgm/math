@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>和倍问题 · 为什么要除以（倍数 + 1）</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 2 课 / 4 · 和倍</span>
+    <span class="sp"></span>
+    <a href="../01-hecha/index.html">← 上一课</a>
+    <a href="../03-chabei/index.html">下一课：差倍 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 和差倍 02</div>
+    <h1>和倍问题：<span class="q-mark">÷(3+1) 里的那个 1 是谁？</span></h1>
+    <p class="q">甲、乙两筐苹果一共 <b>96 千克</b>，甲筐的重量是乙筐的 <em>3 倍</em>。两筐各多少千克？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 272" preserveAspectRatio="xMidYMid meet">
+
+        <!-- 乙筐 -->
+        <text class="tag" x="138" y="88" text-anchor="end">乙筐</text>
+        <rect id="bBar" class="barB" x="150" y="56" width="160" height="48" rx="10"/>
+        <text id="bVal" class="valDark" x="324" y="89" opacity="0">24</text>
+        <text id="bTag" class="hintTxt" x="150" y="44" opacity="0">1 份</text>
+
+        <!-- 甲筐 -->
+        <text class="tag" x="138" y="172" text-anchor="end">甲筐</text>
+        <rect id="aBar" class="barA" x="150" y="140" width="480" height="48" rx="10"/>
+        <line id="sl1" class="segLine" x1="310" y1="146" x2="310" y2="182" opacity="0"/>
+        <line id="sl2" class="segLine" x1="470" y1="146" x2="470" y2="182" opacity="0"/>
+        <text id="aVal" class="valDark" x="644" y="173" opacity="0">72</text>
+        <text id="aTag" class="hintTxt" x="150" y="132" opacity="0">3 份（就是 3 个乙）</text>
+
+        <!-- 一共 -->
+        <text class="tag" x="138" y="247" text-anchor="end">一共</text>
+        <rect id="sA" class="barA" x="150" y="228" width="480" height="26" rx="10"/>
+        <rect id="sB" class="barB" x="630" y="228" width="160" height="26" rx="10"/>
+        <line id="sd1" class="segLine" x1="310" y1="232" x2="310" y2="250" opacity="0"/>
+        <line id="sd2" class="segLine" x1="470" y1="232" x2="470" y2="250" opacity="0"/>
+        <text id="n1" class="valSum" x="230" y="247" text-anchor="middle" opacity="0">1</text>
+        <text id="n2" class="valSum" x="390" y="247" text-anchor="middle" opacity="0">2</text>
+        <text id="n3" class="valSum" x="550" y="247" text-anchor="middle" opacity="0">3</text>
+        <text id="n4" class="valSum" x="710" y="247" text-anchor="middle" opacity="0">4</text>
+        <text id="sTotal" class="hintTxt" x="806" y="248">96 千克</text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 6 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">换一组数字试试</span>
+    <span class="unit">一共</span>
+    <input id="inSum" type="number" value="96" min="2" step="1">
+    <span class="unit">甲是乙的</span>
+    <input id="inN" type="number" value="3" min="2" step="1">
+    <span class="unit">倍</span>
+    <button class="btn" id="apply">重新画</button>
+    <span class="warn" id="warn"></span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const X0 = 150, MAXW = 640;
+  const S = { sum: 96, n: 3, step: 0 };
+
+  function geom(){
+    const parts = S.n + 1;
+    const unit  = MAXW / parts;
+    return { parts, unit,
+             small: S.sum / parts,
+             big:   S.sum / parts * S.n };
+  }
+
+  const STEPS = [
+    {
+      t: '"3 倍"是什么意思',
+      h: '甲筐是乙筐的 3 倍 —— 不是"甲比乙多 3 个"，而是<b>甲正好能拆成 3 个乙</b>。<br>所以先画乙，再把甲的条子拉到乙的 3 倍长。',
+      eq: '甲 = 乙 × 3　　甲 + 乙 = 96'
+    },
+    {
+      t: '把甲切开，就是 3 个乙',
+      h: '在甲上切两刀，得到 3 段。<br>看长度：<b>每一段都和下面乙筐一样长</b>。<br>这才是"倍"的真意思 —— <em>不是 3 个不同的东西，是 3 个一模一样的乙</em>。',
+      eq: '甲 = 3 份（每份都和乙一样大）\n乙 = 1 份'
+    },
+    {
+      t: '一共几份？数出来',
+      h: '甲 3 份，乙 1 份，合起来 <b>4 份</b>。<br>把它们头尾接起来看看（最下面那条"一共"）：正好 4 段，总共 <b>96 千克</b>。<br>现在题目变成了：<em>4 份一共 96，1 份是多少</em>。',
+      eq: '3 + 1 = 4 份\n4 份 = 96 千克'
+    },
+    {
+      t: '4 份一共 96，平分就行',
+      h: '4 份一样大，那就把 96 平分成 4 份：<b>96 ÷ 4 = 24</b>，每份 24。<br><b>这个 ÷4 不是背来的</b> —— 因为数出来一共只有 4 份。',
+      eq: '96 ÷ 4 = <span class="ok">24</span>　（每 1 份是 24）'
+    },
+    {
+      t: '回到问题：甲、乙各占几份',
+      h: '乙筐 = <b>1 份</b> = 24。<br>甲筐 = <b>3 份</b> = 24 × 3 = 72。<br>验算一下：24 + 72 = 96 ✓，72 ÷ 24 = 3 ✓',
+      eq: '乙 = 24\n甲 = 24 × 3 = <span class="ok">72</span>'
+    },
+    {
+      t: '公式：小数 = 和 ÷（倍数 + 1）',
+      h: '为什么是 <b>n + 1</b>？因为"一共几份"永远是：小的那份 <b>1</b> + 大的那 <b>n</b> 份。<br>所以分母是 n + 1，不是 n。<br><br>最常见的错：写成"和 ÷ 倍数"。那样只数了甲的份数，<em>把乙那一份漏掉了</em>，算出来一定偏大。',
+      eq: '小数 = 和 ÷ (n + 1)\n大数 = 小数 × n\n\n验算：24 + 72 = 96 ✓'
+    }
+  ];
+
+  function set(el, a){ for(const k in a) el.setAttribute(k, a[k]); }
+
+  function render(anim){
+    const g = geom(), st = S.step;
+    const stage = $('stage');
+    if(!anim) stage.classList.add('no-anim');
+
+    const bigW = g.unit * S.n;
+
+    /* 乙 */
+    set($('bBar'), { width: g.unit.toFixed(2) });
+    set($('bVal'), { x: (X0 + g.unit + 14).toFixed(2), opacity: st >= 4 ? 1 : 0 });
+    $('bVal').textContent = g.small;
+    set($('bTag'), { opacity: st >= 2 && st < 4 ? 1 : 0 });
+
+    /* 甲 */
+    set($('aBar'), { width: bigW.toFixed(2) });
+    set($('sl1'), { x1:(X0+g.unit).toFixed(2), x2:(X0+g.unit).toFixed(2), opacity: st >= 1 ? 1 : 0 });
+    set($('sl2'), { x1:(X0+g.unit*2).toFixed(2), x2:(X0+g.unit*2).toFixed(2), opacity: st >= 1 ? 1 : 0 });
+    set($('aVal'), { x: (X0 + bigW + 14).toFixed(2), opacity: st >= 4 ? 1 : 0 });
+    $('aVal').textContent = g.big;
+    set($('aTag'), { opacity: st >= 1 && st < 4 ? 1 : 0 });
+    $('aTag').textContent = `3 份（就是 ${S.n} 个乙）`;
+
+    /* 一共 */
+    set($('sA'), { width: bigW.toFixed(2) });
+    set($('sB'), { x: (X0 + bigW).toFixed(2), width: g.unit.toFixed(2) });
+    const showDiv = st >= 2;
+    set($('sd1'), { x1:(X0+g.unit).toFixed(2), x2:(X0+g.unit).toFixed(2), opacity: showDiv ? 1 : 0 });
+    set($('sd2'), { x1:(X0+g.unit*2).toFixed(2), x2:(X0+g.unit*2).toFixed(2), opacity: showDiv ? 1 : 0 });
+    set($('sTotal'), { x: (X0 + MAXW + 16).toFixed(2) });
+
+    const ns = [$('n1'), $('n2'), $('n3'), $('n4')];
+    ns.forEach((el, i) => {
+      set(el, { x: (X0 + g.unit * (i + 0.5)).toFixed(2),
+                opacity: st >= 2 ? 1 : 0 });
+      el.textContent = st >= 3 ? g.small : (i + 1);
+    });
+
+    /* 文案 */
+    const cur = STEPS[st];
+    $('steptag').textContent = `第 ${st + 1} 步 / 共 ${STEPS.length} 步`;
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+
+    if(!anim){
+      void stage.offsetWidth;
+      requestAnimationFrame(() => stage.classList.remove('no-anim'));
+    }
+  }
+
+  function go(n){
+    n = Math.max(0, Math.min(STEPS.length - 1, n));
+    if(n === S.step) return;
+    S.step = n; render(true);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.title = `第 ${i + 1} 步`;
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  $('apply').addEventListener('click', () => {
+    const s = parseInt($('inSum').value, 10);
+    const n = parseInt($('inN').value, 10);
+    const warn = $('warn');
+    if(!Number.isFinite(s) || !Number.isFinite(n) || s <= 0 || n < 2){
+      warn.textContent = '一共要是正整数，倍数要不小于 2'; return;
+    }
+    if(s % (n + 1) !== 0){
+      warn.textContent = `一共要能被 ${n + 1} 整除（不然每份是小数）`; return;
+    }
+    warn.textContent = '';
+    S.sum = s; S.n = n; S.step = 0;
+    render(false);
+  });
+
+  render(false);
+})();
+</script>
+</body>
+</html>

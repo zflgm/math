@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>沏茶 · 13 分钟怎么变成 10 分钟</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:linear-gradient(180deg,#fffdf8 0%,#ffffff 60%);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- 本页 ---------- */
+#gScene,#gDep,#gCmp{transition:opacity .4s ease}
+#gDep,#gCmp{pointer-events:none}
+
+.chip{transition:transform .86s cubic-bezier(.45,.05,.35,1),opacity .35s ease}
+.chip .body{transition:fill .3s ease,stroke .3s ease}
+.chip.shake{animation:sk .5s ease-in-out 2}
+@keyframes sk{0%,100%{transform:translate(0,0)}25%{transform:translate(-6px,0)}75%{transform:translate(6px,0)}}
+
+#cur{transition:transform .18s linear,opacity .3s ease}
+#endLine{transition:transform .55s cubic-bezier(.45,.05,.35,1)}
+#endg{transition:opacity .3s ease}
+#axis{transition:opacity .3s ease}
+#idle{transition:opacity .3s ease}
+
+#gFlame,#gSteam{transition:opacity .5s ease}
+.flame{transform-box:fill-box;transform-origin:center bottom;animation:fl .7s ease-in-out infinite}
+.flame:nth-child(2){animation-delay:.18s;animation-duration:.62s}
+.flame:nth-child(3){animation-delay:.34s;animation-duration:.78s}
+@keyframes fl{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.28)}}
+.steam{transform-box:fill-box;animation:st 2.1s ease-out infinite}
+.steam:nth-child(2){animation-delay:.7s}
+.steam:nth-child(3){animation-delay:1.4s}
+@keyframes st{0%{opacity:0;transform:translateY(8px) scale(.85)}35%{opacity:.75}100%{opacity:0;transform:translateY(-30px) scale(1.2)}}
+
+.tk{font-size:13px;font-weight:700;fill:#b6bfcd;font-variant-numeric:tabular-nums}
+.rowlab{font-size:16px;font-weight:800;fill:#94a3b8}
+.nowl{font-size:15px;font-weight:800;fill:#a8b3c2;letter-spacing:.04em}
+#nowv{font-size:46px;font-weight:800;fill:#0f172a;font-variant-numeric:tabular-nums}
+#nowu{font-size:17px;font-weight:800;fill:#94a3b8}
+#totv{font-size:48px;font-weight:800;fill:#94a3b8;font-variant-numeric:tabular-nums;transition:fill .35s ease}
+#totu{font-size:17px;font-weight:800;fill:#a8b3c2}
+.boiltag{font-size:14px;font-weight:800;fill:#d97706}
+.idle-t{font-size:16px;font-weight:800;fill:#dc2626}
+.idle-s{font-size:13px;font-weight:700;fill:#f0a8a8}
+.bd-t{font-size:20px;font-weight:800;fill:#fff}
+.bd-s{font-size:14px;font-weight:800;fill:#ffffff;opacity:.85}
+.dep-h{font-size:19px;font-weight:800;fill:#0f172a}
+.dep-s{font-size:15px;font-weight:700;fill:#94a3b8}
+.cmp-lab{font-size:15px;font-weight:800;fill:#475569}
+.cmp-v{font-size:22px;font-weight:800;fill:#0f172a;font-variant-numeric:tabular-nums}
+.cmp-t{font-size:16px;font-weight:800;fill:#475569}
+.cmp-seg{font-size:12px;font-weight:800;fill:#1e40af}
+.cmp-big{font-size:25px;font-weight:800;fill:#0f172a;font-variant-numeric:tabular-nums}
+
+body.nt .chip,body.nt #cur,body.nt #endLine,body.nt .chip .body{transition:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 18 课 · 沏茶</span>
+    <span class="sp"></span>
+    <a href="../17-laobing/index.html">← 上一课</a>
+    <a href="../19-woshou/index.html">下一课：握手 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 数学广角 18</div>
+    <h1>沏茶：<span class="q-mark">等水开的时候，手在干什么</span></h1>
+    <p class="q">洗水壶 <b>1 分钟</b>，烧水 <b>8 分钟</b>，洗茶杯 <b>2 分钟</b>，找茶叶 <b>1 分钟</b>，沏茶 <b>1 分钟</b>。最少 <b>几分钟</b>能喝上茶？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 960 460" preserveAspectRatio="xMidYMid meet">
+
+        <defs>
+          <linearGradient id="kettleG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f4f7fa"/>
+            <stop offset="0.48" stop-color="#dde4ec"/>
+            <stop offset="1" stop-color="#b9c4d1"/>
+          </linearGradient>
+          <linearGradient id="lidG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#cfd8e3"/>
+            <stop offset="1" stop-color="#a8b4c3"/>
+          </linearGradient>
+          <linearGradient id="stoveG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9aa6b6"/>
+            <stop offset="1" stop-color="#6b7686"/>
+          </linearGradient>
+          <linearGradient id="fireG" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="#f97316"/>
+            <stop offset="0.55" stop-color="#fb923c"/>
+            <stop offset="1" stop-color="#fcd34d"/>
+          </linearGradient>
+          <marker id="arG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#94a3b8"/>
+          </marker>
+          <marker id="arB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0 0 L10 5 L0 10 Z" fill="#2563eb"/>
+          </marker>
+        </defs>
+
+        <g id="gScene">
+
+          <!-- 灶台与水壶 -->
+          <g id="stove">
+            <g id="gFlame" opacity="0">
+              <g class="flame" transform="translate(168,176)">
+                <path d="M0 0 C-8 -10 -5.5 -20 0 -28 C5.5 -20 8 -10 0 0 Z" fill="url(#fireG)"/>
+              </g>
+              <g class="flame" transform="translate(200,176)">
+                <path d="M0 0 C-9 -12 -6 -23 0 -32 C6 -23 9 -12 0 0 Z" fill="url(#fireG)"/>
+              </g>
+              <g class="flame" transform="translate(232,176)">
+                <path d="M0 0 C-8 -10 -5.5 -20 0 -28 C5.5 -20 8 -10 0 0 Z" fill="url(#fireG)"/>
+              </g>
+            </g>
+
+            <rect x="100" y="176" width="200" height="12" rx="6" fill="url(#stoveG)"/>
+            <rect x="118" y="188" width="16" height="20" rx="4" fill="#7b8696"/>
+            <rect x="266" y="188" width="16" height="20" rx="4" fill="#7b8696"/>
+
+            <path d="M262 88 C300 92 300 142 262 146" fill="none" stroke="#8b97a8" stroke-width="11" stroke-linecap="round"/>
+            <path d="M138 80 C130 140 146 166 200 166 C254 166 270 140 262 80 Z" fill="url(#kettleG)" stroke="#93a0b0" stroke-width="2"/>
+            <ellipse cx="176" cy="104" rx="15" ry="26" fill="#ffffff" opacity=".5" transform="rotate(-12 176 104)"/>
+            <rect x="134" y="68" width="132" height="13" rx="6.5" fill="url(#lidG)" stroke="#93a0b0" stroke-width="1.6"/>
+            <path d="M178 68 L222 68 L214 50 L186 50 Z" fill="url(#lidG)" stroke="#93a0b0" stroke-width="1.6"/>
+            <circle cx="200" cy="46" r="7" fill="#8b97a8"/>
+            <path d="M138 98 L106 82 L106 96 L138 116 Z" fill="url(#lidG)" stroke="#93a0b0" stroke-width="1.6" stroke-linejoin="round"/>
+
+            <g id="gSteam" opacity="0">
+              <path class="steam" d="M100 74 C90 60 108 50 98 34" fill="none" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+              <path class="steam" d="M196 34 C186 20 204 12 194 -2" fill="none" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round" transform="translate(0,10)"/>
+              <path class="steam" d="M214 40 C204 26 222 18 212 4" fill="none" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round" transform="translate(0,10)"/>
+            </g>
+          </g>
+
+          <!-- 现在读数 -->
+          <text class="nowl" x="480" y="88" text-anchor="middle">已经过了</text>
+          <text id="nowv" x="452" y="140" text-anchor="end">0</text>
+          <text id="nowu" x="462" y="140">分钟</text>
+
+          <!-- 总用时 -->
+          <rect x="700" y="42" width="204" height="122" rx="16" fill="#f8fafc" stroke="#e7eaf0" stroke-width="1.4"/>
+          <text class="nowl" x="802" y="76" text-anchor="middle">总用时</text>
+          <text id="totv" x="788" y="136" text-anchor="end">?</text>
+          <text id="totu" x="798" y="136">分钟</text>
+
+          <!-- 时间轴 -->
+          <g id="axis">
+            <g id="grid"></g>
+            <line x1="110" y1="368" x2="922" y2="368" stroke="#dfe5ee" stroke-width="2" stroke-linecap="round"/>
+            <text class="rowlab" x="96" y="255" text-anchor="end">灶台</text>
+            <text class="rowlab" x="96" y="333" text-anchor="end">双手</text>
+          </g>
+
+          <!-- 空闲区 -->
+          <g id="idle" opacity="0">
+            <rect x="168" y="326" width="452" height="34" rx="10" fill="#fef2f2" stroke="#f87171" stroke-width="2" stroke-dasharray="8 6"/>
+            <text class="idle-t" x="394" y="343" text-anchor="middle" dominant-baseline="central">8 分钟，手一直空着</text>
+          </g>
+
+          <!-- 水开线 -->
+          <g id="boilMark" opacity="0">
+            <line x1="632" y1="222" x2="632" y2="376" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6 6"/>
+            <text class="boiltag" x="632" y="214" text-anchor="middle">水开了</text>
+          </g>
+
+          <!-- 结束线 -->
+          <g id="endg">
+            <g id="endLine">
+              <line x1="0" y1="228" x2="0" y2="376" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <text id="endt" class="cmp-v" x="0" y="410" text-anchor="middle">13 分</text>
+          </g>
+
+          <!-- 指针 -->
+          <g id="cur">
+            <line x1="0" y1="228" x2="0" y2="376" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M-7 228 L0 217 L7 228 Z" fill="#0f172a"/>
+          </g>
+
+          <!-- 任务块 -->
+          <g id="gChips"></g>
+
+        </g>
+
+        <!-- 依赖图 -->
+        <g id="gDep" opacity="0"></g>
+
+        <!-- 对比条 -->
+        <g id="gCmp" opacity="0"></g>
+
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 9 步</div>
+      <h2 id="h"></h2>
+      <p id="t"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">按 <b>←</b> <b>→</b> 或 <b>空格</b> 翻页</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const mk = (t, a) => {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', t);
+    for(const k in a) e.setAttribute(k, a[k]);
+    return e;
+  };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  /* ---------- 几何 ---------- */
+  const X0 = 110, U = 58, BH = 34;
+  const ROW = { pan:248, hand:326, mid:287 };
+  const px = m => X0 + m * U;
+
+  const DUR = { wash:1, boil:8, cup:2, tea:1, brew:1 };
+  const NAME = { wash:'洗水壶', boil:'烧水', cup:'洗茶杯', tea:'找茶叶', brew:'沏茶' };
+  const HUE  = { wash:'#2563eb', boil:'#d97706', cup:'#2563eb', tea:'#2563eb', brew:'#0d9488' };
+  const SOFT = { wash:'#3b82f6', boil:'#f59e0b', cup:'#3b82f6', tea:'#3b82f6', brew:'#14b8a6' };
+
+  /* 串着做的位置 */
+  const SERIAL = [
+    ['wash', 0, 'hand'], ['boil', 1, 'pan'], ['cup', 9, 'hand'],
+    ['tea', 11, 'hand'], ['brew', 12, 'hand']
+  ];
+  /* 塞进去之后 */
+  const BEST = [
+    ['wash', 0, 'hand'], ['boil', 1, 'pan'], ['cup', 1, 'hand'],
+    ['tea', 3, 'hand'], ['brew', 9, 'hand']
+  ];
+
+  /* ---------- 状态 ---------- */
+  const S = { step:0, now:0 };
+  let token = 0;
+  const chips = {};
+
+  /* ---------- 建块 ---------- */
+  function buildChips(){
+    const host = $('gChips');
+    for(const id in DUR){
+      const w = DUR[id] * U - 6;
+      const g = mk('g', {class:'chip'});
+      const body = mk('rect', {class:'body', x:0, y:0, width:w, height:BH, rx:10, fill:HUE[id]});
+      const gloss = mk('rect', {x:6, y:4, width:w - 12, height:10, rx:5, fill:'#ffffff', opacity:.18});
+      g.appendChild(body);
+      g.appendChild(gloss);
+
+      const big = DUR[id] >= 4;
+      const lab = mk('text', {
+        x:w / 2, y:BH / 2 + 1, 'text-anchor':'middle', 'dominant-baseline':'central',
+        'font-size': big ? 19 : (DUR[id] === 2 ? 13 : 12), 'font-weight':800, fill:'#fff'
+      });
+      lab.textContent = big ? (NAME[id] + ' ' + DUR[id] + ' 分') : (NAME[id] + (DUR[id] === 2 ? ' 2 分' : ''));
+      g.appendChild(lab);
+
+      host.appendChild(g);
+      chips[id] = { g, body, lab, w };
+    }
+  }
+
+  function put(id, min, row){
+    const c = chips[id];
+    if(!c) return;
+    c.g.style.transform = 'translate(' + px(min) + 'px,' + ROW[row] + 'px)';
+    c.min = min; c.row = row;
+  }
+
+  function layout(list){
+    list.forEach(it => put(it[0], it[1], it[2]));
+  }
+
+  function lit(id, on){
+    chips[id].g.style.opacity = on ? 1 : .34;
+  }
+
+  function hard(fn){
+    document.body.classList.add('nt');
+    fn();
+    void $('stage').getBoundingClientRect();
+    document.body.classList.remove('nt');
+  }
+
+  /* ---------- 杂项 ---------- */
+  function setNow(v){
+    S.now = v;
+    $('nowv').textContent = v;
+    $('cur').style.transform = 'translateX(' + px(v) + 'px)';
+  }
+  function setTotal(v, color){
+    $('totv').textContent = v === null ? '?' : v;
+    $('totv').style.fill = color || (v === null ? '#94a3b8' : '#0f172a');
+    $('endLine').style.transform = 'translateX(' + px(v || 13) + 'px)';
+    $('endt').setAttribute('x', px(v || 13));
+    $('endt').textContent = v === null ? '' : (v + ' 分');
+    $('endg').style.opacity = v === null ? 0 : 1;
+  }
+  function chrome(on){
+    $('axis').style.opacity = on ? 1 : 0;
+    $('cur').style.opacity = on ? 1 : 0;
+  }
+  function setFlame(on){ $('gFlame').style.opacity = on ? 1 : 0; $('gSteam').style.opacity = on ? 1 : 0; }
+  function idle(on){ $('idle').setAttribute('opacity', on ? 1 : 0); }
+  function boilMark(on){ $('boilMark').setAttribute('opacity', on ? 1 : 0); }
+
+  function buildGrid(){
+    const g = $('grid');
+    if(g.childNodes.length) return;
+    for(let m = 0; m <= 14; m++){
+      g.appendChild(mk('line', {
+        x1:px(m), y1:228, x2:px(m), y2:368,
+        stroke: m === 0 ? '#cbd5e1' : '#eef1f6', 'stroke-width': m === 0 ? 2 : 1.5
+      }));
+      const t = mk('text', {class:'tk', x:px(m), y:390, 'text-anchor':'middle'});
+      t.textContent = m;
+      g.appendChild(t);
+    }
+    const u = mk('text', {class:'tk', x:px(14) + 16, y:390, 'text-anchor':'start'});
+    u.textContent = '分钟';
+    g.appendChild(u);
+  }
+
+  /* ---------- 指针走 ---------- */
+  async function sweep(to, tk, speed){
+    const sp = speed || 115;
+    while(S.now < to){
+      if(tk !== token) return;
+      setNow(S.now + 1);
+      await sleep(sp);
+    }
+  }
+
+  /* ---------- 依赖图 ---------- */
+  function buildDep(){
+    const g = $('gDep');
+    if(g.childNodes.length) return;
+
+    const t1 = mk('text', {class:'dep-h', x:480, y:64, 'text-anchor':'middle'});
+    t1.textContent = '这两件，顺序锁死';
+    g.appendChild(t1);
+    const s1 = mk('text', {class:'dep-s', x:480, y:92, 'text-anchor':'middle'});
+    s1.textContent = '水壶不洗不能烧，水不开不能沏';
+    g.appendChild(s1);
+
+    const chain = [
+      {n:'洗水壶', d:'1 分', x:158, w:146},
+      {n:'烧水',   d:'8 分', x:392, w:178},
+      {n:'沏茶',   d:'1 分', x:658, w:146}
+    ];
+    chain.forEach((c, i) => {
+      g.appendChild(mk('rect', {x:c.x, y:130, width:c.w, height:60, rx:12,
+        fill: i === 1 ? '#fde9c4' : '#dbeafe', stroke: i === 1 ? '#d97706' : '#2563eb', 'stroke-width':2}));
+      const tn = mk('text', {class:'bd-t', x:c.x + c.w / 2, y:154, 'text-anchor':'middle'});
+      tn.textContent = c.n;
+      tn.style.fill = i === 1 ? '#92400e' : '#1e40af';
+      const td = mk('text', {class:'bd-s', x:c.x + c.w / 2, y:176, 'text-anchor':'middle'});
+      td.textContent = c.d;
+      td.style.fill = i === 1 ? '#b45309' : '#3b82f6';
+      g.appendChild(tn); g.appendChild(td);
+    });
+    [[304, 392], [570, 658]].forEach(p => {
+      g.appendChild(mk('line', {x1:p[0], y1:160, x2:p[1] - 4, y2:160,
+        stroke:'#94a3b8', 'stroke-width':2.5, 'marker-end':'url(#arG)'}));
+    });
+
+    const t2 = mk('text', {class:'dep-h', x:480, y:262, 'text-anchor':'middle'});
+    t2.textContent = '这两件，跟水没关系';
+    g.appendChild(t2);
+    const s2 = mk('text', {class:'dep-s', x:480, y:290, 'text-anchor':'middle'});
+    s2.textContent = '水烧着的时候，人完全腾得出手来干';
+    g.appendChild(s2);
+
+    const free = [
+      {n:'洗茶杯', d:'2 分', x:280, w:170},
+      {n:'找茶叶', d:'1 分', x:512, w:170}
+    ];
+    free.forEach(c => {
+      g.appendChild(mk('rect', {x:c.x, y:320, width:c.w, height:60, rx:12,
+        fill:'#f0fdfa', stroke:'#0d9488', 'stroke-width':2, 'stroke-dasharray':'7 5'}));
+      const tn = mk('text', {class:'bd-t', x:c.x + c.w / 2, y:344, 'text-anchor':'middle'});
+      tn.textContent = c.n;
+      tn.style.fill = '#0f766e';
+      const td = mk('text', {class:'bd-s', x:c.x + c.w / 2, y:366, 'text-anchor':'middle'});
+      td.textContent = c.d;
+      td.style.fill = '#14b8a6';
+      g.appendChild(tn); g.appendChild(td);
+    });
+  }
+
+  /* ---------- 对比条 ---------- */
+  function buildCmp(){
+    const g = $('gCmp');
+    if(g.childNodes.length) return;
+
+    const OX = 148, V = 52, H = 40;
+    const bx = m => OX + m * V;
+
+    const head = mk('text', {class:'dep-h', x:480, y:54, 'text-anchor':'middle'});
+    head.textContent = '水开之后，还剩多少活没干';
+    g.appendChild(head);
+
+    const rows = [
+      {y:96, tag:'串着做', tot:13,
+       segs:[['wash',0,1],['boil',1,8],['cup',9,2],['tea',11,1],['brew',12,1]],
+       tip:'还要干 4 分钟', tone:'#dc2626'},
+      {y:212, tag:'塞进去', tot:10,
+       segs:[['wash',0,1],['boil',1,8],['brew',9,1]],
+       inside:[['cup',1,2],['tea',3,1]],
+       tip:'只剩 1 分钟', tone:'#0d9488'}
+    ];
+
+    rows.forEach(r => {
+      const lab = mk('text', {class:'cmp-lab', x:OX - 18, y:r.y + 26, 'text-anchor':'end'});
+      lab.textContent = r.tag;
+      g.appendChild(lab);
+
+      r.segs.forEach(s => {
+        const col = HUE[s[0]];
+        g.appendChild(mk('rect', {x:bx(s[1]), y:r.y, width:s[2] * V - 5, height:H, rx:9, fill:col}));
+        if(s[2] >= 3){
+          const t = mk('text', {x:bx(s[1]) + (s[2] * V - 5) / 2, y:r.y + H / 2 + 1,
+            'text-anchor':'middle', 'dominant-baseline':'central',
+            'font-size':17, 'font-weight':800, fill:'#fff'});
+          t.textContent = NAME[s[0]] + ' 8 分';
+          g.appendChild(t);
+        }
+        if(s[2] === 2){
+          const t = mk('text', {x:bx(s[1]) + (s[2] * V - 5) / 2, y:r.y + H / 2 + 1,
+            'text-anchor':'middle', 'dominant-baseline':'central',
+            'font-size':12, 'font-weight':800, fill:'#fff'});
+          t.textContent = NAME[s[0]];
+          g.appendChild(t);
+        }
+      });
+
+      if(r.inside){
+        r.inside.forEach(s => {
+          g.appendChild(mk('rect', {x:bx(s[1]) + 4, y:r.y + 6, width:s[2] * V - 13, height:H - 12, rx:6,
+            fill:'#ffffff', opacity:.94}));
+          const t = mk('text', {class:'cmp-seg', x:bx(s[1]) + 4 + (s[2] * V - 13) / 2, y:r.y + H / 2 + 1,
+            'text-anchor':'middle', 'dominant-baseline':'central'});
+          t.textContent = NAME[s[0]];
+          g.appendChild(t);
+        });
+      }
+
+      const tot = mk('text', {class:'cmp-v', x:bx(r.tot) + 14, y:r.y + 28, 'text-anchor':'start'});
+      tot.textContent = r.tot + ' 分';
+      tot.style.fill = r.tone;
+      g.appendChild(tot);
+
+      const tip = mk('text', {class:'cmp-t', x:bx(9) + 14, y:r.y + H + 22});
+      tip.textContent = r.tip;
+      tip.style.fill = r.tone;
+      g.appendChild(tip);
+    });
+
+    const line = 9;
+    g.appendChild(mk('line', {x1:bx(line), y1:80, x2:bx(line), y2:272,
+      stroke:'#f59e0b', 'stroke-width':2, 'stroke-dasharray':'6 6'}));
+    const bt = mk('text', {class:'boiltag', x:bx(line), y:72, 'text-anchor':'middle'});
+    bt.textContent = '水开了';
+    g.appendChild(bt);
+
+    const big = mk('text', {class:'cmp-big', x:480, y:336, 'text-anchor':'middle'});
+    big.textContent = '差的这 3 分钟 = 洗茶杯 2 分 + 找茶叶 1 分';
+    g.appendChild(big);
+
+    const sub = mk('text', {class:'dep-s', x:480, y:368, 'text-anchor':'middle'});
+    sub.textContent = '它们本来堆在水开之后，现在被挪到了水开之前';
+    g.appendChild(sub);
+  }
+
+  /* ---------- 重置 ---------- */
+  function resetAll(){
+    hard(() => {
+      layout(SERIAL);
+      for(const id in chips) lit(id, true);
+      setNow(0);
+      setTotal(null);
+    });
+    setFlame(false);
+    idle(false);
+    boilMark(false);
+  }
+
+  function hideOverlays(){
+    $('gScene').style.opacity = 1;
+    $('gDep').style.opacity = 0;
+    $('gCmp').style.opacity = 0;
+  }
+
+  /* ---------- 动画 ---------- */
+  async function anim(k, tk){
+    const alive = () => tk === token;
+
+    if(k === 3){ chrome(true); $('gScene').style.opacity = 0; $('gDep').style.opacity = 1; $('gCmp').style.opacity = 0; buildDep(); return; }
+    if(k === 6){ chrome(true); $('gScene').style.opacity = 0; $('gDep').style.opacity = 0; $('gCmp').style.opacity = 1; buildCmp(); return; }
+    hideOverlays();
+    chrome(k !== 0);
+
+    /* 第 1 步：题面 */
+    if(k === 0){
+      resetAll();
+      hard(() => layout([['wash',0,'mid'],['boil',1,'mid'],['cup',9,'mid'],['tea',11,'mid'],['brew',12,'mid']]));
+      return;
+    }
+
+    /* 第 2 步：串着做 13 分钟 */
+    if(k === 1){
+      resetAll();
+      hard(() => { layout(SERIAL); for(const id in chips) lit(id, false); });
+      await sleep(320); if(!alive()) return;
+
+      while(S.now < 13){
+        if(!alive()) return;
+        const next = S.now + 1;
+        setNow(next);
+        for(const id in DUR){
+          const c = chips[id];
+          if(c.min < next) lit(id, true);
+        }
+        if(next > 1 && next <= 9) setFlame(true);
+        if(next === 10) setFlame(false);
+        if(next === 9) boilMark(true);
+        await sleep(105);
+      }
+      setTotal(13, '#dc2626');
+      return;
+    }
+
+    /* 第 3 步：那 8 分钟手是空的 */
+    if(k === 2){
+      resetAll();
+      hard(() => { layout(SERIAL); for(const id in chips) lit(id, true); setNow(9); });
+      setFlame(true);
+      boilMark(true);
+      await sleep(260); if(!alive()) return;
+      idle(true);
+      return;
+    }
+
+    /* 第 4 步：塞进去（不换行位置，只飞任务） */
+    if(k === 4){
+      resetAll();
+      hard(() => { layout(SERIAL); for(const id in chips) lit(id, true); setNow(13); setTotal(13, '#dc2626'); });
+      boilMark(true);
+      await sleep(300); if(!alive()) return;
+
+      idle(false);
+      put('cup', 1, 'hand');
+      await sleep(420); if(!alive()) return;
+      put('tea', 3, 'hand');
+      await sleep(520); if(!alive()) return;
+
+      setFlame(true);
+      await sleep(500); if(!alive()) return;
+      setFlame(false);
+      return;
+    }
+
+    /* 第 5 步：10 分钟 */
+    if(k === 5){
+      resetAll();
+      hard(() => {
+        layout([['wash',0,'hand'],['boil',1,'pan'],['cup',1,'hand'],['tea',3,'hand'],['brew',12,'hand']]);
+        for(const id in chips) lit(id, true);
+        setNow(0); setTotal(13, '#dc2626');
+      });
+      boilMark(true);
+      await sleep(300); if(!alive()) return;
+
+      put('brew', 9, 'hand');
+      await sleep(900); if(!alive()) return;
+
+      setNow(0);
+      while(S.now < 10){
+        if(!alive()) return;
+        setNow(S.now + 1);
+        if(S.now > 1 && S.now <= 9) setFlame(true);
+        if(S.now === 10) setFlame(false);
+        await sleep(110);
+      }
+      setTotal(10, '#0d9488');
+      return;
+    }
+
+    /* 第 7 步：塞错了 */
+    if(k === 7){
+      resetAll();
+      hard(() => {
+        layout(BEST);
+        for(const id in chips) lit(id, true);
+        setNow(10); setTotal(10, '#0d9488');
+      });
+      boilMark(true);
+      await sleep(320); if(!alive()) return;
+
+      put('brew', 4, 'hand');
+      await sleep(760); if(!alive()) return;
+
+      const c = chips.brew;
+      c.body.setAttribute('fill', '#ef4444');
+      c.g.classList.add('shake');
+      $('boilMark').setAttribute('opacity', 0);
+
+      const bx0 = px(4) + 26;
+      const bubble = mk('g', {});
+      bubble.appendChild(mk('rect', {x:bx0 - 58, y:296, width:116, height:26, rx:9, fill:'#dc2626'}));
+      const wt = mk('text', {x:bx0, y:309, 'text-anchor':'middle', 'dominant-baseline':'central',
+        'font-size':14, 'font-weight':800, fill:'#fff'});
+      wt.textContent = '水还没开';
+      bubble.appendChild(wt);
+      $('gChips').appendChild(bubble);
+
+      await sleep(1500); if(!alive()) return;
+
+      c.g.classList.remove('shake');
+      c.body.setAttribute('fill', HUE.brew);
+      bubble.remove();
+      put('brew', 9, 'hand');
+      boilMark(true);
+      setTotal(10, '#0d9488');
+      return;
+    }
+
+    /* 第 9 步：口诀 */
+    if(k === 8){
+      resetAll();
+      hard(() => {
+        layout(BEST);
+        for(const id in chips) lit(id, true);
+        setNow(10); setTotal(10, '#0d9488');
+      });
+      boilMark(true);
+      return;
+    }
+  }
+
+  /* ---------- 文案 ---------- */
+  const STEPS = [
+    {
+      h:'五件事，最少几分钟？',
+      t:'洗水壶、烧水、洗茶杯、找茶叶、沏茶。<b>一件干完再干下一件</b>，加起来就是 13 分钟。能不能少花点？',
+      eq:'1 + 8 + 2 + 1 + 1\n= 13 分钟'
+    },
+    {
+      h:'一件接一件：13 分钟',
+      t:'洗水壶 → 烧水 → 洗茶杯 → 找茶叶 → 沏茶。指针一路走到 13。看着没毛病，但<b>中间那 8 分钟</b>得盯住。',
+      eq:'串着做\n= <span class="hl">13 分钟</span>'
+    },
+    {
+      h:'水在烧，手在等',
+      t:'烧水那 8 分钟，<em>火在干活，人没事干</em>，只能站着等水开。这 8 分钟不是"用掉了"，是"闲掉了"。',
+      eq:'烧水 8 分钟\n手空闲 8 分钟\n（人在旁边干等）'
+    },
+    {
+      h:'只有三件事非排队不可',
+      t:'<b>洗水壶 → 烧水 → 沏茶</b>：壶不洗不能烧，水不开不能沏，这三件锁死了。另外两件不碰水，<i>放在哪儿都行</i>。',
+      eq:'锁死的链：\n洗水壶 → 烧水 → 沏茶\n\n随便放：\n洗茶杯、找茶叶'
+    },
+    {
+      h:'把闲着的 8 分钟用起来',
+      t:'洗茶杯 2 分钟、找茶叶 1 分钟，加起来才 3 分钟，<i>塞得进那 8 分钟</i>。等水开的时候顺手干完。',
+      eq:'8 分钟的等待\n足够放 3 分钟的活\n（还剩 5 分钟空着）'
+    },
+    {
+      h:'水一开，只剩一件事：沏茶',
+      t:'该洗的都洗完了，水开了直接沏。沏茶从第 12 分钟挪到第 9 分钟，总用时 <i>10 分钟</i>。',
+      eq:'洗水壶 1\n+ 烧水 8（同时洗茶杯、找茶叶）\n+ 沏茶 1\n= <span class="ok">10 分钟</span>'
+    },
+    {
+      h:'省下的 3 分钟，是这么来的',
+      t:'盯住"水开"这条线：串着做时，水开后还有 <em>4 分钟</em>的活（2+1+1）；塞进去之后只剩 <i>1 分钟</i>。',
+      eq:'13 − 10 = 3\n= 洗茶杯 2 + 找茶叶 1'
+    },
+    {
+      h:'塞错了，一分钟也省不下',
+      t:'沏茶不能塞进烧水里 —— <em>水还没开</em>。能塞的只有"不靠水"的活，而且得塞在<em>它的前面</em>。',
+      eq:'沏茶 → 只能在水开之后\n洗茶杯 → 得塞在水开之前'
+    },
+    {
+      h:'一句话记住',
+      t:'先找出那条<b>锁死的链</b>，再看链上哪一段在干等，把<b>不靠它的活</b>塞进那段等待里。',
+      eq:'找链 → 找空档 → 塞进去\n\n等 8 分钟，就干 8 分钟以内的活'
+    }
+  ];
+
+  /* ---------- 渲染 ---------- */
+  function render(){
+    const k = S.step;
+    const cur = STEPS[k];
+    $('steptag').textContent = '第 ' + (k + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('h').textContent = cur.h;
+    $('t').innerHTML = cur.t;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = k === 0;
+    $('next').disabled = k === STEPS.length - 1;
+    $('next').textContent = k === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === k));
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === S.step) return;
+    S.step = k;
+    token++;
+    render();
+    anim(k, token);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  buildGrid();
+  buildChips();
+  S.step = 0;
+  render();
+  anim(0, ++token);
+})();
+</script>
+</body>
+</html>

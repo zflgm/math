@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分数百分数 · 单位"1"换人</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+/* ---- 本页补充 ---- */
+svg line{transition:opacity .44s ease, stroke .34s ease, x1 .5s ease, x2 .5s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .38s ease both}
+/* ---------- 本课专用 ---------- */
+#gEmpty text{font-size:17px;font-weight:700;fill:#9aa6b8}
+.cell-txt{font-size:14px;font-weight:700}
+#nBoy, #nGirl{font-size:15px;font-weight:800}
+.ruler-txt{font-size:13px;font-weight:800}
+.preset.on{border-color:var(--a);background:var(--a-lt);color:var(--a-dk)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 13 课 · 分数百分数</span>
+    <span class="sp"></span>
+    <a href="../12-hunhe/index.html">← 上一课</a>
+    <a href="../14-jitu/index.html">下一课：鸡兔同笼 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 分数百分数 13</div>
+    <h1>单位"1"换人：<span class="q-mark">"多 25%"和"少 25%"不是一件事</span></h1>
+    <p class="q">六年级男生比女生多 <b id="qMore">25%</b>。那么女生比男生<em>少</em>百分之几？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 455" preserveAspectRatio="xMidYMid meet">
+
+        <g id="gEmpty">
+          <rect x="130" y="104" width="470" height="46" rx="8" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 7"/>
+          <text x="365" y="133" text-anchor="middle">男生的格子数 = ?</text>
+          <rect x="130" y="192" width="376" height="46" rx="8" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 7"/>
+          <text x="318" y="221" text-anchor="middle">女生的格子数 = ?</text>
+        </g>
+
+        <text id="tagBoy" x="64" y="133" font-size="16" font-weight="800" fill="#64748b">男生</text>
+        <text id="tagGirl" x="64" y="221" font-size="16" font-weight="800" fill="#64748b">女生</text>
+
+        <g id="gBoy"></g>
+        <g id="gGirl"></g>
+
+        <text id="nBoy" x="0" y="133" fill="#64748b"></text>
+        <text id="nGirl" x="0" y="221" fill="#64748b"></text>
+
+        <g id="gapLine"></g>
+        <g id="rGirl"></g>
+        <g id="rBoy"></g>
+
+        <text id="foot" x="130" y="410" font-size="21" font-weight="800" fill="#475569"></text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 9 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">换一组数字</span>
+    <button class="btn preset" data-n="2">2 格 → 3 格</button>
+    <button class="btn preset on" data-n="4">4 格 → 5 格</button>
+    <button class="btn preset" data-n="5">5 格 → 6 格</button>
+    <span class="warn" id="hint">女生几格，男生就是几格 + 1 格</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const W = 96;          // 每格宽度，固定不变 —— 本课的核心承诺
+  const X0 = 130;        // 左端
+  const YB = 104, YG = 192, H = 46;
+
+  let n = 4;             // 女生的格数；男生是 n + 1 格
+  let S = { step: 0 };
+
+  function mk(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function pct(x){
+    return (Math.abs(x - Math.round(x)) < 1e-9 ? String(Math.round(x)) : x.toFixed(1)) + '%';
+  }
+
+  const MORE = () => 100 / n;
+  const LESS = () => 100 / (n + 1);
+
+  /* ---------- 造格子 ---------- */
+  function build(){
+    const gGirl = $('gGirl'), gBoy = $('gBoy');
+    gGirl.innerHTML = ''; gBoy.innerHTML = '';
+    $('qMore').textContent = pct(MORE());
+
+    for(let i = 0; i < n; i++){
+      const r = mk('rect', {
+        x: X0 + i * W, y: YG, width: W, height: H, rx: 3,
+        fill: '#dbeafe', stroke: '#9db8de', 'stroke-width': 1
+      });
+      gGirl.appendChild(r);
+    }
+
+    for(let i = 0; i <= n; i++){
+      const red = (i === n);
+      const r = mk('rect', {
+        x: X0 + i * W, y: YB, width: W, height: H, rx: 3,
+        fill: red ? '#fecaca' : '#dbeafe',
+        stroke: red ? '#ef4444' : '#9db8de',
+        'stroke-width': red ? 2 : 1
+      });
+      gBoy.appendChild(r);
+      if(red){
+        const t = mk('text', {
+          x: X0 + i * W + W / 2, y: YB + H / 2,
+          'text-anchor': 'middle', 'dominant-baseline': 'central',
+          class: 'cell-txt', fill: '#991b1b'
+        });
+        t.textContent = '多 1 格';
+        gBoy.appendChild(t);
+      }
+    }
+
+    // 右端标签
+    $('nGirl').setAttribute('x', X0 + n * W + 14);
+    $('nGirl').textContent = n + ' 格';
+    $('nBoy').setAttribute('x', X0 + (n + 1) * W + 14);
+    $('nBoy').textContent = (n + 1) + ' 格';
+
+    // 两条尺子
+    makeRuler('rGirl', n,     272, '#2563eb', '分母 = ' + n + ' 格');
+    makeRuler('rBoy',  n + 1, 316, '#ef4444', '分母 = ' + (n + 1) + ' 格');
+
+    // 红格左边界那条虚线
+    const gl = $('gapLine');
+    gl.innerHTML = '';
+    const xg = X0 + n * W;
+    gl.appendChild(mk('rect', {
+      x: xg - 1, y: 258, width: 2, height: 84, rx: 1,
+      fill: '#fca5a5'
+    }));
+  }
+
+  function makeRuler(id, cnt, y0, color, label){
+    const g = $(id);
+    g.innerHTML = '';
+    const len = cnt * W, d = 13, th = 3;
+    g.appendChild(mk('rect', {x: X0, y: y0, width: len, height: th, rx: 1.5, fill: color}));
+    g.appendChild(mk('rect', {x: X0 - 1, y: y0 - d, width: th, height: d + th, rx: 1.5, fill: color}));
+    g.appendChild(mk('rect', {x: X0 + len - 2, y: y0 - d, width: th, height: d + th, rx: 1.5, fill: color}));
+    const t = mk('text', {
+      x: X0 + len / 2, y: y0 + 24, 'text-anchor': 'middle',
+      class: 'ruler-txt', fill: color
+    });
+    t.textContent = label;
+    g.appendChild(t);
+  }
+
+  /* ---------- 九步文案 ---------- */
+  function steps(){
+    const more = pct(MORE()), less = pct(LESS());
+    return [
+      {
+        t: '先问一句：这个 ' + more + ' 是谁的？',
+        h: '「男生比女生多 ' + more + '」——这句话里<b>一个具体人数都没有</b>，只有一个 ' + more + '。<br>' +
+           '百分数不能自己站着，它必须挂在某个东西上。<br><br>' +
+           '挂在谁身上？看<b>「比」字后面</b>：比的是女生。<br>' +
+           '所以这道题的尺子是<b>女生</b>，不是男生。<br><br>' +
+           '先别急着算 —— 尺子找准了，题就塌了一半。',
+        eq: more + ' = 女生的 ' + more + '\n尺子 = 女生'
+      },
+      {
+        t: '把女生切成 ' + n + ' 格',
+        h: more + ' 就是 1/' + n + '。想让「' + more + '」看得见，就把女生<b>平均切成 ' + n + ' 份</b>，每份正好 ' + more + '。<br><br>' +
+           '切成 ' + n + ' 份不是随便挑的 —— 是 <b>' + more + ' 这个数规定的</b>。<br>' +
+           '多 20% 就切 5 份，多 50% 就切 2 份。',
+        eq: '女生 = ' + n + ' 格\n每一格 = ' + pct(100 / n)
+      },
+      {
+        t: '男生 = 女生 + 1 格',
+        h: '「多 ' + more + '」翻译成格子，就是<b>多出 1 格</b>。<br>' +
+           '所以男生 = 女生的 ' + n + ' 格 + 多的 1 格 = <b>' + (n + 1) + ' 格</b>。<br>' +
+           '红色那一格，就是「多出来的」。<br><br>' +
+           '注意：<b>两边的格子一样大</b>，我特意没做任何缩放。' +
+           '这样你数格子的时候才敢信 —— 一格就是一格。',
+        eq: '男生 = ' + n + ' 格 + 1 格 = ' + (n + 1) + ' 格'
+      },
+      {
+        t: '第一问：男生比女生多百分之几？',
+        h: '题目已经说了是 ' + more + '，我们<b>验一下它怎么来的</b>：<br>' +
+           '多出来的红格 <b>÷ 女生的 ' + n + ' 格</b> = 1/' + n + ' = <b>' + more + '</b>。<br><br>' +
+           '分母是谁？<b>女生</b>。因为「比女生」——拿女生当尺子，就除以 ' + n + '。',
+        eq: '1 格 ÷ ' + n + ' 格 = 1/' + n + ' = ' + more
+      },
+      {
+        t: '现在换问题：女生比男生少百分之几？',
+        h: '还是那块红格 —— <b>一个像素都没动</b>。<br>' +
+           '但问法变了：「比男生」，尺子换成了<b>男生</b>。<br><br>' +
+           '看下面两条尺子：红尺子比蓝尺子<b>长了一格</b>。<br>' +
+           '同样一块红格，这次要用一把更长的尺子去量它。',
+        eq: '尺子：' + n + ' 格 → ' + (n + 1) + ' 格\n（红格没变）'
+      },
+      {
+        t: '数一数：红格占 ' + (n + 1) + ' 格里的 1 格',
+        h: '用男生的 ' + (n + 1) + ' 格去量红格 —— 红格正好占其中 <b>1 格</b>。<br>' +
+           '所以 <b>1 ÷ ' + (n + 1) + ' = 1/' + (n + 1) + ' = ' + less + '</b>。<br><br>' +
+           '红格还是那一格，只是这次它藏在 ' + (n + 1) + ' 格里，不是 ' + n + ' 格里。',
+        eq: '1 格 ÷ ' + (n + 1) + ' 格 = 1/' + (n + 1) + ' = ' + less
+      },
+      {
+        t: '为什么不是 ' + more + '？',
+        h: '你本来以为答案会是 ' + more + ' 吧？不是。<br><br>' +
+           '两句话说的<b>都是那多出来的一格</b>，但分母换了人：<br>' +
+           '· 「比女生」→ 除以 ' + n + '<br>' +
+           '· 「比男生」→ 除以 ' + (n + 1) + '<br><br>' +
+           '<b>分母变大，商就变小。</b>' + more + ' 变成 ' + less + '，不是算错了，是尺子长了。',
+        eq: '多 ' + more + '　≠　少 ' + less
+      },
+      {
+        t: '记住方向：少的一定比多的小',
+        h: '为什么？因为量「少」的时候，尺子里<b>已经把多的那一格算进去了</b>。<br>' +
+           '尺子更长，量出来就更小。<br><br>' +
+           '所以永远是这个方向：<b>少的那个百分比 < 多的那个百分比</b>。<br>' +
+           '你要是算出来「少 30%，多 25%」，不用验算，一眼就知道反了。',
+        eq: '多 1/' + n + '　→　少 1/' + (n + 1) + '\n永远更小'
+      },
+      {
+        t: '点下面按钮，换几组试试',
+        h: '· <b>2 格 → 3 格</b>：多 50%，少 33.3%<br>' +
+           '· <b>4 格 → 5 格</b>：多 25%，少 20%<br>' +
+           '· <b>5 格 → 6 格</b>：多 20%，少 16.7%<br><br>' +
+           '三组数字，红格都只占 1 格。变的只有格子总数。<br>' +
+           '<b>数格子，比背公式可靠。</b>',
+        eq: '多 1/n　少 1/(n+1)'
+      }
+    ];
+  }
+
+  let STEPS = steps();
+
+  /* ---------- 画面状态 ---------- */
+  function paint(){
+    const st = S.step;
+    const on = (id, v) => { $(id).style.opacity = v ? 1 : 0; };
+
+    on('gEmpty', st === 0);
+    on('gGirl', st >= 1);
+    on('gBoy',  st >= 2);
+    on('tagGirl', st >= 1);
+    on('tagBoy',  st >= 2);
+    on('nGirl', st >= 1);
+    on('nBoy',  st >= 2);
+
+    on('rGirl', st >= 3);
+    on('rBoy',  st >= 4);
+    on('gapLine', st >= 4);
+
+    // 第 5 步之后，女生尺退成灰（作为对比基准）
+    const gRule = $('rGirl');
+    gRule.style.opacity = st >= 3 ? (st >= 4 ? 0.42 : 1) : 0;
+
+    // 底部大字
+    const foot = $('foot');
+    if(st <= 0)      foot.textContent = '';
+    else if(st === 1) foot.textContent = '女生 = ' + n + ' 格';
+    else if(st === 2) foot.textContent = '男生 = ' + (n + 1) + ' 格（红格是多出来的那 1 格）';
+    else if(st === 3) foot.textContent = '红格 ÷ ' + n + ' 格 = ' + pct(MORE());
+    else if(st === 4) foot.textContent = '同一块红格，尺子换成男生';
+    else if(st === 5) foot.textContent = '红格 ÷ ' + (n + 1) + ' 格 = ' + pct(LESS());
+    else if(st === 6) foot.textContent = '多 ' + pct(MORE()) + '　　≠　　少 ' + pct(LESS());
+    else if(st === 7) foot.textContent = pct(LESS()) + ' < ' + pct(MORE()) + '　少的一定比多的小';
+    else              foot.textContent = '红格永远是 1 格，变的只是格子总数';
+  }
+
+  function render(){
+    const st = S.step;
+    paint();
+    const cur = STEPS[st];
+    $('steptag').textContent = '第 ' + (st + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === S.step) return;
+    S.step = k;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  document.querySelectorAll('.preset').forEach(b => {
+    b.addEventListener('click', () => {
+      const v = parseInt(b.dataset.n, 10);
+      if(v === n) return;
+      document.querySelectorAll('.preset').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      n = v;
+      STEPS = steps();
+      S.step = Math.max(2, Math.min(S.step, STEPS.length - 1));
+      build(); render();
+      const hint = $('hint');
+      hint.textContent = '女生 ' + n + ' 格，男生 ' + (n + 1) + ' 格 —— 多 ' + pct(MORE()) + '，少 ' + pct(LESS());
+    });
+  });
+
+  build();
+  render();
+})();
+</script>
+</body>
+</html>

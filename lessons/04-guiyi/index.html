@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>归一问题 · "照这样计算"到底照什么</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 4 课 / 4 · 归一归总</span>
+    <span class="sp"></span>
+    <a href="../03-chabei/index.html">← 上一课</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 和差倍 04</div>
+    <h1>归一问题：<span class="q-mark">"照这样计算"照的是哪个数？</span></h1>
+    <p class="q">3 台机器 4 小时加工 <b>720 个</b>零件。照这样计算，5 台机器 6 小时加工多少个？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 442" preserveAspectRatio="xMidYMid meet">
+        <g id="grid"></g>
+        <g id="labels"></g>
+        <text id="foot" x="150" y="424">3 × 4 = 12 个格子</text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 7 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">换成别的问法</span>
+    <input id="inM" type="number" value="5" min="1" max="5" step="1">
+    <span class="unit">台 ·</span>
+    <input id="inH" type="number" value="6" min="1" max="6" step="1">
+    <span class="unit">小时</span>
+    <button class="btn" id="apply">重新画</button>
+    <span class="warn" id="warn"></span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const COLS = 6, ROWS = 5;          // 最多画 5 台 × 6 小时
+  const CW = 106, CH = 62;
+  const X0 = 150, Y0 = 66;
+  const CX = (j) => X0 + CW * j;
+  const CY = (i) => Y0 + CH * i;
+
+  const S = { m: 5, h: 6, step: 0 };
+
+  /* 固定条件：3 台 4 小时 = 720 个 */
+  const M0 = 3, H0 = 4, TOTAL = 720;
+
+  function setup(){
+    const g = $('grid'), lb = $('labels');
+    g.innerHTML = ''; lb.innerHTML = '';
+    for(let i = 0; i < ROWS; i++){
+      for(let j = 0; j < COLS; j++){
+        const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        r.setAttribute('id', `c${i}-${j}`);
+        r.setAttribute('class', 'cell');
+        r.setAttribute('x', CX(j));
+        r.setAttribute('y', CY(i));
+        r.setAttribute('width', CW - 4);
+        r.setAttribute('height', CH - 4);
+        r.setAttribute('rx', 8);
+        g.appendChild(r);
+
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('id', `v${i}-${j}`);
+        t.setAttribute('class', 'valDark');
+        t.setAttribute('x', CX(j) + (CW - 4) / 2);
+        t.setAttribute('y', CY(i) + 39);
+        t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('opacity', '0');
+        g.appendChild(t);
+      }
+    }
+    /* 行标签（台） */
+    for(let i = 0; i < ROWS; i++){
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('id', `r${i}`);
+      t.setAttribute('class', 'tag sm');
+      t.setAttribute('x', X0 - 14);
+      t.setAttribute('y', CY(i) + 38);
+      t.setAttribute('text-anchor', 'end');
+      t.setAttribute('opacity', '0');
+      t.textContent = `${i + 1} 台`;
+      lb.appendChild(t);
+    }
+    /* 列标签（小时） */
+    for(let j = 0; j < COLS; j++){
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('id', `col${j}`);
+      t.setAttribute('class', 'tag sm');
+      t.setAttribute('x', CX(j) + (CW - 4) / 2);
+      t.setAttribute('y', Y0 - 14);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('opacity', '0');
+      t.textContent = `${j + 1} 小时`;
+      lb.appendChild(t);
+    }
+  }
+
+  const STEPS = [
+    {
+      t: '先把"3 台 4 小时"画成格子',
+      h: '一台机器干一小时 = <b>一个格子</b>。<br>3 台机器干 4 小时 → <b>3 行 × 4 列 = 12 个格子</b>。<br>这 12 个格子一起干出来的，正好是 720 个零件。',
+      eq: '3 × 4 = 12 个格子\n12 个格子 → 720 个'
+    },
+    {
+      t: '720 不是哪台机器的，是 12 格一起的',
+      h: '这 720 个零件分不清谁干了多少 —— 三台机器同时在转，同时攒出来的。<br>但我们可以做一件事：<em>把它摊平</em>。',
+      eq: '12 格 → 720 个'
+    },
+    {
+      t: '摊平：一个格子是多少？',
+      h: '12 个格子一样大（都是一台机器一小时），那就平分：<b>720 ÷ 12 = 60</b>。<br>每格 60 个 —— 这就是"<b>1 台机器 1 小时</b>能干多少"。<br><br>写成原来的样子也一样：720 ÷ 3 ÷ 4 = 60。先按台分，再按小时分。',
+      eq: '720 ÷ 12 = <span class="ok">60</span>\n720 ÷ 3 ÷ 4 = 60　（一样）'
+    },
+    {
+      t: '"照这样计算"照的是哪个数？',
+      h: '就照这个 <b>60</b>。<br>不管换成几台机器、干几小时，<b>每个格子永远是 60 个</b>。<br><br>这句话是整道题的钥匙：它保证了格子大小不变，接下去才能一格格数。少了这句，题就做不了。',
+      eq: '每格 = 60（不变）'
+    },
+    {
+      t: '换成 5 台 6 小时，是几个格子？',
+      h: '5 台 → 5 行，6 小时 → 6 列，<b>5 × 6 = 30 个格子</b>。<br>看图上多出来的那些格子 —— 那就是多干的活。',
+      eq: '5 × 6 = 30 个格子'
+    },
+    {
+      t: '30 格，每格 60',
+      h: '30 × 60 = <b>1800</b> 个。<br>验算一下方向：台数变多、时间变长，结果当然比 720 大，1800 合理。',
+      eq: '30 × 60 = <span class="ok">1800</span>'
+    },
+    {
+      t: '归一和归总，方向相反',
+      h: '这题用的是<b>归一</b>：先求出"一份是多少"（60），再乘份数。<br>如果反过来问"1800 个零件，5 台机器要干几小时"，那就是<b>归总</b>：先求总量，再重新分。<br><br>一句话记：<em>归一先除后乘，归总先乘后除</em>。',
+      eq: '归一：总量 ÷ 份数 = 单一量 → 再 × 新份数\n归总：单一量 × 份数 = 总量 → 再 ÷ 新份数'
+    }
+  ];
+
+  function render(anim){
+    const st = S.step;
+    const stage = $('stage');
+    if(!anim) stage.classList.add('no-anim');
+
+    const per = TOTAL / (M0 * H0);          // 每格 60
+    const activeM = st >= 4 ? Math.max(M0, S.m) : M0;
+    const activeH = st >= 4 ? Math.max(H0, S.h) : H0;
+
+    for(let i = 0; i < ROWS; i++){
+      for(let j = 0; j < COLS; j++){
+        const inBase = (i < M0 && j < H0);
+        const inNew  = (i < activeM && j < activeH);
+        const on = inBase || (st >= 4 && inNew);
+        const c = $(`c${i}-${j}`), v = $(`v${i}-${j}`);
+        c.setAttribute('opacity', on ? 1 : 0);
+        c.setAttribute('class', inBase ? 'cell' : 'cell new');
+        v.setAttribute('opacity', (on && st >= 2) ? 1 : 0);
+        v.textContent = per;
+      }
+    }
+    for(let i = 0; i < ROWS; i++){
+      $(`r${i}`).setAttribute('opacity', i < activeM ? 1 : 0);
+    }
+    for(let j = 0; j < COLS; j++){
+      $(`col${j}`).setAttribute('opacity', j < activeH ? 1 : 0);
+    }
+
+    const foot = $('foot');
+    foot.setAttribute('x', X0);
+    if(st <= 1){
+      foot.textContent = `${M0} × ${H0} = ${M0*H0} 个格子　一共 ${TOTAL} 个零件`;
+      foot.setAttribute('fill', '#475569');
+      foot.setAttribute('font-size', 21);
+      foot.setAttribute('font-weight', 800);
+    } else if(st === 2 || st === 3){
+      foot.textContent = `${TOTAL} ÷ ${M0*H0} = ${per}　→　每格 ${per} 个`;
+      foot.setAttribute('fill', '#0d9488');
+      foot.setAttribute('font-size', 22);
+      foot.setAttribute('font-weight', 800);
+    } else {
+      foot.textContent = `${S.m} × ${S.h} = ${S.m*S.h} 个格子　×　每格 ${per} 个　=　${S.m*S.h*per} 个`;
+      foot.setAttribute('fill', '#0d9488');
+      foot.setAttribute('font-size', 22);
+      foot.setAttribute('font-weight', 800);
+    }
+
+    const cur = STEPS[st];
+    $('steptag').textContent = `第 ${st + 1} 步 / 共 ${STEPS.length} 步`;
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+
+    if(!anim){
+      void stage.offsetWidth;
+      requestAnimationFrame(() => stage.classList.remove('no-anim'));
+    }
+  }
+
+  function go(n){
+    n = Math.max(0, Math.min(STEPS.length - 1, n));
+    if(n === S.step) return;
+    S.step = n; render(true);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.title = `第 ${i + 1} 步`;
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  $('apply').addEventListener('click', () => {
+    const m = parseInt($('inM').value, 10);
+    const h = parseInt($('inH').value, 10);
+    const warn = $('warn');
+    if(!Number.isFinite(m) || !Number.isFinite(h) || m < 1 || h < 1){
+      warn.textContent = '台数和小时数都要是正整数'; return;
+    }
+    if(m > ROWS || h > COLS){
+      warn.textContent = `画板最多 ${ROWS} 台 × ${COLS} 小时`; return;
+    }
+    warn.textContent = '';
+    S.m = m; S.h = h; S.step = 4;
+    render(false);
+  });
+
+  setup();
+  render(false);
+})();
+</script>
+</body>
+</html>

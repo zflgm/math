@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>找次品 · 一次称量切三份</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+
+/* ---------- 本页 ---------- */
+#beamG{transition:transform .9s cubic-bezier(.45,.05,.35,1)}
+#panL,#panR{transition:transform .9s cubic-bezier(.45,.05,.35,1)}
+.chip{transition:transform .78s cubic-bezier(.45,.05,.35,1), opacity .5s ease}
+.chip .inner{transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+.ov{transition:opacity .5s ease;pointer-events:none}
+.pulse{animation:pulse .95s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.stat{font-size:19px;font-weight:800;fill:#64748b}
+.lbl{font-size:19px;font-weight:800;fill:#94a3b8}
+#verdict{font-size:22px;font-weight:800;fill:#94a3b8;transition:fill .3s ease}
+.tree-t{font-size:17px;font-weight:700;fill:#475569}
+.tree-big{font-size:30px;font-weight:800;fill:#0f172a}
+.tree-mid{font-size:19px;font-weight:700;fill:#475569}
+.lad-t{font-size:20px;font-weight:800;fill:#475569}
+.lad-v{font-size:25px;font-weight:800;fill:#2563eb}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 16 课 · 找次品</span>
+    <span class="sp"></span>
+    <a href="../15-zhishu/index.html">← 上一课</a>
+    <a href="../17-laobing/index.html">下一课：烙饼 →</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 经典模型 16</div>
+    <h1>找次品：<span class="q-mark">一次称量，切三份</span></h1>
+    <p class="q">9 个零件，其中 <b>1 个偏重</b>。用一台天平，最少称 <b>几次</b>一定找得出来？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 480" preserveAspectRatio="xMidYMid meet">
+
+        <text id="statL" class="stat" x="60" y="44">嫌疑：9 个</text>
+        <text id="statR" class="stat" x="860" y="44" text-anchor="end">已称：0 次</text>
+
+        <g id="gBalance">
+          <text id="verdict" x="400" y="98" text-anchor="middle"></text>
+
+          <rect x="393" y="196" width="14" height="132" fill="#cbd5e1"/>
+          <path d="M352 342 L448 342 L434 326 L366 326 Z" fill="#94a3b8"/>
+          <path d="M400 152 L387 198 L413 198 Z" fill="#94a3b8"/>
+          <circle cx="400" cy="150" r="7" fill="#475569"/>
+
+          <g id="beamG">
+            <rect x="250" y="145" width="300" height="10" rx="5" fill="#475569"/>
+            <circle cx="250" cy="150" r="7" fill="#334155"/>
+            <circle cx="550" cy="150" r="7" fill="#334155"/>
+          </g>
+
+          <g id="panL">
+            <path d="M250 156 L250 198" stroke="#94a3b8" stroke-width="2.4" fill="none"/>
+            <circle cx="250" cy="198" r="3.5" fill="#94a3b8"/>
+            <path d="M250 198 L177 224 M250 198 L323 224" stroke="#94a3b8" stroke-width="2.4" fill="none"/>
+            <path d="M170 224 L192 258 L308 258 L330 224 Z" fill="#dbeafe" stroke="#64748b" stroke-width="2.5" stroke-linejoin="round"/>
+          </g>
+          <g id="panR">
+            <path d="M550 156 L550 198" stroke="#94a3b8" stroke-width="2.4" fill="none"/>
+            <circle cx="550" cy="198" r="3.5" fill="#94a3b8"/>
+            <path d="M550 198 L477 224 M550 198 L623 224" stroke="#94a3b8" stroke-width="2.4" fill="none"/>
+            <path d="M470 224 L492 258 L608 258 L630 224 Z" fill="#dbeafe" stroke="#64748b" stroke-width="2.5" stroke-linejoin="round"/>
+          </g>
+
+          <text class="lbl" x="250" y="312" text-anchor="middle">左盘</text>
+          <text class="lbl" x="550" y="312" text-anchor="middle">右盘</text>
+
+          <line x1="60" y1="400" x2="880" y2="400" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+          <text id="lblTable" class="lbl" x="760" y="434" text-anchor="middle" opacity="0">不称的</text>
+
+          <g id="gChips"></g>
+        </g>
+
+        <g id="gTree" class="ov" opacity="0"></g>
+        <g id="gLadder" class="ov" opacity="0"></g>
+
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 10 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">这一课</span>
+    <span class="unit">天平只有两个盘，所以每次必有「不称的那堆」—— 平了，答案就在那一堆里</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, a) => { const e = document.createElementNS(NS, tag); for(const k in a) e.setAttribute(k, a[k]); return e; };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  const PANL = 250, PANR = 550, PANTOP = 224, TILT = 28;
+  const CHIP = 38, GAP = 9;
+  const ROW_Y = 362;
+  const TABLE_CX = 760;
+
+  let S = { step: -1, tilt: 0, where: {}, cnt: 0, sus: 9 };
+  let chips = {};
+  let token = 0;
+
+  /* ---------- 基础绘制 ---------- */
+  function clearChips(){
+    $('gChips').innerHTML = '';
+    chips = {}; S.where = {};
+  }
+
+  function makeChip(n, x, y){
+    const g = mk('g', {class:'chip'});
+    g.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    const inner = mk('g', {class:'inner'});
+    const r = mk('rect', {x:0, y:0, width:CHIP, height:CHIP, rx:10, fill:'#2563eb'});
+    const t = mk('text', {
+      x:CHIP/2, y:CHIP/2 + 6, 'text-anchor':'middle',
+      'font-size': n > 9 ? 15 : 17, 'font-weight':800, fill:'#fff'
+    });
+    t.textContent = n;
+    inner.appendChild(r); inner.appendChild(t);
+    g.appendChild(inner);
+    g.__r = r; g.__t = t;
+    $('gChips').appendChild(g);
+    chips[n] = g;
+    return g;
+  }
+
+  function rowX(i, count, cx){
+    const total = count * CHIP + (count - 1) * GAP;
+    return cx - total / 2 + i * (CHIP + GAP);
+  }
+
+  function posOf(where, i, count){
+    if(where === 'L' || where === 'R'){
+      const cx = where === 'L' ? PANL : PANR;
+      const dy = where === 'L' ? TILT * S.tilt : -TILT * S.tilt;
+      return [rowX(i, count, cx), PANTOP - CHIP + dy];
+    }
+    if(where === 'T') return [rowX(i, count, TABLE_CX), ROW_Y];
+    return [rowX(i, count, 480), ROW_Y];
+  }
+
+  function place(n){
+    const w = S.where[n];
+    if(!w) return;
+    const xy = posOf(w.pile, w.i, w.count);
+    chips[n].style.transform = 'translate(' + xy[0] + 'px,' + xy[1] + 'px)';
+  }
+
+  function assign(n, pile, i, count){
+    S.where[n] = {pile:pile, i:i, count:count};
+    place(n);
+  }
+
+  function setTilt(t){
+    S.tilt = t;
+    $('beamG').setAttribute('transform', 'rotate(' + (-13.5 * t) + ' 400 150)');
+    $('panL').style.transform = 'translate(0px,' + (TILT * t) + 'px)';
+    $('panR').style.transform = 'translate(0px,' + (-TILT * t) + 'px)';
+    for(const n in S.where) place(n);
+  }
+
+  function setVerdict(txt, color){
+    const v = $('verdict');
+    v.textContent = txt || '';
+    v.style.fill = color || '#94a3b8';
+  }
+
+  function setStat(sus, cnt){
+    S.sus = sus; S.cnt = cnt;
+    $('statL').textContent = '嫌疑：' + sus + ' 个';
+    $('statR').textContent = '已称：' + cnt + ' 次';
+  }
+
+  function kill(n){
+    const g = chips[n];
+    if(!g) return;
+    g.style.opacity = 0;
+    g.__r.setAttribute('fill', '#e2e8f0');
+    g.__t.setAttribute('fill', '#a8b3c2');
+    setTimeout(() => { if(g.style.opacity === '0') g.style.display = 'none'; }, 620);
+  }
+
+  function mark(n){
+    const g = chips[n];
+    g.__r.setAttribute('fill', '#ef4444');
+    g.__t.setAttribute('font-size', 21);
+    g.querySelector('.inner').classList.add('pulse');
+  }
+
+  function clearMarks(){
+    for(const n in chips){
+      const g = chips[n];
+      g.querySelector('.inner').classList.remove('pulse');
+      g.querySelector('.inner').style.transform = '';
+      if(g.__r.getAttribute('fill') === '#ef4444') g.__r.setAttribute('fill', '#2563eb');
+    }
+  }
+
+  function revive(n){
+    const g = chips[n];
+    if(!g) return;
+    g.style.display = '';
+    g.style.opacity = 1;
+    g.__r.setAttribute('fill', '#2563eb');
+    g.__t.setAttribute('fill', '#fff');
+    g.__t.setAttribute('font-size', n > 9 ? 15 : 17);
+    const inner = g.querySelector('.inner');
+    inner.classList.remove('pulse');
+    inner.style.transform = '';
+  }
+
+  function ensure9(){
+    if(chips[1] && chips[9]) return false;
+    clearChips();
+    for(let n = 1; n <= 9; n++) makeChip(n, rowX(n - 1, 9, 480), ROW_Y);
+    setTilt(0);
+    split3([1,2,3], [4,5,6], [7,8,9]);
+    return true;
+  }
+
+  function showTableLabel(on){
+    $('lblTable').setAttribute('opacity', on ? 1 : 0);
+  }
+
+  /* ---------- 布局序列 ---------- */
+  function tileBoard(){                 // 全部摊在桌面上
+    const c = Object.keys(chips).length;
+    const list = Object.keys(chips).map(Number).sort((a, b) => a - b);
+    list.forEach((n, i) => assign(n, 'ROW', i, list.length));
+  }
+
+  function split3(a, b, board, bcount){
+    a.forEach((n, i) => assign(n, 'L', i, a.length));
+    b.forEach((n, i) => assign(n, 'R', i, b.length));
+    if(board.length) board.forEach((n, i) => assign(n, 'T', i, board.length));
+    showTableLabel(true);
+  }
+
+  /* ---------- 树 ---------- */
+  function buildTree(){
+    const g = $('gTree');
+    g.innerHTML = '';
+    const rootX = 66, rootY = 236;
+    const l1x = 246, l1y = [112, 236, 360];
+    const l2x = 396, l2y = [64, 104, 144, 184, 224, 264, 304, 344, 384];
+    const names = ['左沉', '右沉', '平'];
+
+    l1y.forEach(y => {
+      g.appendChild(mk('path', {
+        d:'M' + rootX + ' ' + rootY + ' Q' + (rootX + 90) + ' ' + rootY + ' ' + l1x + ' ' + y,
+        fill:'none', stroke:'#cbd5e1', 'stroke-width':1.8
+      }));
+    });
+    l1y.forEach((y, k) => {
+      for(let j = 0; j < 3; j++){
+        const ly = l2y[k * 3 + j];
+        g.appendChild(mk('path', {
+          d:'M' + l1x + ' ' + y + ' Q' + (l1x + 80) + ' ' + y + ' ' + l2x + ' ' + ly,
+          fill:'none', stroke:'#dbe2ec', 'stroke-width':1.6
+        }));
+      }
+    });
+
+    g.appendChild(mk('circle', {cx:rootX, cy:rootY, r:10, fill:'#0f172a'}));
+    const rt = mk('text', {x:rootX, y:rootY - 26, 'text-anchor':'middle', class:'tree-t'});
+    rt.textContent = '9 个零件';
+    g.appendChild(rt);
+
+    l1y.forEach((y, k) => {
+      g.appendChild(mk('circle', {cx:l1x, cy:y, r:9, fill:'#2563eb'}));
+      const t = mk('text', {x:l1x + 18, y:y + 5, class:'tree-t'});
+      t.textContent = names[k];
+      g.appendChild(t);
+    });
+
+    l2y.forEach((y, i) => {
+      g.appendChild(mk('rect', {x:l2x, y:y - 11, width:22, height:22, rx:6, fill:'#22c55e'}));
+      const t = mk('text', {x:l2x + 32, y:y + 5, class:'tree-t', fill:'#0f766e'});
+      t.textContent = (i + 1) + ' 号';
+      g.appendChild(t);
+    });
+
+    const cap1 = mk('text', {x:560, y:206, class:'tree-big'});
+    cap1.textContent = '3 × 3 = 9 条路';
+    g.appendChild(cap1);
+
+    const cap2 = mk('text', {x:560, y:246, class:'tree-mid'});
+    cap2.textContent = '每条路正好认出一个零件';
+    g.appendChild(cap2);
+
+    const cap3 = mk('text', {x:560, y:282, class:'tree-mid', fill:'#0d9488'});
+    cap3.textContent = '9 条路，正好够 9 个零件';
+    g.appendChild(cap3);
+  }
+
+  /* ---------- 阶梯 ---------- */
+  function buildLadder(){
+    const g = $('gLadder');
+    g.innerHTML = '';
+    const data = [
+      {lab:'称 1 次', n:3,  w:60},
+      {lab:'称 2 次', n:9,  w:180},
+      {lab:'称 3 次', n:27, w:540}
+    ];
+    const x0 = 210, h = 46;
+    const rows = [150, 232, 314];
+
+    data.forEach((d, i) => {
+      const y = rows[i];
+      g.appendChild(mk('rect', {x:x0, y:y, width:d.w, height:h, rx:9, fill:'#2563eb'}));
+      const lab = mk('text', {x:x0 - 16, y:y + 30, 'text-anchor':'end', class:'lad-t'});
+      lab.textContent = d.lab;
+      g.appendChild(lab);
+      const v = mk('text', {x:x0 + d.w + 16, y:y + 30, class:'lad-v'});
+      v.textContent = d.n + ' 个';
+      g.appendChild(v);
+    });
+
+    const t = mk('text', {x:x0, y:96, class:'tree-mid'});
+    t.textContent = '每称一次，岔口就翻三倍';
+    g.appendChild(t);
+  }
+
+  /* ---------- 十步 ---------- */
+  const STEPS = [
+    {
+      t:'9 个零件，1 个偏重',
+      h:'桌上有 <b>9 个零件</b>，长得一模一样，其中 <b>1 个重了一点</b>。<br>' +
+        '天平只能告诉你"哪边沉"，不能告诉你"重了几克"。<br><br>' +
+        '问：<b>最少称几次，一定能把那个重的挑出来？</b>',
+      eq:'9 个零件，1 个偏重\n最少称几次？'
+    },
+    {
+      t:'天平只有三种结果',
+      h:'左沉、右沉、<b>一样平</b>。<br><br>' +
+        '"一样平"也是结果，而且常常最有用 —— 它等于在说：<b>次品不在这两个盘上</b>，' +
+        '而在没上秤的那堆里。<br><br>' +
+        '一次称量，就是 <b>三个岔口</b>。',
+      eq:'一次称量 → 3 种结果\n左沉 · 右沉 · 一样平'
+    },
+    {
+      t:'分成 3、3、3',
+      h:'前两堆各上一边盘，第三堆<b>放桌上不称</b>。<br><br>' +
+        '为什么偏偏分三份？因为天平刚好给你三种结果 —— <b>三份，刚好一种结果管一份</b>。<br>' +
+        '只分两份，就白白浪费了一种结果。',
+      eq:'9 = 3 + 3 + 3\n左盘 3 · 右盘 3 · 桌上 3'
+    },
+    {
+      t:'第一次称：一样平',
+      h:'假设次品在 7、8、9 号里，两个盘上装的都是好零件，所以<b>一样平</b>。<br><br>' +
+        '平了，就说明<b>次品在桌上那堆</b>。1-6 号当场排除 —— ' +
+        '嫌疑从 9 个一下变成 <b>3 个</b>。',
+      eq:'平 → 次品在 7、8、9 号\n9 个 → 3 个'
+    },
+    {
+      t:'第二次：还是三分',
+      h:'3 个也照样分三份：<b>7 号</b>上左盘，<b>8 号</b>上右盘，<b>9 号</b>留桌上。<br><br>' +
+        '跟刚才同一招，只是零件少了两个。',
+      eq:'3 = 1 + 1 + 1'
+    },
+    {
+      t:'左边沉 → 7 号',
+      h:'左边沉，次品就在左盘上。左盘只有 7 号一个 —— <b>当场定案</b>。<br><br>' +
+        '（要是平了，那答案就是桌上那个 9 号。）<br><br>' +
+        '总共称了 <b>2 次</b>。',
+      eq:'左沉 → 7 号是次品\n一共 2 次'
+    },
+    {
+      t:'为什么正好是 9',
+      h:'一次称量三个岔，两次就是 <b>3 × 3 = 9 条路</b>。<br><br>' +
+        '每条路正好认出一个零件 —— 所以 9 条路<b>不多不少</b>，刚好够 9 个零件。<br>' +
+        '再多一个，就没有路可走了。',
+      eq:'3 × 3 = 9 条路\n9 条路 = 9 个零件'
+    },
+    {
+      t:'那 10 个呢',
+      h:'10 个只能分 3、3、4。称 3 和 3：<br>' +
+        '· <b>不平</b> → 在 3 个里，再一次，共 2 次<br>' +
+        '· <b>平</b> → 在 4 个里，4 个还得再称 2 次<br><br>' +
+        '最坏 <b>3 次</b> —— 只多一个零件，就得多称一次。',
+      eq:'10 = 3 + 3 + 4\n平了剩 4 个 → 还要 2 次\n共 3 次'
+    },
+    {
+      t:'每多一次，岔口翻三倍',
+      h:'1 次 <b>3 个</b>，2 次 <b>9 个</b>，3 次 <b>27 个</b>。<br><br>' +
+        '9 个和 10 个只差一个零件，可 10 已经<b>跨过了 9 这条线</b>，只能进下一档。',
+      eq:'3 → 9 → 27\n10 > 9，所以要第 3 次'
+    },
+    {
+      t:'口诀',
+      h:'<b>上秤的两堆必须一样多</b>；桌上那堆不能比它们大，最好只差 1。<br><br>' +
+        '能三份平分就平分（<b>9 → 3,3,3</b>）；分不开就 <b>8 → 3,3,2</b>、' +
+        '<b>10 → 3,3,4</b>、<b>11 → 4,4,3</b>。',
+      eq:'上秤两堆一样多\n桌上那堆差 1'
+    }
+  ];
+
+  /* ---------- 每一步的动画 ---------- */
+  async function anim(k, tk){
+    const alive = () => tk === token;
+    const hideStat = (k === 6 || k === 8);
+    $('statL').style.opacity = hideStat ? 0 : 1;
+    $('statR').style.opacity = hideStat ? 0 : 1;
+
+    if(k === 0){
+      $('gTree').style.opacity = 0;
+      $('gLadder').style.opacity = 0;
+      $('gBalance').style.opacity = 1;
+      clearChips(); clearMarks();
+      for(let n = 1; n <= 9; n++) makeChip(n, rowX(n - 1, 9, 480), ROW_Y);
+      tileBoard();
+      setTilt(0); setVerdict(''); showTableLabel(false); setStat(9, 0);
+      return;
+    }
+
+    if(k === 1){
+      ensure9();
+      setVerdict('左边沉', '#ef4444'); setTilt(1); await sleep(950); if(!alive()) return;
+      setVerdict('右边沉', '#ef4444'); setTilt(-1); await sleep(950); if(!alive()) return;
+      setVerdict('一样平', '#0d9488'); setTilt(0);
+      return;
+    }
+
+    if(k === 2){
+      ensure9();
+      [1,2,3,4,5,6,7,8,9].forEach(revive);
+      setVerdict(''); setTilt(0);
+      split3([1,2,3], [4,5,6], [7,8,9]);
+      setStat(9, 0);
+      return;
+    }
+
+    if(k === 3){
+      ensure9();
+      [1,2,3,4,5,6,7,8,9].forEach(revive);
+      setVerdict('一样平', '#0d9488'); setTilt(0);
+      await sleep(620); if(!alive()) return;
+      [1,2,3,4,5,6].forEach(n => kill(n));
+      showTableLabel(true);
+      setStat(3, 1);
+      return;
+    }
+
+    if(k === 4){
+      ensure9();
+      [1,2,3,4,5,6].forEach(n => kill(n));
+      [7,8,9].forEach(revive);
+      setVerdict(''); setTilt(0);
+      split3([7], [8], [9]);
+      setStat(3, 1);
+      return;
+    }
+
+    if(k === 5){
+      ensure9();
+      [1,2,3,4,5,6].forEach(n => kill(n));
+      split3([7], [8], [9]);
+      await sleep(720); if(!alive()) return;
+      setTilt(1); setVerdict('左边沉', '#ef4444');
+      await sleep(980); if(!alive()) return;
+      kill(8); kill(9);
+      showTableLabel(false);
+      mark(7);
+      setStat(1, 2);
+      return;
+    }
+
+    if(k === 6){
+      $('gBalance').style.opacity = 0;
+      $('gTree').style.opacity = 1;
+      if(!$('gTree').childNodes.length) buildTree();
+      return;
+    }
+
+    if(k === 7){
+      $('gTree').style.opacity = 0;
+      $('gBalance').style.opacity = 1;
+      clearChips(); clearMarks();
+      for(let n = 1; n <= 10; n++) makeChip(n, rowX(n - 1, 10, 480), ROW_Y);
+      tileBoard();
+      setTilt(0); setVerdict(''); showTableLabel(false); setStat(10, 0);
+      await sleep(560); if(!alive()) return;
+
+      split3([1,2,3], [4,5,6], [7,8,9,10]);
+      await sleep(900); if(!alive()) return;
+
+      setVerdict('一样平', '#0d9488');
+      await sleep(620); if(!alive()) return;
+      [1,2,3,4,5,6].forEach(n => kill(n));
+      setStat(4, 1);
+      await sleep(760); if(!alive()) return;
+
+      setVerdict(''); setTilt(0);
+      split3([7], [8], [9,10]);
+      await sleep(900); if(!alive()) return;
+
+      setVerdict('一样平', '#0d9488');
+      await sleep(620); if(!alive()) return;
+      kill(7); kill(8);
+      setStat(2, 2);
+      await sleep(700); if(!alive()) return;
+
+      setVerdict(''); setTilt(0);
+      split3([9], [10], []);
+      showTableLabel(false);
+      await sleep(900); if(!alive()) return;
+
+      setTilt(1); setVerdict('左边沉', '#ef4444');
+      await sleep(980); if(!alive()) return;
+      kill(10);
+      mark(9);
+      setStat(1, 3);
+      return;
+    }
+
+    if(k === 8){
+      $('gBalance').style.opacity = 0;
+      $('gLadder').style.opacity = 1;
+      if(!$('gLadder').childNodes.length) buildLadder();
+      return;
+    }
+
+    if(k === 9){
+      $('gLadder').style.opacity = 0;
+      $('gBalance').style.opacity = 1;
+      clearChips(); clearMarks();
+      for(let n = 1; n <= 9; n++) makeChip(n, rowX(n - 1, 9, 480), ROW_Y);
+      tileBoard();
+      setVerdict(''); setTilt(0); setStat(9, 0);
+      await sleep(420); if(!alive()) return;
+      split3([1,2,3], [4,5,6], [7,8,9]);
+      return;
+    }
+  }
+
+  /* ---------- 渲染 ---------- */
+  function render(){
+    const k = S.step;
+    const cur = STEPS[k];
+    $('steptag').textContent = '第 ' + (k + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = k === 0;
+    $('next').disabled = k === STEPS.length - 1;
+    $('next').textContent = k === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === k));
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === S.step) return;
+    S.step = k;
+    token++;
+    render();
+    anim(k, token);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  S.step = 0;
+  render();
+  anim(0, ++token);
+})();
+</script>
+</body>
+</html>

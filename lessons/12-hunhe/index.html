@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>浓度 · 两杯混合：为什么不能取平均</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+/* ---- 本页补充 ---- */
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .38s ease both}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 12 课 · 浓度 3/3 · 混合</span>
+    <span class="sp"></span>
+    <a href="../11-jiayan/index.html">← 上一课</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 浓度 12</div>
+    <h1>两杯混合：<span class="q-mark">为什么不能把浓度取平均</span></h1>
+    <p class="q">甲杯 <b>200 克 / 20%</b>，乙杯 <b>300 克 / 10%</b>。倒在一起，浓度是多少？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 420" preserveAspectRatio="xMidYMid meet">
+        <rect x="100" y="86" width="14" height="14" rx="3" fill="#f59e0b"/>
+        <text x="121" y="98" font-size="14" font-weight="800" fill="#64748b">盐</text>
+        <rect x="163" y="86" width="14" height="14" rx="3" fill="#bfdbfe"/>
+        <text x="184" y="98" font-size="14" font-weight="800" fill="#64748b">水</text>
+
+        <text id="conc" x="820" y="100" text-anchor="end" font-size="26" font-weight="800" fill="#0f172a"></text>
+
+        <!-- 甲杯 -->
+        <g id="rowA">
+          <text x="100" y="122" font-size="15" font-weight="800" fill="#94a3b8">甲杯 200 克</text>
+          <rect id="sAs" x="100" y="132" width="57.6" height="76" fill="#f59e0b"/>
+          <rect id="sAw" x="157.6" y="132" width="230.4" height="76" fill="#bfdbfe"/>
+          <text id="tAs" x="128.8" y="177" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">40</text>
+          <text id="tAw" x="272.8" y="177" text-anchor="middle" font-size="16" font-weight="800" fill="#1e40af">水 160</text>
+          <text id="pA" x="400" y="177" font-size="18" font-weight="800" fill="#0f172a">20%</text>
+        </g>
+
+        <!-- 乙杯 -->
+        <g id="rowB">
+          <text x="100" y="228" font-size="15" font-weight="800" fill="#94a3b8">乙杯 300 克</text>
+          <rect id="sBs" x="100" y="238" width="43.2" height="76" fill="#f59e0b"/>
+          <rect id="sBw" x="143.2" y="238" width="388.8" height="76" fill="#bfdbfe"/>
+          <text id="tBs" x="121.6" y="283" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">30</text>
+          <text id="tBw" x="337.6" y="283" text-anchor="middle" font-size="16" font-weight="800" fill="#1e40af">水 270</text>
+          <text id="pB" x="544" y="283" font-size="18" font-weight="800" fill="#0f172a">10%</text>
+        </g>
+
+        <!-- 合并后的合计标注 -->
+        <g id="merged" opacity="0">
+          <text id="tSaltSum" x="150" y="177" text-anchor="middle" font-size="16" font-weight="800" fill="#ffffff">盐 70</text>
+          <text id="tWaterSum" x="510" y="177" text-anchor="middle" font-size="17" font-weight="800" fill="#1e40af">水 430</text>
+        </g>
+
+        <text id="sum" x="100" y="345" font-size="20" font-weight="800" fill="#475569"></text>
+        <text id="foot" x="100" y="382" font-size="20" font-weight="800" fill="#0d9488"></text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 6 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const K = 720 / 500;      // 1.44 px / 克
+  const H = 76;
+
+  const A_SALT = 40, A_WATER = 160;   // 甲 200 克 20%
+  const B_SALT = 30, B_WATER = 270;   // 乙 300 克 10%
+
+  const Y_TOP = 132, Y_BOT = 238, Y_MID = 184;
+
+  const S = { step: 0 };
+
+  const STEPS = [
+    {
+      t: '先各算各的盐',
+      h: '甲杯 200 克 20%：盐 = 200 × 20% = <b>40 克</b>，水 = 160 克。<br><br>乙杯还没出场，先看甲。',
+      eq: '甲：200 × 20% = 40 克'
+    },
+    {
+      t: '乙杯也一样，一起拆开',
+      h: '乙杯 300 克 10%：盐 = 300 × 10% = <b>30 克</b>，水 = 270 克。<br><br>看蓝条：乙的水比甲长一大截。这一点很关键，<b>后面全靠它</b>。',
+      eq: '乙：300 × 10% = 30 克'
+    },
+    {
+      t: '倒在一起：盐归盐，水归水',
+      h: '两杯倒进一个盆里。别管混没混匀 —— 我们只做一件事：<b>把盐挑出来堆一堆，水也倒成一片</b>。<br>盐 40 + 30 = <b>70 克</b>，水 160 + 270 = <b>430 克</b>。<br><br>总重 70 + 430 = <b>500 克</b>。',
+      eq: '总盐 40 + 30 = 70 克\n总水 160 + 270 = 430 克\n总溶液 200 + 300 = 500 克'
+    },
+    {
+      t: '新浓度：70 ÷ 500',
+      h: '<b>70 ÷ 500 = 14%</b>。<br><br>这就是混合题的固定套路：<b>盐相加，溶液相加，然后再除一次</b>。千万别把两个浓度直接加起来。',
+      eq: '70 ÷ 500 = 14%'
+    },
+    {
+      t: '为什么不能取平均？',
+      h: '（20% + 10%）÷ 2 = 15%，看着挺合理，<em>但它是错的</em>。<br>真答案是 14%，差了整整一个点。<br><br>原因就在蓝条上：乙杯 300 克，比甲杯 200 克多 —— <b>淡的那杯拉得更重</b>，所以结果被拽向 10% 那一头。<br>只有两杯<b>一样重</b>的时候，取平均才碰巧对。',
+      eq: '（20% + 10%）÷ 2 = 15%　✗\n70 ÷ 500 = 14%　✓'
+    },
+    {
+      t: '两个自己就能检查的地方',
+      h: '混合完，先别急着写答案，拿这两条校一校：<br><br>① 浓度一定夹在两个原浓度中间（14% 在 10% 和 20% 之间 ✓）<br>② 一定更靠近重量大的那杯（300 克那杯是 10%，所以偏向 10% ✓）<br><br>两条都对，答案基本就稳了。',
+      eq: '10% < 14% < 20%　✓\n更靠近 10%（乙杯更重）　✓'
+    }
+  ];
+
+  function paint(){
+    const st = S.step;
+    const merged = st >= 2;
+
+    const showB = st >= 1;
+    $('rowB').setAttribute('opacity', showB ? 1 : 0);
+
+    const boxA = $('rowA');
+
+    if(!merged){
+      /* 两杯分开 */
+      $('sAs').setAttribute('x', 100);
+      $('sAs').setAttribute('y', Y_TOP);
+      $('sAs').setAttribute('width', A_SALT * K);
+      $('sAs').setAttribute('height', H);
+      $('sAw').setAttribute('x', 100 + A_SALT * K);
+      $('sAw').setAttribute('y', Y_TOP);
+      $('sAw').setAttribute('width', A_WATER * K);
+      $('sAw').setAttribute('height', H);
+
+      $('sBs').setAttribute('x', 100);
+      $('sBs').setAttribute('y', Y_BOT);
+      $('sBs').setAttribute('width', B_SALT * K);
+      $('sBs').setAttribute('height', H);
+      $('sBw').setAttribute('x', 100 + B_SALT * K);
+      $('sBw').setAttribute('y', Y_BOT);
+      $('sBw').setAttribute('width', B_WATER * K);
+      $('sBw').setAttribute('height', H);
+
+      $('tAs').setAttribute('x', 100 + A_SALT * K / 2);
+      $('tAs').setAttribute('y', Y_TOP + 45);
+      $('tAw').setAttribute('x', 100 + A_SALT * K + A_WATER * K / 2);
+      $('tAw').setAttribute('y', Y_TOP + 45);
+      $('tBs').setAttribute('x', 100 + B_SALT * K / 2);
+      $('tBs').setAttribute('y', Y_BOT + 45);
+      $('tBw').setAttribute('x', 100 + B_SALT * K + B_WATER * K / 2);
+      $('tBw').setAttribute('y', Y_BOT + 45);
+
+      ['tAs','tAw','tBs','tBw','pA','pB'].forEach(id => $(id).setAttribute('opacity', 1));
+      $('merged').setAttribute('opacity', 0);
+      $('conc').textContent = st === 0 ? '甲杯 20%' : '甲 20%　乙 10%';
+      $('conc').setAttribute('fill', '#0f172a');
+
+      $('sum').textContent = st === 0
+        ? '甲杯：盐 40 + 水 160 = 200 克'
+        : '甲杯 200 克（盐 40）　乙杯 300 克（盐 30）';
+
+    } else {
+      /* 合并：四段各自归位，首尾相接成一条 */
+      const x0 = 100;
+      const wAs = A_SALT * K, wBs = B_SALT * K;
+      const wAw = A_WATER * K, wBw = B_WATER * K;
+
+      $('sAs').setAttribute('x', x0);
+      $('sAs').setAttribute('y', Y_MID);
+      $('sAs').setAttribute('width', wAs);
+      $('sAs').setAttribute('height', H);
+
+      $('sBs').setAttribute('x', x0 + wAs);
+      $('sBs').setAttribute('y', Y_MID);
+      $('sBs').setAttribute('width', wBs);
+      $('sBs').setAttribute('height', H);
+
+      $('sAw').setAttribute('x', x0 + wAs + wBs);
+      $('sAw').setAttribute('y', Y_MID);
+      $('sAw').setAttribute('width', wAw);
+      $('sAw').setAttribute('height', H);
+
+      $('sBw').setAttribute('x', x0 + wAs + wBs + wAw);
+      $('sBw').setAttribute('y', Y_MID);
+      $('sBw').setAttribute('width', wBw);
+      $('sBw').setAttribute('height', H);
+
+      ['tAs','tAw','tBs','tBw','pA','pB'].forEach(id => $(id).setAttribute('opacity', 0));
+
+      $('merged').setAttribute('opacity', 1);
+      $('tSaltSum').setAttribute('x', x0 + (wAs + wBs) / 2);
+      $('tSaltSum').setAttribute('y', Y_MID + 45);
+      $('tWaterSum').setAttribute('x', x0 + wAs + wBs + wAw / 2 + wBw / 2);
+      $('tWaterSum').setAttribute('y', Y_MID + 45);
+
+      $('conc').textContent = st >= 3 ? '混合后 14%' : '合在一起';
+      $('conc').setAttribute('fill', st >= 3 ? '#0d9488' : '#0f172a');
+
+      $('sum').textContent = '总盐 70 克　+　总水 430 克　=　500 克';
+    }
+
+    $('foot').textContent = FOOT[st];
+  }
+
+  const FOOT = [
+    '甲杯：盐 40 克，水 160 克',
+    '乙杯：盐 30 克，水 270 克（水更多）',
+    '盐 40 + 30 = 70　水 160 + 270 = 430',
+    '70 ÷ 500 = 14%',
+    '（20%+10%）÷2 = 15% 是错的',
+    '夹在中间，并且偏向重的那杯'
+  ];
+
+  function render(){
+    const st = S.step;
+    paint();
+    const cur = STEPS[st];
+    $('steptag').textContent = `第 ${st + 1} 步 / 共 ${STEPS.length} 步`;
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+  }
+
+  function go(n){
+    n = Math.max(0, Math.min(STEPS.length - 1, n));
+    if(n === S.step) return;
+    S.step = n;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.title = `第 ${i + 1} 步`;
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

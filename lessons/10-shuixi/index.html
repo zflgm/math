@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>浓度 · 加水稀释：盐一粒没少</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+/* ---- 本页补充 ---- */
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .38s ease both}
+
+circle.grain{
+  transition: cx .95s cubic-bezier(.45,.05,.3,1),
+              cy .95s cubic-bezier(.45,.05,.3,1),
+              r .45s ease, fill .3s ease;
+}
+line.surf{transition: y1 .85s cubic-bezier(.45,.05,.3,1), y2 .85s cubic-bezier(.45,.05,.3,1), opacity .4s}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 10 课 · 浓度 1/3 · 稀释</span>
+    <span class="sp"></span>
+    <a href="../09-gongcheng/index.html">← 上一课</a>
+    <a href="../11-jiayan/index.html">下一课：加盐 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 浓度 10</div>
+    <h1>加水稀释：<span class="q-mark">盐一粒都没有少</span></h1>
+    <p class="q">有 <b>200 克</b>浓度 <b>20%</b> 的盐水，加水后浓度变成 <em>10%</em>。加了多少水？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 470" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <clipPath id="cup">
+            <path d="M180,100 L180,388 Q180,400 192,400 L448,400 Q460,400 460,388 L460,100 Z"/>
+          </clipPath>
+        </defs>
+
+        <g id="ticks"></g>
+
+        <g clip-path="url(#cup)">
+          <rect id="liquid" x="180" y="250" width="280" height="150" fill="#bfdbfe"/>
+          <g id="grains"></g>
+          <line id="surface" class="surf" x1="180" y1="250" x2="460" y2="250"
+                stroke="#93c5fd" stroke-width="4"/>
+        </g>
+
+        <path d="M180,100 L180,388 Q180,400 192,400 L448,400 Q460,400 460,388 L460,100"
+              fill="none" stroke="#94a3b8" stroke-width="3.5" stroke-linecap="round"/>
+
+        <text x="530" y="150" font-size="15" font-weight="800" fill="#94a3b8" letter-spacing="1">这一杯</text>
+
+        <circle cx="541" cy="205" r="7" fill="#f59e0b"/>
+        <text x="558" y="212" font-size="22" font-weight="800" fill="#0f172a">盐 <tspan id="vSalt" font-size="26">40</tspan> 克</text>
+
+        <rect x="534" y="240" width="14" height="14" rx="3" fill="#bfdbfe" stroke="#93c5fd" stroke-width="1.5"/>
+        <text x="558" y="253" font-size="22" font-weight="800" fill="#0f172a">水 <tspan id="vWater" font-size="26">160</tspan> 克</text>
+
+        <line x1="530" y1="290" x2="820" y2="290" stroke="#eef1f6" stroke-width="2"/>
+
+        <text x="530" y="330" font-size="20" font-weight="800" fill="#64748b">整杯 <tspan id="vWhole" fill="#0f172a" font-size="24">200</tspan> 克</text>
+
+        <text id="vConc" x="530" y="405" font-size="40" font-weight="800" fill="#0f172a">浓度 20%</text>
+
+        <text id="foot" x="180" y="445" font-size="20" font-weight="800" fill="#475569"></text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 7 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  function mk(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  /* 杯子几何：底 400，顶 100，1 克 = 0.75 px 高 */
+  const CUP_X = 180, CUP_W = 280, BOT = 400;
+  const PX_PER_G = 0.75;
+  const SALT = 40;
+  const WATER = [160, 360, 360, 360, 360, 120, 120];
+
+  const S = { step: 0 };
+
+  /* ---- 40 粒盐：5 列 × 8 行 + 抖动，位置固定 ---- */
+  const GRAINS = (function(){
+    let s = 20261101;
+    const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+    const COLS = 5, ROWS = 8, out = [];
+    for(let r = 0; r < ROWS; r++){
+      for(let c = 0; c < COLS; c++){
+        out.push({
+          u: 0.10 + (c + 0.5) / COLS * 0.80 + (rnd() - 0.5) * 0.07,
+          v: 0.05 + (r + 0.5) / ROWS * 0.90 + (rnd() - 0.5) * 0.045
+        });
+      }
+    }
+    return out;
+  })();
+
+  function buildTicks(){
+    const g = $('ticks');
+    g.innerHTML = '';
+    [100, 200, 300, 400].forEach(gr => {
+      const y = BOT - gr * PX_PER_G;
+      g.appendChild(mk('line', {
+        x1: CUP_X - 10, y1: y, x2: CUP_X, y2: y,
+        stroke: '#cbd5e1', 'stroke-width': 2
+      }));
+      const t = mk('text', {
+        x: CUP_X - 16, y: y + 5, 'text-anchor': 'end',
+        'font-size': 13, 'font-weight': 700, fill: '#b6c0cf'
+      });
+      t.textContent = gr;
+      g.appendChild(t);
+    });
+  }
+
+  function buildGrains(){
+    const g = $('grains');
+    g.innerHTML = '';
+    GRAINS.forEach((_, i) => {
+      g.appendChild(mk('circle', {
+        id: 'g' + i, 'class': 'grain',
+        cx: CUP_X + CUP_W / 2, cy: BOT,
+        r: 5, fill: '#f59e0b'
+      }));
+    });
+  }
+
+  function paint(){
+    const st = S.step;
+    const water = WATER[st];
+    const whole = SALT + water;
+    const h = whole * PX_PER_G;
+    const surf = BOT - h;
+
+    $('liquid').setAttribute('y', surf);
+    $('liquid').setAttribute('height', h);
+    $('surface').setAttribute('y1', surf);
+    $('surface').setAttribute('y2', surf);
+
+    GRAINS.forEach((p, i) => {
+      const c = $('g' + i);
+      c.setAttribute('cx', CUP_X + p.u * CUP_W);
+      c.setAttribute('cy', BOT - p.v * h);
+    });
+
+    $('vSalt').textContent = SALT;
+    $('vWater').textContent = water;
+    $('vWhole').textContent = whole;
+
+    const conc = Math.round(SALT / whole * 1000) / 10;
+    $('vConc').textContent = `浓度 ${conc}%`;
+    $('vConc').setAttribute('fill', (st === 1 || st === 2) ? '#ef4444' : '#0f172a');
+
+    $('foot').textContent = FOOT[st];
+    $('foot').setAttribute('fill', st >= 5 ? '#0d9488' : '#475569');
+  }
+
+  const FOOT = [
+    '数一数：杯里正好 40 个橙点，一个点 = 1 克盐',
+    '液面升上去了，橙点还是 40 个 —— 只是散开了',
+    '盐 = 40 克，从头到尾没变',
+    '40 ÷ 400 = 10%　（盐没少，只是摊薄了）',
+    '加的水 = 400 − 200 = 200 克',
+    '40 ÷ 160 = 25%　水少了就咸',
+    '分子永远不动，动的只有分母'
+  ];
+
+  const STEPS = [
+    {
+      t: '先看这一杯',
+      h: '200 克、浓度 20% 的盐水。<br>盐 = 200 × 20% = <b>40 克</b>，水 = 200 − 40 = <b>160 克</b>。<br><br>数一数杯里的橙点：正好 <b>40 个</b>。<em>一个点就是一克盐</em>。',
+      eq: '盐 = 200 × 20% = 40 克\n水 = 200 − 40 = 160 克'
+    },
+    {
+      t: '往里加水',
+      h: '倒进 200 克水，液面一下升了一大截。<br><br>橙点呢？<b>一个都没跑</b>，只是被托得更高、散得更开了。',
+      eq: '水：160 → 360 克'
+    },
+    {
+      t: '数一数，还是 40 个',
+      h: '倒水这个动作，没人往里加盐，也没人往外捞盐。<br><b>盐一粒没变</b>，变的是"泡它的水"多了。<br><br>同样是 40 个点，现在<b>散得那么开</b> —— 这就是"变淡"的真面目。',
+      eq: '盐 = 40 克（不变）'
+    },
+    {
+      t: '10% 是这么来的',
+      h: '现在整杯 400 克，盐还是 40 克 → <b>40 ÷ 400 = 10%</b>。<br><br>浓度降下来，不是盐变少了，是<b>同样多的盐摊在更多的水里</b>。',
+      eq: '40 ÷ 400 = 10%'
+    },
+    {
+      t: '加了多少水',
+      h: '最直接：<b>400 − 200 = 200 克</b>。<br>从水看也一样：160 → 360，多了 200 克。<br><br>验算一下：40 ÷ 400 = 10% ✓',
+      eq: '加水 = 400 − 200 = 200 克'
+    },
+    {
+      t: '反过来：把水蒸掉',
+      h: '蒸发到只剩 160 克。盐还是那 40 克 → <b>40 ÷ 160 = 25%</b>，浓度反而升上去了。<br><br>水少了，盐没少，每一口都更咸。橙点又挤回来了。',
+      eq: '40 ÷ 160 = 25%'
+    },
+    {
+      t: '一句话把这一课收掉',
+      h: '加水 → 盐不变，整杯变重，浓度<b>降</b><br>蒸发 → 盐不变，整杯变轻，浓度<b>升</b><br><br>方向不用背：<b>盐一直是那么多，水多了就淡，水少了就咸</b>。',
+      eq: '原样　40 ÷ 200 = 20%\n加水　40 ÷ 400 = 10%\n蒸发　40 ÷ 160 = 25%\n（分子永远是 40）'
+    }
+  ];
+
+  function render(){
+    const st = S.step;
+    paint();
+    const cur = STEPS[st];
+    $('steptag').textContent = `第 ${st + 1} 步 / 共 ${STEPS.length} 步`;
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+  }
+
+  function go(n){
+    n = Math.max(0, Math.min(STEPS.length - 1, n));
+    if(n === S.step) return;
+    S.step = n;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.title = `第 ${i + 1} 步`;
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  buildTicks();
+  buildGrains();
+  render();
+})();
+</script>
+</body>
+</html>

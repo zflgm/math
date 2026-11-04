@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鸡兔同笼 · 假设法</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+/* ---- 本页补充 ---- */
+svg line{transition:opacity .44s ease, stroke .34s ease, x1 .5s ease, x2 .5s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .38s ease both}
+#nowFeet, #nowHead{font-size:19px;font-weight:800;fill:#475569}
+#legendTxt{font-size:15px;font-weight:700;fill:#64748b}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 14 课 · 鸡兔同笼</span>
+    <span class="sp"></span>
+    <a href="../13-fenshu/index.html">← 上一课</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 经典模型 14</div>
+    <h1>鸡兔同笼：<span class="q-mark">"差几只脚"才是钥匙</span></h1>
+    <p class="q">笼子里有鸡和兔共 <b>8 只</b>，一共 <b>26 只脚</b>。鸡兔各几只？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 566" preserveAspectRatio="xMidYMid meet">
+
+        <text id="nowHead" x="46" y="36">头：8 个</text>
+        <text id="nowFeet" x="874" y="36" text-anchor="end"></text>
+
+        <line x1="30" y1="252" x2="890" y2="252" stroke="#E4EAF2" stroke-width="2" stroke-linecap="round"/>
+        <line x1="30" y1="472" x2="890" y2="472" stroke="#E4EAF2" stroke-width="2" stroke-linecap="round"/>
+        <g id="gSil"></g>
+        <g id="gAni"></g>
+
+        <text id="legendTxt" x="460" y="514" text-anchor="middle">鸡 = 1 头 2 脚　　　　兔 = 1 头 4 脚</text>
+
+        <text id="foot" x="460" y="552" text-anchor="middle" font-size="23" font-weight="800" fill="#475569"></text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 9 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">这一课</span>
+    <span class="unit">8 头 26 脚 —— 换成 35 头 94 脚，招数一样，只是数字大</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const COLS = [130, 350, 570, 790];   // 4 列
+  const GYS  = [250, 470];             // 两行的地面
+  const SC   = 1.5;                    // 放大倍数
+  const BASE = 242;                    // 画动物时用的地面坐标（缩放基准）
+
+  const N = 8;          // 总只数
+  const REAL_FEET = 26; // 题目给的脚数
+
+  let S = { step: 0 };
+
+  function mk(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    if(attrs) for(const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  /* ---------- 画一只鸡：尖嘴、红冠、两条细腿 ---------- */
+  function drawChick(){
+    const g = mk('g');
+    // 尾羽
+    g.appendChild(mk('path', {d:'M -24 200 Q -46 182 -44 202 Q -42 212 -24 211 Z', fill:'#F59E0B'}));
+    // 身子
+    g.appendChild(mk('ellipse', {cx:-2, cy:198, rx:28, ry:21, fill:'#FCD34D'}));
+    // 翅膀
+    g.appendChild(mk('path', {d:'M -13 194 Q -2 188 9 195 Q 0 207 -11 203 Z', fill:'#FBBF24'}));
+    // 两条腿 + 爪
+    [-10, 10].forEach(x => {
+      g.appendChild(mk('line', {x1:x, y1:218, x2:x, y2:239,
+        stroke:'#E58E0A', 'stroke-width':4, 'stroke-linecap':'round'}));
+      g.appendChild(mk('line', {x1:x-6, y1:241, x2:x+6, y2:241,
+        stroke:'#E58E0A', 'stroke-width':4, 'stroke-linecap':'round'}));
+    });
+    // 鸡冠
+    g.appendChild(mk('path', {d:'M 11 162 Q 12 147 19 156 Q 22 143 28 155 Q 33 147 36 161 Z', fill:'#EF4444'}));
+    // 头
+    g.appendChild(mk('circle', {cx:22, cy:172, r:15, fill:'#FDE68A'}));
+    // 尖嘴
+    g.appendChild(mk('path', {d:'M 34 169 L 48 175 L 34 180 Z', fill:'#F59E0B'}));
+    // 肉髯
+    g.appendChild(mk('circle', {cx:32, cy:183, r:3.8, fill:'#EF4444'}));
+    // 眼
+    g.appendChild(mk('circle', {cx:26, cy:167, r:3, fill:'#1E293B'}));
+    g.appendChild(mk('circle', {cx:27, cy:166, r:1.1, fill:'#fff'}));
+    return g;
+  }
+
+  /* ---------- 画一只兔：长耳、圆尾巴、四条腿 ---------- */
+  function drawBunny(){
+    const g = mk('g');
+    // 圆尾巴
+    g.appendChild(mk('circle', {cx:-34, cy:198, r:10, fill:'#FFFFFF',
+      stroke:'#C3D0E0', 'stroke-width':1.6}));
+    // 两只长耳（带粉色内耳）
+    [[12, 146, -9], [26, 144, 7]].forEach(function(e){
+      const ex = e[0], ey = e[1], rot = e[2];
+      g.appendChild(mk('ellipse', {cx:ex, cy:ey, rx:6, ry:18, fill:'#E4EBF5',
+        transform:'rotate(' + rot + ' ' + ex + ' ' + (ey + 15) + ')'}));
+      g.appendChild(mk('ellipse', {cx:ex, cy:ey + 2, rx:2.7, ry:12, fill:'#FBCFE8',
+        transform:'rotate(' + rot + ' ' + ex + ' ' + (ey + 15) + ')'}));
+    });
+    // 四条腿
+    [[-26, -3], [-9, -1], [9, 1], [26, 3]].forEach(function(p){
+      const x = p[0], dx = p[1];
+      g.appendChild(mk('line', {x1:x, y1:219, x2:x + dx, y2:238,
+        stroke:'#B9C6D6', 'stroke-width':5.2, 'stroke-linecap':'round'}));
+      g.appendChild(mk('ellipse', {cx:x + dx, cy:240, rx:6, ry:3.2, fill:'#A6B5C9'}));
+    });
+    // 身子
+    g.appendChild(mk('ellipse', {cx:-2, cy:202, rx:28, ry:21, fill:'#E9F0F8'}));
+    // 头
+    g.appendChild(mk('circle', {cx:20, cy:176, r:15, fill:'#F4F7FB'}));
+    // 鼻子
+    g.appendChild(mk('circle', {cx:34, cy:179, r:2.4, fill:'#F9A8D4'}));
+    // 眼
+    g.appendChild(mk('circle', {cx:25, cy:171, r:3, fill:'#1E293B'}));
+    g.appendChild(mk('circle', {cx:26, cy:170, r:1.1, fill:'#fff'}));
+    return g;
+  }
+
+  /* ---------- 第 1 步的剪影：看不出是鸡是兔 ---------- */
+  function drawSil(){
+    const g = mk('g');
+    g.appendChild(mk('ellipse', {cx:-2, cy:241, rx:34, ry:5, fill:'#E8EEF6'}));
+    g.appendChild(mk('ellipse', {cx:-2, cy:202, rx:32, ry:23, fill:'#D2DCE8'}));
+    g.appendChild(mk('circle', {cx:22, cy:184, r:16, fill:'#D2DCE8'}));
+    return g;
+  }
+
+  const silG = [], ckG = [], bnG = [];
+
+  function build(){
+    const gS = $('gSil'), gA = $('gAni');
+    gS.innerHTML = ''; gA.innerHTML = '';
+    silG.length = 0; ckG.length = 0; bnG.length = 0;
+
+    for(let i = 0; i < N; i++){
+      const cx = COLS[i % 4], gy = GYS[Math.floor(i / 4)];
+      const tf = 'translate(' + cx + ',' + gy + ') scale(' + SC + ') translate(0,' + (-BASE) + ')';
+
+      const s = drawSil();
+      s.setAttribute('transform', tf);
+      gS.appendChild(s); silG.push(s);
+
+      const w = mk('g', {transform: tf});
+      const ck = drawChick(), bn = drawBunny();
+      bn.setAttribute('style', 'opacity:0');
+      w.appendChild(ck); w.appendChild(bn);
+      gA.appendChild(w);
+      ckG.push(ck); bnG.push(bn);
+    }
+  }
+
+  /* ---------- 状态：兔有几只 ---------- */
+  function rabbitAt(st){
+    if(st === 1) return 1;             // 第二讲讲规则，拿 1 只兔做对照
+    if(st === 4) return 1;             // 换 1 只试试
+    if(st === 5 || st === 6) return 5; // 补够 5 只
+    if(st === 7) return 8;             // 反着假设：全当兔
+    if(st === 8) return 5;             // 收口：回到真答案
+    return 0;
+  }
+
+  function paint(){
+    const st = S.step;
+    const R = rabbitAt(st);
+    const feetNow = (N - R) * 2 + R * 4;
+    const real = st >= 1;
+
+    $('gSil').style.opacity = real ? 0 : 1;
+    $('gAni').style.opacity = real ? 1 : 0;
+
+    ckG.forEach(function(g, i){ g.style.opacity = i < R ? 0 : 1; });
+    bnG.forEach(function(g, i){ g.style.opacity = i < R ? 1 : 0; });
+
+    $('nowHead').textContent = '头：' + N + ' 个';
+
+    const nf = $('nowFeet');
+    if(st < 2){
+      nf.textContent = '';
+    }else{
+      nf.textContent = '脚：' + feetNow + ' 只' +
+        (feetNow === REAL_FEET ? '' : ' ／ 题目 26 只');
+      nf.setAttribute('fill', feetNow === REAL_FEET ? '#0D9488'
+        : (feetNow < REAL_FEET ? '#DC2626' : '#EA580C'));
+    }
+
+    $('legendTxt').style.opacity = real ? 1 : 0;
+
+    const foot = $('foot');
+    const txt = [
+      '8 个头，看不出谁是谁',
+      '鸡 2 只脚，兔 4 只脚',
+      '假设全是鸡：8 × 2 = 16 只脚',
+      '题目 26 只，少了 10 只',
+      '换 1 只兔：多 2 只脚，16 → 18',
+      '补够 10 只 → 换 5 只 → 26 只脚',
+      '5 兔 20 脚 + 3 鸡 6 脚 = 26 ✓',
+      '假设全是兔：8 × 4 = 32，多了 6 只',
+      '5 只兔，3 只鸡'
+    ];
+    foot.textContent = txt[st];
+    foot.setAttribute('fill', (st === 5 || st === 6 || st === 8) ? '#0D9488' : '#475569');
+  }
+
+  /* ---------- 九步 ---------- */
+  const STEPS = [
+    {
+      t: '头都长一个样',
+      h: '8 只动物，8 个头。题目只告诉你「头有 8 个」，<b>分不出谁是鸡谁是兔</b>。<br>' +
+         '从头看，一点线索都没有，只能先摆着。<br><br>' +
+         '线索藏在别的地方。',
+      eq: '头：8 个\n鸡？兔？—— 看不出'
+    },
+    {
+      t: '不一样的地方：脚',
+      h: '鸡 <b>2 只脚</b>，兔 <b>4 只脚</b>，头都是 1 个。<br><br>' +
+         '这就是破题的<b>缝</b>：头数一样，脚数差一倍。<br>' +
+         '题目另外还给了一个数 —— 脚的只数。它就是为了配这个缝的。',
+      eq: '鸡：1 头 2 脚\n兔：1 头 4 脚'
+    },
+    {
+      t: '先耍个赖：假设全是鸡',
+      h: '把 8 只都当成鸡 → 每只 2 脚 → <b>8 × 2 = 16 只脚</b>。<br><br>' +
+         '这是「如果题目里一只兔都没有」的答案。<br>' +
+         '先算出来，一会儿再跟真答案对质。',
+      eq: '8 × 2 = 16 只脚'
+    },
+    {
+      t: '题目说 26 只 —— 少了 10 只',
+      h: '真实是 <b>26</b> 只脚，我们算出 <b>16</b> 只，<b>少了 10 只</b>。<br><br>' +
+         '少的这 10 只脚，说明<b>有兔被我们当成了鸡</b>。<br>' +
+         '接下来只要找出"几只被冤枉了"，题就完了。',
+      eq: '26 − 16 = 10 只脚'
+    },
+    {
+      t: '换一只试试：多 2 只脚',
+      h: '把一只「鸡」换成兔 —— 它左右各长出一只脚，一共 <b>2 只</b>。总数从 16 变 <b>18</b>。<br><br>' +
+         '注意：换一只只多 <b>2</b> 只，不是 4 只。<br>' +
+         '那 2 只它本来就长着，只是被我们假设掉、漏算了。',
+      eq: '换 1 只：16 → 18（+2）'
+    },
+    {
+      t: '要补 10 只，就得换 5 只',
+      h: '每换一只补 2 只脚，要补 10 只，就要换 <b>10 ÷ 2 = 5 只</b>。<br>' +
+         '数一下画面上竖着长耳朵的 —— 正好 <b>5 只</b>，脚正好 <b>26</b> 只。<br><br>' +
+         '所以：<b>兔 5 只，鸡 3 只</b>。',
+      eq: '10 ÷ 2 = 5 只兔\n8 − 5 = 3 只鸡'
+    },
+    {
+      t: '验一下',
+      h: '5 只兔：5 × 4 = <b>20</b> 只脚<br>' +
+         '3 只鸡：3 × 2 = <b>6</b> 只脚<br>' +
+         '合起来 26 只脚，头 8 个 ✓<br><br>' +
+         '两个总数都对上，才算真做完了。',
+      eq: '5×4 + 3×2 = 20 + 6 = 26 ✓'
+    },
+    {
+      t: '反过来假设全是兔，也一样',
+      h: '8 只全当兔 → 8 × 4 = <b>32</b> 只脚，比 26 <b>多了 6 只</b>。<br>' +
+         '每把一只兔换回鸡，<b>少 2 只</b>脚 → 6 ÷ 2 = <b>3 只鸡</b>。<br>' +
+         '兔 8 − 3 = 5 只，跟刚才一样。<br><br>' +
+         '<b>正着假设、反着假设，答案必须一样</b> —— 不一样就是算错了。',
+      eq: '(32 − 26) ÷ 2 = 3 只鸡'
+    },
+    {
+      t: '这一招叫：假设法',
+      h: '三步：<b>先假设一种 → 数差了几只脚 → 除以「每只差 2」</b>。<br><br>' +
+         '为什么除 2 不除 4？因为换的是<b>一只</b>，一只鸡和一只兔之间只差 2 只脚。<br>' +
+         '除以 4，就等于假设「每换一只兔能补 4 只脚」—— 那 2 只它本来就有的，又被算了一遍。<br><br>' +
+         '35 头 94 脚也是这一招：94 − 70 = 24，24 ÷ 2 = 12 只兔。头再多，招不变。',
+      eq: '差 ÷ 2 = 兔的只数'
+    }
+  ];
+
+  function render(){
+    const st = S.step;
+    paint();
+    const cur = STEPS[st];
+    $('steptag').textContent = '第 ' + (st + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === S.step) return;
+    S.step = k;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  build();
+  render();
+})();
+</script>
+</body>
+</html>

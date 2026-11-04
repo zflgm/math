@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>和差问题 · 为什么是「和加减差除以二」</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 1 课 / 4 · 和差</span>
+    <span class="sp"></span>
+    <a href="../02-hebei/index.html">下一课：和倍 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 应用题第一课</div>
+    <h1>和差问题：<span class="q-mark">÷2 到底在除什么？</span></h1>
+    <p class="q">两筐苹果共 <b>100 千克</b>，甲筐比乙筐多 <em>20 千克</em>。甲、乙两筐各多少千克？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 322" preserveAspectRatio="xMidYMid meet">
+        <!-- 甲筐 -->
+        <text class="tag" x="120" y="79" text-anchor="end">甲筐</text>
+        <rect id="aBlue" class="barA" x="132" y="48" width="320" height="48" rx="10"/>
+        <rect id="aRed"  class="barD" x="452" y="48" width="0" height="48" rx="10" opacity="0"/>
+        <text id="aRedTxt" class="valRed" x="0" y="0" text-anchor="middle" opacity="0">20</text>
+        <text id="aVal" class="val" x="150" y="80">60</text>
+
+        <!-- 乙筐 -->
+        <text class="tag" x="120" y="171" text-anchor="end">乙筐</text>
+        <rect id="bBar"   class="barB" x="132" y="140" width="213.33" height="48" rx="10"/>
+        <rect id="bPatch" class="patch" x="345.33" y="140" width="0" height="48" rx="10"/>
+        <text id="bVal" class="val" x="150" y="172">40</text>
+
+        <!-- 差的括号 -->
+        <g id="diffMark" opacity="0">
+          <path id="diffBracket" class="bracket" d=""/>
+          <text id="diffLabel" class="diffTxt" x="0" y="0">差 20</text>
+        </g>
+
+        <!-- 右端对齐虚线 -->
+        <line id="alignLine" class="alignLine" x1="0" y1="42" x2="0" y2="196" opacity="0"/>
+
+        <!-- 合起来 -->
+        <text class="tag" x="120" y="243" text-anchor="end">一共</text>
+        <rect id="sGhost" class="ghost" x="132" y="226" width="533.33" height="24" rx="12" opacity="0"/>
+        <rect id="sBar"   class="barS" x="132" y="226" width="533.33" height="24" rx="12"/>
+        <text id="sVal" class="valSum" x="160" y="243">100 千克</text>
+
+        <!-- 平分 -->
+        <line id="sSplit" class="split" x1="0" y1="218" x2="0" y2="258" opacity="0"/>
+        <text id="half1" class="halfTxt" x="0" y="284" text-anchor="middle" opacity="0">40</text>
+        <text id="half2" class="halfTxt" x="0" y="284" text-anchor="middle" opacity="0">40</text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 7 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">换一组数字试试</span>
+    <span class="unit">和</span>
+    <input id="inSum" type="number" value="100" min="2" step="1">
+    <span class="unit">差</span>
+    <input id="inDiff" type="number" value="20" min="0" step="1">
+    <button class="btn" id="apply">重新画</button>
+    <span class="warn" id="warn"></span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const X0 = 132, MAXW = 640, RX = 10;
+  const YA = 48, YB = 140, YS = 226;
+
+  const S = { sum: 100, diff: 20, step: 0 };
+
+  /* ---------- 几何 ---------- */
+  function geom(){
+    const k = MAXW / (S.sum + S.diff || 1);   // 每千克多少像素
+    const bigW   = (S.sum + S.diff) / 2 * k;
+    const smallW = (S.sum - S.diff) / 2 * k;
+    const sumW   = S.sum * k;
+    const diffW  = Math.max(0, bigW - smallW);
+    return {k, bigW, smallW, sumW, diffW,
+            big: (S.sum + S.diff) / 2,
+            small: (S.sum - S.diff) / 2};
+  }
+
+  /* ---------- 文案 ---------- */
+  const STEPS = [
+    {
+      t: '先别管公式，只看两根条子',
+      h: '甲筐比乙筐多，所以甲这根画得长一点。<br>两根条子加起来有多长，就是"<b>共 100 千克</b>"。',
+      eq: '和 = 100 千克　　差 = 20 千克'
+    },
+    {
+      t: '甲伸出来的那一截，就是"差"',
+      h: '左端对齐，甲比乙长出来的这一段 = <em>20 千克</em>。<br>这 20 千克是甲<b>额外多出来的</b>，乙那边一点都没有。',
+      eq: '甲 − 乙 = 20'
+    },
+    {
+      t: '关键一步：把多出来的砍掉',
+      h: '把甲多出来的 20 砍掉，甲就缩到跟乙一样长了。<br>两根一样长，总长也从 100 变成 <b>80</b>。<br>（这一步，就是方程里"两边同时减 20"）',
+      eq: '100 − 20 = 80'
+    },
+    {
+      t: '一样长的两根，总长 80 —— 那就平分',
+      h: '80 ÷ 2 = 40，这是现在每根的长度。<br>乙没被动过，所以<b>乙就是 40</b>。<br>甲被砍掉了 20，得还回去：40 + 20 = 60。',
+      eq: '80 ÷ 2 = <span class="ok">40</span>　→ 乙 = 40\n40 + 20 = <span class="ok">60</span>　→ 甲 = 60'
+    },
+    {
+      t: '换个方向：这次不砍，改成补',
+      h: '回到最开始的样子。这回给乙<b>补上 20</b>，乙就长到跟甲一样了。<br>两根还是一样长，但总长变成 <em>120</em>。',
+      eq: '100 + 20 = 120'
+    },
+    {
+      t: '120 平分',
+      h: '120 ÷ 2 = 60，这是现在每根的长度。<br>甲没被动过，所以<b>甲就是 60</b>。<br>乙是补出来的，要还回去：60 − 20 = 40。',
+      eq: '120 ÷ 2 = <span class="ok">60</span>　→ 甲 = 60\n60 − 20 = <span class="ok">40</span>　→ 乙 = 40'
+    },
+    {
+      t: '公式，只是把这两条路写成一句话',
+      h: '走"<em>砍</em>"这条路 → 少的那筐 =（和 − 差）÷ 2<br>走"<em>补</em>"这条路 → 多的那筐 =（和 + 差）÷ 2<br><br>所以 <b>÷2 从来不是要背的</b>：那时候两根一样长，总长当然要平分给两个人。<br><br>课本上把"多的那筐"叫<b>大数</b>、"少的那筐"叫<b>小数</b>。名字而已，就是这两根条子。',
+      eq: '少的 =（和 − 差）÷ 2\n多的 =（和 + 差）÷ 2'
+    }
+  ];
+
+  /* ---------- 渲染 ---------- */
+  function set(el, attrs){
+    for(const k in attrs) el.setAttribute(k, attrs[k]);
+  }
+
+  function render(anim){
+    const g = geom(), st = S.step;
+    const stage = $('stage');
+    if(!anim) stage.classList.add('no-anim');
+
+    const showBig   = (st <= 1 || st >= 4);
+    const detached  = (st === 2 || st === 3);
+
+    /* 甲：蓝段 */
+    set($('aBlue'), { width: (st === 0 ? g.bigW : g.smallW).toFixed(2) });
+
+    /* 甲：红段（差的那一截） */
+    const redW = st === 0 ? 0 : g.diffW;
+    const redX = detached ? (X0 + g.smallW + 74) : (X0 + g.smallW);
+    const redY = detached ? (YA - 42) : YA;
+    set($('aRed'), {
+      x: redX.toFixed(2),
+      y: redY.toFixed(2),
+      width: redW.toFixed(2),
+      opacity: st === 0 ? 0 : 1
+    });
+    set($('aRedTxt'), {
+      x: (redX + redW / 2).toFixed(2),
+      y: (redY + 31).toFixed(2),
+      opacity: (st === 0 || redW < 26) ? 0 : 1
+    });
+    $('aRedTxt').textContent = S.diff;
+
+    /* 甲数值 */
+    $('aVal').textContent = showBig ? g.big : g.small;
+    $('aVal').style.opacity = (st === 0 ? g.bigW : g.smallW) < 62 ? 0 : 1;
+
+    /* 乙 */
+    set($('bBar'), { width: g.smallW.toFixed(2) });
+    $('bVal').textContent = st >= 4 ? g.big : g.small;
+    $('bVal').style.opacity = g.smallW < 62 ? 0 : 1;
+
+    /* 乙的补块 */
+    const patchOn = st >= 4;
+    set($('bPatch'), {
+      x: (X0 + g.smallW).toFixed(2),
+      width: (patchOn ? g.diffW : 0).toFixed(2),
+      opacity: patchOn ? 1 : 0
+    });
+    $('bPatch').classList.toggle('on', st >= 5);
+
+    /* 差的括号 */
+    const markOn = st === 1;
+    set($('diffMark'), { opacity: markOn ? 1 : 0 });
+    if(markOn){
+      const x1 = X0 + g.smallW, x2 = X0 + g.bigW, y = 120;
+      $('diffBracket').setAttribute('d', `M${x1} ${y+7} L${x1} ${y} L${x2} ${y} L${x2} ${y+7}`);
+      set($('diffLabel'), { x: (x2 + 12).toFixed(2), y: y + 6 });
+      $('diffLabel').textContent = '差 ' + S.diff;
+    }
+
+    /* 右端对齐虚线 */
+    const alignOn = st >= 2;
+    const alignX = (st >= 4 ? X0 + g.bigW : X0 + g.smallW);
+    set($('alignLine'), { x1: alignX.toFixed(2), x2: alignX.toFixed(2), opacity: alignOn ? 1 : 0 });
+
+    /* 和条 */
+    let sW = g.sumW, sTxt = S.sum + ' 千克';
+    if(st >= 2 && st <= 3){ sW = g.smallW * 2;  sTxt = (S.sum - S.diff) + ' 千克'; }
+    if(st >= 4){ sW = g.bigW * 2; sTxt = (S.sum + S.diff) + ' 千克'; }
+    set($('sBar'), { width: sW.toFixed(2) });
+    $('sVal').textContent = sTxt;
+    $('sVal').style.opacity = sW < 108 ? 0 : 1;
+
+    set($('sGhost'), { width: g.sumW.toFixed(2), opacity: (st >= 2) ? 1 : 0 });
+
+    /* 平分 */
+    const splitOn = (st === 3 || st >= 5);
+    if(splitOn){
+      const cut = (st === 3 ? X0 + g.smallW : X0 + g.bigW);
+      const w1 = (st === 3 ? g.smallW : g.bigW);
+      const val = (st === 3 ? g.small : g.big);
+      set($('sSplit'), { x1: cut.toFixed(2), x2: cut.toFixed(2), opacity: 1 });
+      set($('half1'), { x: (X0 + w1 / 2).toFixed(2), opacity: 1 });
+      set($('half2'), { x: (X0 + w1 * 1.5).toFixed(2), opacity: 1 });
+      $('half1').textContent = val;
+      $('half2').textContent = val;
+    } else {
+      set($('sSplit'), { opacity: 0 });
+      set($('half1'), { opacity: 0 });
+      set($('half2'), { opacity: 0 });
+    }
+
+    /* 文案 */
+    const cur = STEPS[st];
+    $('steptag').textContent = `第 ${st + 1} 步 / 共 ${STEPS.length} 步`;
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    /* 按钮 & 圆点 */
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+
+    if(!anim){
+      void stage.offsetWidth;
+      requestAnimationFrame(() => stage.classList.remove('no-anim'));
+    }
+  }
+
+  /* ---------- 控制 ---------- */
+  function go(n){
+    n = Math.max(0, Math.min(STEPS.length - 1, n));
+    if(n === S.step) return;
+    S.step = n;
+    render(true);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = `第 ${i + 1} 步`;
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  /* ---------- 换数字 ---------- */
+  $('apply').addEventListener('click', () => {
+    const s = parseInt($('inSum').value, 10);
+    const d = parseInt($('inDiff').value, 10);
+    const warn = $('warn');
+
+    if(!Number.isFinite(s) || !Number.isFinite(d) || s <= 0 || d < 0){
+      warn.textContent = '要填两个正整数'; return;
+    }
+    if(d >= s){
+      warn.textContent = '差必须比和小，不然少的那筐要变成负数了'; return;
+    }
+    if((s + d) % 2 !== 0){
+      warn.textContent = '和与差要同为奇数或同为偶数，否则算出来是小数'; return;
+    }
+    warn.textContent = '';
+    S.sum = s; S.diff = d; S.step = 0;
+    render(false);
+  });
+
+  /* ---------- 启动 ---------- */
+  render(false);
+})();
+</script>
+</body>
+</html>

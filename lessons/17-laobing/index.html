@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>烙饼 · 3 张只要 9 分钟</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:linear-gradient(180deg,#fffdf7 0%,#ffffff 58%);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- 本页 ---------- */
+#gScene,#gFaces,#gRule{transition:opacity .38s ease}
+#gFaces,#gRule{pointer-events:none}
+.cake{transition:transform .8s cubic-bezier(.45,.05,.35,1)}
+.cake .inner{transform-box:fill-box;transform-origin:center;transition:transform .2s ease}
+.cake .inner.flip{transform:scaleX(.08)}
+.cake .body{transition:fill .45s ease}
+.cake .num{font-size:32px;font-weight:800;fill:#7a4a12;font-variant-numeric:tabular-nums}
+.cake .bdg{font-size:15px;font-weight:800;fill:#7a4a12}
+#heat{transition:opacity .55s ease}
+.st-t{font-size:17px;font-weight:800;fill:#94a3b8}
+#tm{font-size:36px;font-weight:800;fill:#0f172a;font-variant-numeric:tabular-nums}
+#note{font-size:16px;font-weight:800;fill:#94a3b8;transition:fill .3s ease}
+.rl{font-size:18px;font-weight:800;fill:#475569}
+.rs{font-size:14px;font-weight:700;fill:#a8b3c2;font-variant-numeric:tabular-nums}
+.ct{font-size:18px;font-weight:800;fill:#0f172a}
+.ct.waste{fill:#dc2626;font-size:17px}
+.hd{font-size:14px;font-weight:800;fill:#a8b3c2;letter-spacing:.04em}
+.wp{animation:wp 1.15s ease-in-out infinite}
+@keyframes wp{0%,100%{stroke-opacity:1}50%{stroke-opacity:.18}}
+#freeHint{transition:opacity .3s ease}
+#freeHint.on{animation:hp 1.5s ease-in-out infinite}
+@keyframes hp{0%,100%{opacity:.35}50%{opacity:1}}
+.fh{font-size:19px;font-weight:800;fill:#a7f3e4}
+.ov-t{font-size:28px;font-weight:800;fill:#0f172a}
+.ov-s{font-size:16px;font-weight:700;fill:#94a3b8}
+.fc-t{font-size:17px;font-weight:800;fill:#7a4a12}
+.fc-l{font-size:19px;font-weight:800;fill:#475569}
+.fc-s{font-size:15px;font-weight:700;fill:#a8b3c2}
+.ov-big{font-size:30px;font-weight:800;fill:#0f172a;font-variant-numeric:tabular-nums}
+.card-n{font-size:17px;font-weight:800;fill:#475569}
+.card-v{font-size:24px;font-weight:800;fill:#0f172a;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 17 课 · 烙饼</span>
+    <span class="sp"></span>
+    <a href="../16-zhaocipin/index.html">← 上一课</a>
+    <a href="../18-qicha/index.html">下一课：沏茶 →</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 数学广角 17</div>
+    <h1>烙饼：<span class="q-mark">锅不能空着</span></h1>
+    <p class="q">一口锅一次最多烙 <b>2 张</b>饼，每面要 <b>3 分钟</b>。烙 3 张饼，最少 <b>几分钟</b>？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 960 504" preserveAspectRatio="xMidYMid meet">
+
+        <defs>
+          <radialGradient id="panG" cx="42%" cy="36%" r="70%">
+            <stop offset="0" stop-color="#4f5a68"/>
+            <stop offset="0.72" stop-color="#39424f"/>
+            <stop offset="1" stop-color="#2a313c"/>
+          </radialGradient>
+          <radialGradient id="panIn" cx="46%" cy="40%" r="66%">
+            <stop offset="0" stop-color="#6b7686"/>
+            <stop offset="1" stop-color="#3d4653"/>
+          </radialGradient>
+          <radialGradient id="heatG" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#fb923c" stop-opacity=".62"/>
+            <stop offset="0.62" stop-color="#f97316" stop-opacity=".22"/>
+            <stop offset="1" stop-color="#f97316" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9a6b3f"/>
+            <stop offset="1" stop-color="#6b4423"/>
+          </linearGradient>
+          <linearGradient id="boardG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#f7ecd9"/>
+            <stop offset="1" stop-color="#eddfc6"/>
+          </linearGradient>
+          <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#cbd5e1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <g id="gScene">
+
+          <text class="st-t" x="40" y="42">这口锅一次最多放 2 张</text>
+
+          <rect x="398" y="182" width="112" height="28" rx="14" fill="url(#wood)"/>
+          <circle cx="272" cy="196" r="142" fill="#525c6b" stroke="#98a3b2" stroke-width="2"/>
+          <circle cx="272" cy="196" r="133" fill="url(#panG)"/>
+          <circle cx="272" cy="196" r="128" fill="url(#panIn)"/>
+          <circle cx="272" cy="196" r="128" fill="none" stroke="#1b212b" stroke-opacity=".55" stroke-width="3"/>
+          <circle id="heat" cx="272" cy="196" r="128" fill="url(#heatG)" opacity="0"/>
+          <path d="M182 133 A110 110 0 0 1 300 90" fill="none" stroke="#ffffff" stroke-opacity=".14" stroke-width="11" stroke-linecap="round"/>
+          <path d="M212 268 A92 92 0 0 0 300 292" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="7" stroke-linecap="round"/>
+
+          <rect x="74" y="350" width="396" height="124" rx="20" fill="url(#boardG)" stroke="#e0caa5" stroke-width="1.6"/>
+          <rect x="84" y="360" width="376" height="104" rx="14" fill="none" stroke="#e9dabb" stroke-width="1.4"/>
+          <line x1="96" y1="368" x2="96" y2="456" stroke="#e5d3b0" stroke-width="1.6" stroke-linecap="round"/>
+          <line x1="448" y1="368" x2="448" y2="456" stroke="#e5d3b0" stroke-width="1.6" stroke-linecap="round"/>
+          <text class="rs" x="272" y="496" text-anchor="middle">案 板</text>
+
+          <g id="freeHint" opacity="0">
+            <circle cx="336" cy="196" r="58" fill="#0d9488" fill-opacity=".16" stroke="#5eead4" stroke-width="3" stroke-dasharray="9 7"/>
+            <text class="fh" x="336" y="196" text-anchor="middle" dominant-baseline="central">空位</text>
+          </g>
+
+          <g id="gCakes"></g>
+
+          <text class="hd" x="545" y="44">时 间 表</text>
+          <text class="hd" x="716" y="74" text-anchor="middle">位置 1</text>
+          <text class="hd" x="838" y="74" text-anchor="middle">位置 2</text>
+          <g id="gTable"></g>
+
+          <text class="rs" x="545" y="392">已用时间</text>
+          <text id="tm" x="545" y="434">0 分钟</text>
+          <text id="note" x="545" y="466"></text>
+
+        </g>
+
+        <g id="gFaces" opacity="0">
+          <text class="ov-t" x="480" y="72" text-anchor="middle">3 张饼 = 6 个面</text>
+          <text class="ov-s" x="480" y="104" text-anchor="middle">锅一轮只放得下 2 个面，所以两个一组往下排</text>
+
+          <circle cx="346" cy="170" r="42" fill="#f6c877" stroke="#2563eb" stroke-width="4"/>
+          <text class="fc-t" x="346" y="170" text-anchor="middle" dominant-baseline="central">1 正</text>
+          <circle cx="442" cy="170" r="42" fill="#f6c877" stroke="#0d9488" stroke-width="4"/>
+          <text class="fc-t" x="442" y="170" text-anchor="middle" dominant-baseline="central">2 正</text>
+          <line x1="500" y1="170" x2="548" y2="170" stroke="#cbd5e1" stroke-width="1.8" marker-end="url(#ar)"/>
+          <text class="fc-l" x="564" y="164">第 1 轮</text>
+          <text class="fc-s" x="564" y="186">3 分钟</text>
+
+          <circle cx="346" cy="262" r="42" fill="#f6c877" stroke="#2563eb" stroke-width="4"/>
+          <text class="fc-t" x="346" y="262" text-anchor="middle" dominant-baseline="central">1 反</text>
+          <circle cx="442" cy="262" r="42" fill="#f6c877" stroke="#d97706" stroke-width="4"/>
+          <text class="fc-t" x="442" y="262" text-anchor="middle" dominant-baseline="central">3 正</text>
+          <line x1="500" y1="262" x2="548" y2="262" stroke="#cbd5e1" stroke-width="1.8" marker-end="url(#ar)"/>
+          <text class="fc-l" x="564" y="256">第 2 轮</text>
+          <text class="fc-s" x="564" y="278">3 分钟</text>
+
+          <circle cx="346" cy="354" r="42" fill="#f6c877" stroke="#0d9488" stroke-width="4"/>
+          <text class="fc-t" x="346" y="354" text-anchor="middle" dominant-baseline="central">2 反</text>
+          <circle cx="442" cy="354" r="42" fill="#f6c877" stroke="#d97706" stroke-width="4"/>
+          <text class="fc-t" x="442" y="354" text-anchor="middle" dominant-baseline="central">3 反</text>
+          <line x1="500" y1="354" x2="548" y2="354" stroke="#cbd5e1" stroke-width="1.8" marker-end="url(#ar)"/>
+          <text class="fc-l" x="564" y="348">第 3 轮</text>
+          <text class="fc-s" x="564" y="370">3 分钟</text>
+
+          <text class="ov-big" x="480" y="452" text-anchor="middle">6 ÷ 2 = 3 轮 → 3 × 3 = 9 分钟</text>
+        </g>
+
+        <g id="gRule" opacity="0">
+          <text class="ov-t" x="480" y="96" text-anchor="middle">n ≥ 2 时，最少 3n 分钟</text>
+          <text class="ov-s" x="480" y="128" text-anchor="middle">每多一张饼，就多花 3 分钟 —— 因为总能找个人填满空位</text>
+
+          <g id="gCards"></g>
+
+          <text class="ov-big" x="480" y="392" text-anchor="middle">n = 1 是唯一例外：6 分钟</text>
+          <text class="ov-s" x="480" y="426" text-anchor="middle">一张饼的两个面没法同时烙，另一个位置想帮也帮不上</text>
+        </g>
+
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 9 步</div>
+      <h2 id="h"></h2>
+      <p id="t"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">按 <b>←</b> <b>→</b> 或 <b>空格</b> 翻页</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const mk = (t, a) => {
+    const e = document.createElementNS('http://www.w3.org/2000/svg', t);
+    for(const k in a) e.setAttribute(k, a[k]);
+    return e;
+  };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  /* ---------- 几何 ---------- */
+  const PAN_CY = 196;
+  const SLOT = [[208, PAN_CY], [336, PAN_CY]];
+  const WAIT_Y = 411;
+  const WAIT_X = {1:152, 2:272, 3:392};
+
+  const COL_X = [660, 782], ROW_Y = [92, 164, 236, 308], CELL_W = 112, CELL_H = 58;
+
+  const TINT = {1:'#dbeafe', 2:'#ccfbf1', 3:'#fde9c4'};
+  const HUE  = {1:'#2563eb', 2:'#0d9488', 3:'#d97706'};
+  const FILL = ['#fdf4de', '#f6c877', '#e9a24a'];
+  const EDGE = ['#e2cfa4', '#d9a558', '#bf7d2f'];
+
+  /* ---------- 状态 ---------- */
+  const S = { step:0, done:{}, down:{}, where:{}, min:0 };
+  let token = 0;
+  let cakes = {};
+  let cells = {};
+
+  /* ---------- 建饼 ---------- */
+  function buildCakes(){
+    const host = $('gCakes');
+    for(let n = 1; n <= 3; n++){
+      const g = mk('g', {class:'cake', id:'cake' + n});
+      const inner = mk('g', {class:'inner'});
+
+      const body = mk('circle', {r:54, fill:FILL[0], stroke:EDGE[0], 'stroke-width':2});
+
+      const spots = mk('g', {opacity:0});
+      const sp = [[-22,-19,8],[15,-24,6],[-7,7,9],[26,13,6],[-28,17,5],[5,-3,5]];
+      sp.forEach(s => spots.appendChild(mk('circle', {cx:s[0], cy:s[1], r:s[2], fill:'#c07a2c', opacity:.42})));
+
+      const ring = mk('circle', {r:54, fill:'none', stroke:HUE[n], 'stroke-width':4, opacity:.85});
+
+      const num = mk('text', {class:'num', y:2, 'text-anchor':'middle', 'dominant-baseline':'central'});
+      num.textContent = n;
+
+      const bb = mk('rect', {x:-22, y:25, width:44, height:24, rx:12, fill:'#ffffff', opacity:.82});
+      const bd = mk('text', {class:'bdg', y:38, 'text-anchor':'middle', 'dominant-baseline':'central'});
+      bd.textContent = '正';
+
+      const chk = mk('g', {opacity:0});
+      chk.appendChild(mk('circle', {cx:34, cy:-34, r:14, fill:'#0d9488'}));
+      chk.appendChild(mk('path', {d:'M27 -34 L32.5 -28.5 L42 -40', fill:'none', stroke:'#fff', 'stroke-width':3.4, 'stroke-linecap':'round', 'stroke-linejoin':'round'}));
+
+      inner.appendChild(body);
+      inner.appendChild(spots);
+      inner.appendChild(ring);
+      inner.appendChild(num);
+      inner.appendChild(bb);
+      inner.appendChild(bd);
+      inner.appendChild(chk);
+      g.appendChild(inner);
+      host.appendChild(g);
+
+      cakes[n] = {g, inner, body, spots, bd, chk};
+    }
+  }
+
+  /* ---------- 摆放与上色 ---------- */
+  function place(n){
+    const w = S.where[n];
+    let x = WAIT_X[n], y = WAIT_Y;
+    if(w === 'pan0'){ x = SLOT[0][0]; y = SLOT[0][1]; }
+    if(w === 'pan1'){ x = SLOT[1][0]; y = SLOT[1][1]; }
+    cakes[n].g.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  }
+
+  function paint(n){
+    const d = S.done[n];
+    const c = cakes[n];
+    const i = Math.min(d, 2);
+    c.body.setAttribute('fill', FILL[i]);
+    c.body.setAttribute('stroke', EDGE[i]);
+    c.spots.setAttribute('opacity', d >= 1 ? .9 : 0);
+    c.chk.setAttribute('opacity', d >= 2 ? 1 : 0);
+    c.bd.textContent = S.down[n];
+  }
+
+  function flip(n){
+    S.down[n] = S.down[n] === '正' ? '反' : '正';
+    const inner = cakes[n].inner;
+    inner.classList.add('flip');
+    return new Promise(res => {
+      setTimeout(() => {
+        paint(n);
+        setTimeout(() => { inner.classList.remove('flip'); res(); }, 230);
+      }, 200);
+    });
+  }
+
+  /* ---------- 时间表 ---------- */
+  function buildTable(){
+    const g = $('gTable');
+    g.innerHTML = '';
+    cells = {};
+    for(let r = 0; r < 4; r++){
+      const l1 = mk('text', {class:'rl', x:545, y:ROW_Y[r] + 26});
+      l1.textContent = '第 ' + (r + 1) + ' 轮';
+      const l2 = mk('text', {class:'rs', x:545, y:ROW_Y[r] + 48});
+      l2.textContent = (r * 3) + '–' + (r * 3 + 3) + ' 分';
+      g.appendChild(l1); g.appendChild(l2);
+
+      for(let c = 0; c < 2; c++){
+        const bg = mk('rect', {
+          x:COL_X[c], y:ROW_Y[r], width:CELL_W, height:CELL_H, rx:12,
+          fill:'none', stroke:'#e6eaf1', 'stroke-width':1.4, 'stroke-dasharray':'5 5'
+        });
+        const t = mk('text', {
+          class:'ct', x:COL_X[c] + CELL_W / 2, y:ROW_Y[r] + CELL_H / 2,
+          'text-anchor':'middle', 'dominant-baseline':'central'
+        });
+        g.appendChild(bg); g.appendChild(t);
+        cells[r + '-' + c] = {bg, t};
+      }
+    }
+  }
+
+  function clearTable(){
+    for(const key in cells){
+      const el = cells[key];
+      el.bg.setAttribute('fill', 'none');
+      el.bg.setAttribute('stroke', '#e6eaf1');
+      el.bg.setAttribute('stroke-dasharray', '5 5');
+      el.bg.classList.remove('wp');
+      el.t.textContent = '';
+      el.t.setAttribute('class', 'ct');
+    }
+  }
+
+  function fillCell(r, c, n, side, kind){
+    const el = cells[r + '-' + c];
+    if(!el) return;
+    if(!n){
+      el.bg.setAttribute('fill', kind === 'waste' ? '#fef2f2' : 'none');
+      el.bg.setAttribute('stroke', kind === 'waste' ? '#f87171' : '#e6eaf1');
+      el.bg.setAttribute('stroke-dasharray', '5 5');
+      el.t.textContent = kind === 'waste' ? '空着' : (kind === 'idle' ? '空着' : '');
+      el.t.setAttribute('class', kind === 'waste' ? 'ct waste' : 'ct');
+      if(kind === 'waste') el.t.style.fill = '#dc2626';
+      else el.t.style.fill = '#b4b2a9';
+      return;
+    }
+    el.bg.setAttribute('fill', TINT[n]);
+    el.bg.setAttribute('stroke', HUE[n]);
+    el.bg.setAttribute('stroke-dasharray', '0');
+    el.t.textContent = n + ' 号 ' + side;
+    el.t.setAttribute('class', 'ct');
+    el.t.style.fill = '#0f172a';
+  }
+
+  /* ---------- 杂项 ---------- */
+  function setTime(){ $('tm').textContent = S.min + ' 分钟'; }
+  function setHeat(v){ $('heat').style.opacity = v; }
+  function setNote(txt, color){
+    $('note').textContent = txt || '';
+    $('note').style.fill = color || '#94a3b8';
+  }
+  function slotHint(on){ $('freeHint').classList.toggle('on', !!on); $('freeHint').setAttribute('opacity', on ? 1 : 0); }
+
+  function resetAll(){
+    for(let n = 1; n <= 3; n++){
+      S.done[n] = 0; S.down[n] = '正'; S.where[n] = 'wait';
+      paint(n); place(n);
+    }
+    S.min = 0;
+    setTime(); clearTable(); setHeat(0); setNote(''); slotHint(false);
+  }
+
+  /* ---------- 一步 = 3 分钟 ---------- */
+  async function cookRound() {
+    setHeat(1);
+    await sleep(700);
+    setHeat(0);
+  }
+
+  /* ---------- 9 步动画 ---------- */
+  async function anim(k, tk){
+    const alive = () => tk === token;
+
+    if(k === 7){ $('gScene').style.opacity = 0; $('gFaces').style.opacity = 1; $('gRule').style.opacity = 0; return; }
+    if(k === 8){ $('gScene').style.opacity = 0; $('gFaces').style.opacity = 0; $('gRule').style.opacity = 1; return; }
+    $('gScene').style.opacity = 1; $('gFaces').style.opacity = 0; $('gRule').style.opacity = 0;
+
+    /* 第 1 步：题面 */
+    if(k === 0){
+      resetAll();
+      return;
+    }
+
+    /* 第 2 步：1 张 = 6 分钟 */
+    if(k === 1){
+      resetAll();
+      await sleep(280); if(!alive()) return;
+
+      S.where[1] = 'pan0'; place(1);
+      await sleep(760); if(!alive()) return;
+
+      fillCell(0, 0, 1, '正'); fillCell(0, 1, null, null, 'idle');
+      S.min = 3; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 1; paint(1);
+      await sleep(620); if(!alive()) return;
+
+      await flip(1); if(!alive()) return;
+      fillCell(1, 0, 1, '反'); fillCell(1, 1, null, null, 'idle');
+      S.min = 6; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 2; paint(1);
+      await sleep(600); if(!alive()) return;
+
+      S.where[1] = 'wait'; place(1);
+      return;
+    }
+
+    /* 第 3 步：2 张 = 6 分钟 */
+    if(k === 2){
+      resetAll();
+      await sleep(240); if(!alive()) return;
+
+      S.where[1] = 'pan0'; S.where[2] = 'pan1'; place(1); place(2);
+      await sleep(760); if(!alive()) return;
+
+      fillCell(0, 0, 1, '正'); fillCell(0, 1, 2, '正');
+      S.min = 3; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 1; S.done[2] = 1; paint(1); paint(2);
+      await sleep(600); if(!alive()) return;
+
+      await flip(1); if(!alive()) return;
+      await flip(2); if(!alive()) return;
+
+      fillCell(1, 0, 1, '反'); fillCell(1, 1, 2, '反');
+      S.min = 6; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 2; S.done[2] = 2; paint(1); paint(2);
+      await sleep(620); if(!alive()) return;
+
+      S.where[1] = 'wait'; S.where[2] = 'wait'; place(1); place(2);
+      return;
+    }
+
+    /* 第 4 步：老实来 12 分钟 */
+    if(k === 3){
+      resetAll();
+      await sleep(240); if(!alive()) return;
+
+      S.where[1] = 'pan0'; S.where[2] = 'pan1'; place(1); place(2);
+      await sleep(720); if(!alive()) return;
+
+      fillCell(0, 0, 1, '正'); fillCell(0, 1, 2, '正');
+      S.min = 3; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 1; S.done[2] = 1; paint(1); paint(2);
+      await sleep(520); if(!alive()) return;
+
+      await flip(1); if(!alive()) return;
+      await flip(2); if(!alive()) return;
+
+      fillCell(1, 0, 1, '反'); fillCell(1, 1, 2, '反');
+      S.min = 6; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 2; S.done[2] = 2; paint(1); paint(2);
+      await sleep(520); if(!alive()) return;
+
+      S.where[1] = 'wait'; S.where[2] = 'wait'; place(1); place(2);
+      await sleep(680); if(!alive()) return;
+
+      S.where[3] = 'pan0'; place(3);
+      await sleep(700); if(!alive()) return;
+
+      fillCell(2, 0, 3, '正'); fillCell(2, 1, null, null, 'waste');
+      S.min = 9; setTime(); await cookRound(); if(!alive()) return;
+      S.done[3] = 1; paint(3);
+      await sleep(560); if(!alive()) return;
+
+      await flip(3); if(!alive()) return;
+
+      fillCell(3, 0, 3, '反'); fillCell(3, 1, null, null, 'waste');
+      S.min = 12; setTime(); await cookRound(); if(!alive()) return;
+      S.done[3] = 2; paint(3);
+      await sleep(620); if(!alive()) return;
+
+      setNote('两个空位 = 白等 6 分钟', '#dc2626');
+      return;
+    }
+
+    /* 第 5 步：12 分钟账单（直接呈现） */
+    if(k === 4){
+      resetAll();
+      S.done[1] = 2; S.done[2] = 2; S.done[3] = 2;
+      S.where[1] = 'wait'; S.where[2] = 'wait'; S.where[3] = 'pan0';
+      for(let n = 1; n <= 3; n++){ paint(n); place(n); }
+      S.min = 12; setTime();
+      fillCell(0, 0, 1, '正'); fillCell(0, 1, 2, '正');
+      fillCell(1, 0, 1, '反'); fillCell(1, 1, 2, '反');
+      fillCell(2, 0, 3, '正'); fillCell(2, 1, null, null, 'waste');
+      fillCell(3, 0, 3, '反'); fillCell(3, 1, null, null, 'waste');
+      cells['2-1'].bg.classList.add('wp');
+      cells['3-1'].bg.classList.add('wp');
+      setNote('两个空位 = 白等 6 分钟', '#dc2626');
+      return;
+    }
+
+    /* 第 6 步：破局 —— 中途拿出来 */
+    if(k === 5){
+      resetAll();
+      await sleep(240); if(!alive()) return;
+
+      S.where[1] = 'pan0'; S.where[2] = 'pan1'; place(1); place(2);
+      await sleep(740); if(!alive()) return;
+
+      fillCell(0, 0, 1, '正'); fillCell(0, 1, 2, '正');
+      S.min = 3; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 1; S.done[2] = 1; paint(1); paint(2);
+      await sleep(760); if(!alive()) return;
+
+      S.where[2] = 'wait'; place(2);
+      await sleep(860); if(!alive()) return;
+
+      slotHint(true);
+      setNote('位置空出来了 —— 谁都能进去', '#0d9488');
+      return;
+    }
+
+    /* 第 7 步：9 分钟三步走 */
+    if(k === 6){
+      resetAll();
+      await sleep(220); if(!alive()) return;
+
+      S.where[1] = 'pan0'; S.where[2] = 'pan1'; place(1); place(2);
+      await sleep(720); if(!alive()) return;
+
+      fillCell(0, 0, 1, '正'); fillCell(0, 1, 2, '正');
+      S.min = 3; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 1; S.done[2] = 1; paint(1); paint(2);
+      await sleep(560); if(!alive()) return;
+
+      S.where[2] = 'wait'; place(2);
+      S.where[3] = 'pan1'; place(3);
+      await sleep(820); if(!alive()) return;
+      await flip(1); if(!alive()) return;
+
+      fillCell(1, 0, 1, '反'); fillCell(1, 1, 3, '正');
+      S.min = 6; setTime(); await cookRound(); if(!alive()) return;
+      S.done[1] = 2; S.done[3] = 1; paint(1); paint(3);
+      await sleep(600); if(!alive()) return;
+
+      S.where[1] = 'wait'; place(1);
+      await sleep(420); if(!alive()) return;
+      S.where[2] = 'pan0'; place(2);
+      await sleep(640); if(!alive()) return;
+      await flip(2); if(!alive()) return;
+      await flip(3); if(!alive()) return;
+
+      fillCell(2, 0, 2, '反'); fillCell(2, 1, 3, '反');
+      S.min = 9; setTime(); await cookRound(); if(!alive()) return;
+      S.done[2] = 2; S.done[3] = 2; paint(2); paint(3);
+      await sleep(620); if(!alive()) return;
+
+      setNote('9 分钟：2 号和 3 号同时出锅', '#0d9488');
+      return;
+    }
+  }
+
+  /* ---------- 规律卡片 ---------- */
+  function buildCards(){
+    const g = $('gCards');
+    if(g.childNodes.length) return;
+    const data = [
+      {n:'1 张', v:'6 分', hi:false, ex:true},
+      {n:'2 张', v:'6 分', hi:false},
+      {n:'3 张', v:'9 分', hi:true},
+      {n:'4 张', v:'12 分', hi:false},
+      {n:'5 张', v:'15 分', hi:false}
+    ];
+    const w = 104, gap = 16;
+    const total = data.length * w + (data.length - 1) * gap;
+    const x0 = (960 - total) / 2;
+
+    data.forEach((d, i) => {
+      const x = x0 + i * (w + gap);
+      g.appendChild(mk('rect', {
+        x:x, y:172, width:w, height:110, rx:14,
+        fill: d.hi ? '#dbeafe' : (d.ex ? '#fef2f2' : '#f8fafc'),
+        stroke: d.hi ? '#2563eb' : (d.ex ? '#f0a8a8' : '#e7eaf0'),
+        'stroke-width': d.hi ? 2 : 1.4
+      }));
+      const t1 = mk('text', {class:'card-n', x:x + w / 2, y:210, 'text-anchor':'middle'});
+      t1.textContent = d.n;
+      if(d.ex) t1.style.fill = '#b91c1c';
+      const t2 = mk('text', {class:'card-v', x:x + w / 2, y:254, 'text-anchor':'middle'});
+      t2.textContent = d.v;
+      if(d.ex) t2.style.fill = '#b91c1c';
+      g.appendChild(t1); g.appendChild(t2);
+    });
+  }
+
+  /* ---------- 文案 ---------- */
+  const STEPS = [
+    {
+      h:'烙 3 张饼，最少几分钟？',
+      t:'一口锅一次最多烙 2 张饼，每面要 3 分钟。1 张是 6 分钟，2 张也是 6 分钟。<b>那 3 张呢？</b>',
+      eq:'1 张 → 6 分钟\n2 张 → 6 分钟\n3 张 → ?'
+    },
+    {
+      h:'1 张：锅空一半，也得等',
+      t:'一张饼有正反两面，各要 3 分钟。锅的另一半一直空着 —— 因为<i>同一张饼的两面不能同时烙</i>。',
+      eq:'正面 3 分 + 反面 3 分\n= 6 分钟'
+    },
+    {
+      h:'2 张：还是 6 分钟',
+      t:'两张一起下锅，正面烙一轮、反面烙一轮。锅装满了，<b>时间一点没多花</b>。这就是「一次最多 2 张」的意思。',
+      eq:'两张同时烙\n= 6 分钟\n（多烙一张，不加时间）'
+    },
+    {
+      h:'老实来：12 分钟',
+      t:'先烙 1、2 号，6 分钟出锅；再单独烙 3 号，又是 6 分钟。加起来 <em>12 分钟</em>。听着挺合理，但看时间表就露馅了。',
+      eq:'1、2 号 一起 → 6 分钟\n3 号 单独 → 6 分钟\n= <span class="hl">12 分钟</span>'
+    },
+    {
+      h:'那 6 分钟，是空转掉的',
+      t:'后两轮锅里只有一张饼，另一个位置<b>从头空到尾</b>。空着的位置，就是白白流走的时间 —— 12 分钟里有一半在浪费。',
+      eq:'12 分钟里\n有 6 分钟只烙了 1 个面\n（本该烙 2 个）'
+    },
+    {
+      h:'破局：中途可以拿出来',
+      t:'饼烙好一面<i>就能先拿出来</i>放案板上，过一会儿再放回去烙另一面。<b>题目从来没要求一口气烙完。</b>',
+      eq:'2 号烙好一面\n→ 请出锅，先等着\n→ 位置让给 3 号'
+    },
+    {
+      h:'9 分钟：最后一轮，两张一起出锅',
+      t:'轮 1 烙 1 正、2 正；轮 2 把 2 号请出去，换 3 号进来；轮 3 烙 2 反、3 反。三个位置一分钟没闲过。',
+      eq:'轮 1：1 正 · 2 正\n轮 2：1 反 · 3 正\n轮 3：2 反 · 3 反\n= <span class="ok">9 分钟</span>'
+    },
+    {
+      h:'换个单位：数面，不数张',
+      t:'别再数「几张饼」了，改数「<b>几个面</b>」。每轮锅只烙得下 2 个面，面数除以 2，就是轮数。',
+      eq:'3 张 × 2 面 = 6 个面\n6 ÷ 2 = 3 轮\n3 轮 × 3 分 = <span class="ok">9 分钟</span>'
+    },
+    {
+      h:'规律：n ≥ 2 时，3n 分钟',
+      t:'只要不止一张，就总能找到饼来填满空位。但 1 张饼是硬例外 —— 它的两个面没法同时烙，另一只手想帮也帮不上。',
+      eq:'n 张饼（n ≥ 2）\n最少 3n 分钟\n\n1 张 → 6 分钟（特例）'
+    }
+  ];
+
+  /* ---------- 渲染 ---------- */
+  function render(){
+    const k = S.step;
+    const cur = STEPS[k];
+    $('steptag').textContent = '第 ' + (k + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('h').textContent = cur.h;
+    $('t').innerHTML = cur.t;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = k === 0;
+    $('next').disabled = k === STEPS.length - 1;
+    $('next').textContent = k === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === k));
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === S.step) return;
+    S.step = k;
+    token++;
+    render();
+    anim(k, token);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  buildCakes();
+  buildTable();
+  buildCards();
+  S.step = 0;
+  render();
+  anim(0, ++token);
+})();
+</script>
+</body>
+</html>

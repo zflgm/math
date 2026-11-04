@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>植树问题 · 点比段多 1</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}
+/* ---- 本页补充 ---- */
+svg line{transition:opacity .44s ease, stroke .34s ease, x1 .5s ease, x2 .5s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .38s ease both}
+#nowSeg, #nowTree{font-size:19px;font-weight:800;fill:#475569}
+.seg-no{font-size:14px;font-weight:800;fill:#93a3b8}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 15 课 · 植树问题</span>
+    <span class="sp"></span>
+    <a href="../14-jitu/index.html">← 上一课</a>
+    <a href="../16-zhaocipin/index.html">下一课：找次品 →</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 经典模型 15</div>
+    <h1>植树问题：<span class="q-mark">先数段，再数点</span></h1>
+    <p class="q">一条小路长 <b>20 米</b>，每隔 <b>5 米</b>栽一棵树。一共要栽几棵？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 455" preserveAspectRatio="xMidYMid meet">
+
+        <text id="nowSeg" x="60" y="56">段：4 段</text>
+        <text id="nowTree" x="860" y="56" text-anchor="end">树：5 棵</text>
+
+        <g id="gLine"></g>
+        <g id="gCircle"></g>
+
+        <text id="foot" x="460" y="400" text-anchor="middle" font-size="22" font-weight="800" fill="#475569"></text>
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 8 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">这一课</span>
+    <span class="unit">路长 20 米，每 5 米栽一棵 —— 段数 4，剩下的全看"两端栽不栽"</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const X0 = 160, SEGW = 150, NSEG = 4;
+  const ROAD_Y = 250;
+
+  let S = { step: 0 };
+
+  function mk(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  let trees = [];          // 直线上的 5 棵树
+  let circleTrees = [];
+
+  function build(){
+    const g = $('gLine');
+    g.innerHTML = '';
+
+    // 四段路
+    for(let i = 0; i < NSEG; i++){
+      g.appendChild(mk('rect', {
+        x: X0 + i * SEGW, y: ROAD_Y - 7, width: SEGW, height: 14,
+        fill: i % 2 ? '#bfdbfe' : '#dbeafe'
+      }));
+      const t = mk('text', {
+        x: X0 + i * SEGW + SEGW / 2, y: ROAD_Y + 62,
+        'text-anchor': 'middle', class: 'seg-no'
+      });
+      t.textContent = (i + 1) + ' 段';
+      g.appendChild(t);
+    }
+
+    // 五个点上的树
+    trees = [];
+    for(let i = 0; i <= NSEG; i++){
+      const c = mk('circle', {
+        cx: X0 + i * SEGW, cy: ROAD_Y, r: 15,
+        fill: '#22c55e', stroke: '#ffffff', 'stroke-width': 2.5
+      });
+      g.appendChild(c);
+      trees.push(c);
+    }
+
+    // 圆形花坛
+    const gc = $('gCircle');
+    gc.innerHTML = '';
+    const CX = 460, CY = 222, R = 130, N = 8;
+    const pts = [];
+    for(let k = 0; k < N; k++){
+      const a = -Math.PI / 2 + k * Math.PI / 4;
+      pts.push([CX + R * Math.cos(a), CY + R * Math.sin(a)]);
+    }
+    gc.appendChild(mk('polygon', {
+      points: pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '),
+      fill: 'none', stroke: '#bfdbfe', 'stroke-width': 12,
+      'stroke-linejoin': 'round'
+    }));
+    circleTrees = [];
+    pts.forEach(p => {
+      const c = mk('circle', {
+        cx: p[0].toFixed(1), cy: p[1].toFixed(1), r: 15,
+        fill: '#22c55e', stroke: '#ffffff', 'stroke-width': 2.5
+      });
+      gc.appendChild(c); circleTrees.push(c);
+    });
+    const mid = mk('text', {
+      x: CX, y: CY + 8, 'text-anchor': 'middle',
+      'font-size': 22, 'font-weight': 800, fill: '#64748b'
+    });
+    mid.textContent = '8 段 = 8 棵';
+    gc.appendChild(mid);
+  }
+
+  /* ---------- 树显示几只 ---------- */
+  function treeState(st){
+    // 返回 [左端, 右端, 中间] 是否显示
+    if(st < 2) return {left: true, right: true, count: 5};
+    if(st === 3) return {left: true, right: false, count: 4};
+    if(st === 4) return {left: false, right: false, count: 3};
+    return {left: true, right: true, count: 5};
+  }
+
+  function paint(){
+    const st = S.step;
+    const isCircle = (st === 6);
+
+    $('gLine').style.opacity = isCircle ? 0 : 1;
+    $('gCircle').style.opacity = isCircle ? 1 : 0;
+
+    const ts = treeState(st);
+    trees.forEach((t, i) => {
+      let show = true;
+      if(i === 0 && !ts.left) show = false;
+      if(i === NSEG && !ts.right) show = false;
+      if(st < 2) show = false;          // 第 1、2 步还没有树
+      t.style.opacity = show ? 1 : 0;
+      t.setAttribute('fill', show ? '#22c55e' : '#e2e8f0');
+    });
+
+    circleTrees.forEach(t => { t.style.opacity = isCircle ? 1 : 0; });
+
+    $('nowSeg').textContent = isCircle ? '段：8 段' : '段：4 段';
+    const nt = $('nowTree');
+    if(st === 0){ nt.textContent = '树：还没栽'; }
+    else if(st === 1){ nt.textContent = '树：还没栽'; }
+    else if(isCircle){ nt.textContent = '树：8 棵'; }
+    else { nt.textContent = '树：' + ts.count + ' 棵'; }
+    nt.setAttribute('fill', st >= 2 ? '#0d9488' : '#64748b');
+
+    const txt = [
+      '这条路被分成了几段？',
+      '4 段 —— 段是死的，树是活的',
+      '两端都栽：4 + 1 = 5 棵',
+      '只栽一端：4 棵',
+      '两端都不栽：3 棵',
+      '5 个手指，4 个缝 —— 点比段多 1',
+      '圆：首尾接上，8 段 8 棵',
+      '锯木头、上楼梯、敲钟 —— 同一道题'
+    ];
+    const foot = $('foot');
+    foot.textContent = txt[st];
+    foot.setAttribute('fill', st >= 2 && st <= 5 ? '#0d9488' : '#475569');
+  }
+
+  /* ---------- 八步 ---------- */
+  const STEPS = [
+    {
+      t: '先数段，别数树',
+      h: '路长 <b>20 米</b>，每 <b>5 米</b>栽一棵。<br>' +
+         '多数人的第一反应是"数有几棵"，可现在一棵都还没栽 —— 得先决定怎么栽。<br><br>' +
+         '所以先做一件更基本的事：<b>这条路被分成了几段？</b>',
+      eq: '总长 20 米 ÷ 每段 5 米 = ?'
+    },
+    {
+      t: '4 段',
+      h: '20 ÷ 5 = <b>4 段</b>。<br>' +
+         '看下面标着 1、2、3、4 的四个格子 —— <b>格子就是段</b>。<br><br>' +
+         '不管最后栽几棵，段永远是 4 段。<br>' +
+         '<b>段是死的，树是活的</b> —— 题目怎么变，变的都是树。',
+      eq: '20 ÷ 5 = 4 段（这个是定死的）'
+    },
+    {
+      t: '两端都栽：5 棵',
+      h: '<b>棵数 = 段数 + 1</b> → 4 + 1 = <b>5 棵</b>。<br><br>' +
+         '为什么多 1？段的两头各要一个点，4 段正好摆下 5 个点。<br>' +
+         '像 4 根绳子接起来，接头有 5 个。',
+      eq: '棵数 = 4 + 1 = 5'
+    },
+    {
+      t: '只栽一端：4 棵',
+      h: '<b>棵数 = 段数</b> → <b>4 棵</b>。<br><br>' +
+         '去掉右边那棵。少掉的那个点，正好是最后一段的右端。<br>' +
+         '生活里对应"路的一头是院墙，另一头是路口" —— 墙那头不栽。',
+      eq: '棵数 = 4'
+    },
+    {
+      t: '两端都不栽：3 棵',
+      h: '<b>棵数 = 段数 − 1</b> → 4 − 1 = <b>3 棵</b>。<br><br>' +
+         '两头都去掉，只剩中间 3 个点。<br>' +
+         '对应"两头都是楼房，只在中间空地上栽"。',
+      eq: '棵数 = 4 − 1 = 3'
+    },
+    {
+      t: '为什么是"点比段多 1"',
+      h: '看自己的手：<b>5 个手指，4 个缝</b>。<br>' +
+         '手指是<b>点</b>（树），缝是<b>段</b>（间隔）。缝永远比手指少 1。<br><br>' +
+         '把这一画面记住，比背三个公式管用 —— <b>三个公式其实是同一句话</b>，' +
+         '只是两端栽不栽不同。',
+      eq: '手指 − 缝 = 1\n（点 − 段 = 1）'
+    },
+    {
+      t: '封闭图形：不加也不减',
+      h: '圆形花坛周长 60 米，每 5 米摆一盆 → 12 段，<b>12 盆</b>。<br><br>' +
+         '为什么不用 +1？因为<b>首尾接上了</b> —— 最后一个点和第一个点是同一个点，' +
+         '要是 +1 就把它数了两遍。<br>' +
+         '没有"两端"，所以没有 ±1。',
+      eq: '圆：棵数 = 段数'
+    },
+    {
+      t: '三个变形，其实是同一道题',
+      h: '<b>锯木头</b>：次数 = 段数 − 1（锯成 5 段只锯 4 次）<br>' +
+         '<b>上楼梯</b>：段数 = 楼层差（1 楼到 5 楼只走 4 段，楼层是点，楼梯是段）<br>' +
+         '<b>敲钟</b>：间隔数 = 敲的次数 − 1（敲 5 下，只有 4 个间隔）<br><br>' +
+         '全是"点"和"段"的关系，只是换了说法。<br>' +
+         '做法固定：<b>先指认谁是点、谁是段，再决定要不要 ±1</b>。',
+      eq: '段数 = 总长 ÷ 间隔\n点数 = 段数 ± 1（看两端）'
+    }
+  ];
+
+  function render(){
+    const st = S.step;
+    paint();
+    const cur = STEPS[st];
+    $('steptag').textContent = '第 ' + (st + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === S.step) return;
+    S.step = k;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  build();
+  render();
+})();
+</script>
+</body>
+</html>

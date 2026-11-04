@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>火车过桥 · 车头要多走一个车长</title>
+<style>/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valSum{font-size:19px;font-weight:800;fill:#fff}
+.valRed{font-size:24px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.diffTxt{font-size:20px;font-weight:800;fill:var(--d)}
+.halfTxt{font-size:21px;font-weight:800;fill:#475569}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+.partNum{font-size:17px;font-weight:800;fill:#fff}
+
+/* ---------- 通用形状 ---------- */
+.barA{fill:var(--a)}
+.barD{fill:var(--d)}
+.barB{fill:var(--b)}
+.barS{fill:var(--s)}
+.barOk{fill:var(--ok)}
+.patch{fill:none;stroke:var(--b);stroke-width:3;stroke-dasharray:9 8}
+.patch.on{fill:var(--b-lt);stroke:var(--b);stroke-dasharray:none}
+.ghost{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-dasharray:7 7}
+.split{stroke:#0f172a;stroke-width:3;stroke-linecap:round}
+.alignLine{stroke:#334155;stroke-width:2.5;stroke-dasharray:6 6;opacity:.32}
+.bracket{stroke:var(--d);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.segLine{stroke:#ffffff;stroke-width:3;stroke-linecap:round}
+.unitBox{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:6 5}
+.cell{fill:var(--a-lt);stroke:#ffffff;stroke-width:2.5}
+.cell.new{fill:#eef3fd}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- try panel ---------- */
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try input{
+  width:92px;font-family:inherit;font-size:17px;font-weight:800;
+  padding:9px 12px;border:1px solid var(--line);border-radius:10px;
+  color:var(--ink);background:#fbfcfe;font-variant-numeric:tabular-nums;
+}
+.try input:focus{outline:none;border-color:var(--a);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.try .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.try .warn{font-size:14px;font-weight:700;color:var(--d)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 目录页 ---------- */
+.cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:18px;margin-top:22px;
+}
+.card{
+  display:block;text-decoration:none;color:inherit;
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04);
+  transition:.18s ease;
+  position:relative;overflow:hidden;
+}
+.card:hover{border-color:#c7d3e6;transform:translateY(-2px);box-shadow:0 10px 26px -14px rgba(15,23,42,.28)}
+.card .no{
+  font-size:13px;font-weight:800;letter-spacing:.08em;color:#9aa6b8;
+}
+.card h3{margin-top:8px;font-size:22px;font-weight:800}
+.card p{margin-top:9px;font-size:15px;line-height:1.7;color:#5b6779}
+.card .go{
+  margin-top:16px;font-size:14px;font-weight:800;color:var(--a);
+}
+.card.done::after{
+  content:"已做";position:absolute;top:16px;right:16px;
+  font-size:12px;font-weight:800;color:var(--ok);
+  background:var(--ok-lt);padding:3px 9px;border-radius:999px;
+}
+
+.card.soon{opacity:.5;pointer-events:none;background:#fbfcfd}
+.card.soon .go{color:#94a3b8}
+.sect-title{
+  margin:36px 0 4px;font-size:19px;font-weight:800;color:#0f172a;
+  display:flex;align-items:center;gap:10px;
+}
+.sect-title span{
+  font-size:12px;font-weight:800;color:#9aa6b8;letter-spacing:.06em;
+  background:#eef1f6;padding:3px 9px;border-radius:999px;
+}</style>
+<style>
+  .t18{font-size:18px;font-weight:800}
+  .ts14{font-size:14px;font-weight:700}
+  .ts15{font-size:15px;font-weight:700}
+  #train, #frontMark, #prog, #progCar { transition: transform 1.4s cubic-bezier(.45,.05,.35,1), width 1.4s cubic-bezier(.45,.05,.35,1); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 8 课 / 8 · 火车过桥</span>
+    <span class="sp"></span>
+    <a href="../07-liushui/index.html">← 上一课</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 行程问题 08</div>
+    <h1>火车过桥：<span class="q-mark">为什么路程要多加一个车长？</span></h1>
+    <p class="q">一列火车长 <b>200 米</b>，以每秒 20 米的速度通过一座 <b>1000 米</b>长的大桥。从车头上桥到车尾离桥，共要多少秒？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 300" preserveAspectRatio="xMidYMid meet">
+
+        <text id="cap" class="t18" x="460" y="64" text-anchor="middle" fill="#0f172a">火车停在桥外，准备上桥</text>
+
+        <!-- 车头轨迹条 -->
+        <rect x="260" y="92" width="480" height="16" fill="#eef1f6"/>
+        <rect id="prog" x="260" y="92" width="0" height="16" fill="#2563eb"/>
+        <rect id="progCar" x="660" y="92" width="0" height="16" fill="#ef4444"/>
+        <text id="progTxt" class="ts14" x="260" y="84" fill="#64748b">车头走过的路程</text>
+
+        <!-- 桥 -->
+        <rect x="260" y="178" width="400" height="14" fill="#94a3b8"/>
+        <rect x="260" y="192" width="14" height="26" fill="#cbd5e1"/>
+        <rect x="646" y="192" width="14" height="26" fill="#cbd5e1"/>
+        <text class="ts15" x="460" y="212" text-anchor="middle" fill="#64748b">桥长 1000 米</text>
+        <text id="tagA" class="ts14" x="260" y="246" text-anchor="middle" fill="#94a3b8">桥头</text>
+        <text id="tagB" class="ts14" x="660" y="246" text-anchor="middle" fill="#94a3b8">桥尾</text>
+
+        <!-- 火车 -->
+        <g id="train" transform="translate(160,150)">
+          <rect x="0" y="0" width="80" height="28" rx="8" fill="#2563eb"/>
+          <rect x="8" y="6" width="14" height="12" rx="3" fill="#bfdbfe"/>
+          <rect x="28" y="6" width="14" height="12" rx="3" fill="#bfdbfe"/>
+          <rect x="48" y="6" width="14" height="12" rx="3" fill="#bfdbfe"/>
+          <path d="M68 6 L78 14 L68 22 Z" fill="#ffffff" opacity="0.9"/>
+          <circle cx="16" cy="28" r="5" fill="#1e293b"/>
+          <circle cx="64" cy="28" r="5" fill="#1e293b"/>
+        </g>
+        <line id="frontMark" x1="240" y1="144" x2="240" y2="182" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+        <text id="carLen" class="ts14" x="200" y="140" text-anchor="middle" fill="#ef4444">车长 200 米</text>
+
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 7 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">换一组数字试试</span>
+    <span class="unit">车长</span>
+    <input id="inL" type="number" value="200" min="50" step="50">
+    <span class="unit">桥长</span>
+    <input id="inB" type="number" value="1000" min="200" step="100">
+    <button class="btn" id="apply">重新画</button>
+    <span class="warn" id="warn"></span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+
+  const BX1 = 260, BX2 = 660, SPAN = BX2 - BX1;   // 桥画 400px
+  const S = { len: 200, bridge: 1000, speed: 20, step: 0 };
+
+  function geom(){
+    const k = SPAN / S.bridge;        // 每米多少像素
+    return { k, carPx: S.len * k, total: (S.len + S.bridge) };
+  }
+
+  /* 车头位置（像素）的五个状态 */
+  function headOf(st){
+    const g = geom();
+    if(st <= 0) return BX1 - g.carPx;      // 停在桥外
+    if(st === 1) return BX1;               // 车头上桥
+    if(st === 2) return BX2;               // 车头出桥
+    return BX2 + g.carPx;                  // 车尾离桥（车头再往前一个车长）
+  }
+
+  const STEPS = [
+    {
+      t: '先分清：什么才算"通过"',
+      h: '这题的坑不在算，在<b>理解"完全通过"</b>。<br>火车不是一个小点，它自己就有 200 米长。<br>所以"通过"这件事，得从头到尾看完整。',
+      eq: '车长 200 米　桥长 1000 米　车速 20 米/秒'
+    },
+    {
+      t: '① 车头上桥 —— 这时开始计时',
+      h: '车头刚碰到桥头，秒表按下。<br>注意：这时候整列车还几乎都在桥外。<br><br>但我们只用<b>车头</b>这一个点来算 —— 火车是整体移动的，每个点走的距离都一样。',
+      eq: '起点：车头在桥头'
+    },
+    {
+      t: '② 车头出桥 —— 但这还不算通过',
+      h: '车头到达桥尾了，可你看车身 —— <b>还有一大截压在桥上</b>。<br>这时候说"火车通过了"是错的：车厢还在桥上，桥还没空出来。<br><br>所以，不能用车头出桥当终点。',
+      eq: '车头走的路程 = 桥长 = 1000 米\n（这时只走了这么多，还不够）'
+    },
+    {
+      t: '③ 车尾离桥 —— 这才是完全通过',
+      h: '车尾离开桥尾的那一刻，桥才真正空出来。<br>此时<b>车头已经跑到桥尾前方 200 米</b>的位置了。<br><br>要"带着整列车出去"，车头就必须多走一个车长。',
+      eq: '终点：车尾在桥尾\n此时车头在桥尾前方 200 米处'
+    },
+    {
+      t: '所以路程 = 桥长 + 车长',
+      h: '看上面那条轨迹：蓝色是"走完桥"，红色是"把车身也拉出去"。<br>两段加起来，就是车头一共走的距离。<br><br><b>1000 + 200 = 1200 米</b>',
+      eq: '路程 = 桥长 + 车长\n= 1000 + 200 = 1200 米'
+    },
+    {
+      t: '最后一步：用路程除速度',
+      h: '1200 ÷ 20 = <b>60 秒</b>。<br><br>可以想一下：如果只算桥长，1000 ÷ 20 = 50 秒 —— 那时车头刚出桥，车厢还在桥上，还差一个车长的路程（200 ÷ 20 = 10 秒）。',
+      eq: '1200 ÷ 20 = <span class="ok">60</span> 秒\n（只算桥长会得 50 秒，少了 10 秒）'
+    },
+    {
+      t: '顺带一个反向的题',
+      h: '如果问"火车<b>完全在桥上</b>的时间"，反过来要<b>减</b>一个车长：<br>车尾上桥，到车头出桥 —— 这段时间里车头只走了 桥长 − 车长。<br><br>(1000 − 200) ÷ 20 = 40 秒。<br><br>一句话记：<em>车头要多走一个车长；完全在桥上，要少走一个车长</em>。',
+      eq: '完全通过：路程 = 桥长 + 车长\n完全在桥上：路程 = 桥长 − 车长'
+    }
+  ];
+
+  function render(anim){
+    const g = geom(), st = S.step;
+    const stage = $('stage');
+    if(!anim) stage.classList.add('no-anim');
+
+    const head = headOf(st);
+    const carPx = g.carPx;
+
+    $('train').setAttribute('transform', `translate(${(head - carPx).toFixed(2)},150)`);
+    $('frontMark').setAttribute('x1', head.toFixed(2));
+    $('frontMark').setAttribute('x2', head.toFixed(2));
+    $('carLen').setAttribute('x', (head - carPx / 2).toFixed(2));
+
+    /* 轨迹条 */
+    const walked = Math.max(0, head - BX1);
+    const bridgePart = Math.min(walked, SPAN);
+    const carPart = Math.max(0, walked - SPAN);
+    $('prog').setAttribute('width', bridgePart.toFixed(2));
+    $('progCar').setAttribute('x', BX2.toFixed(2));
+    $('progCar').setAttribute('width', carPart.toFixed(2));
+    $('progTxt').setAttribute('x', BX1.toFixed(2));
+
+    const caps = [
+      '火车停在桥外，准备上桥',
+      '① 车头上桥 —— 开始计时',
+      '② 车头出桥 —— 车尾还在桥上，不算通过',
+      '③ 车尾离桥 —— 完全通过'
+    ];
+    $('cap').textContent = caps[Math.min(st, 3)];
+
+    const color = st === 2 ? '#ef4444' : '#0f172a';
+    $('cap').setAttribute('fill', color);
+
+    const cur = STEPS[st];
+    $('steptag').textContent = `第 ${st + 1} 步 / 共 ${STEPS.length} 步`;
+    $('t').textContent = cur.t;
+    $('h').innerHTML = cur.h;
+    $('eq').innerHTML = cur.eq;
+
+    $('prev').disabled = st === 0;
+    $('next').disabled = st === STEPS.length - 1;
+    $('next').textContent = st === STEPS.length - 1 ? '已经讲完了'
+                         : (st <= 2 ? '看下一步 →' : '下一步 →');
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === st));
+
+    if(!anim){
+      void stage.offsetWidth;
+      requestAnimationFrame(() => stage.classList.remove('no-anim'));
+    }
+  }
+
+  function go(n){
+    n = Math.max(0, Math.min(STEPS.length - 1, n));
+    if(n === S.step) return;
+    S.step = n; render(true);
+  }
+
+  $('prev').addEventListener('click', () => go(S.step - 1));
+  $('next').addEventListener('click', () => go(S.step + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot'; d.title = `第 ${i + 1} 步`;
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(S.step + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(S.step - 1); }
+  });
+
+  $('apply').addEventListener('click', () => {
+    const l = parseInt($('inL').value, 10);
+    const b = parseInt($('inB').value, 10);
+    const warn = $('warn');
+    if(!Number.isFinite(l) || !Number.isFinite(b) || l <= 0 || b <= 0){
+      warn.textContent = '两个数都要是正整数'; return;
+    }
+    if(b <= l){ warn.textContent = '桥要比车长，不然"完全在桥上"不成立'; return; }
+    warn.textContent = '';
+    S.len = l; S.bridge = b; S.step = 0;
+    render(false);
+  });
+
+  render(false);
+})();
+</script>
+</body>
+</html>
