@@ -177,11 +177,13 @@ svg rect, svg text, svg g, svg path, svg line{
 }
 .hide{opacity:0}
 
-/* 四年级方框 */
-.box-lbl{font-size:15px;font-weight:800;fill:#94a3b8;letter-spacing:.02em}
-.box-num{font-size:34px;font-weight:800;fill:#a8b2c2;font-variant-numeric:tabular-nums}
-.box-num.on{fill:#1d4ed8}
-.box-num.done{fill:#0d9488}
+/* 四年级米袋 */
+.bag-lbl{font-size:16px;font-weight:800;fill:#64748b;letter-spacing:.02em}
+.bag-val{font-size:24px;font-weight:800;fill:#a8b2c2;font-variant-numeric:tabular-nums}
+.bag-val.on{fill:#1d4ed8}
+.bag-val.done{fill:#0d9488}
+.halfmark{stroke:#ef4444;stroke-width:2;stroke-dasharray:7 5;stroke-linecap:round}
+.halfmark-txt{font-size:16px;font-weight:800;fill:#ef4444}
 
 /* 箭头 */
 .arw{stroke:#94a3b8;stroke-width:2.5;fill:none;stroke-linecap:round}
@@ -277,150 +279,244 @@ svg rect, svg text, svg g, svg path, svg line{
   };
 
   /* =========================================================
-     四年级：四个方框 + 反向箭头
+     四年级：三个米袋 + 反向箭头
      ========================================================= */
-  const BX = [28, 260, 492, 724];   // 四个方框的 x
-  const BW = 168, BY = 62, BH = 124;
-  const AR = [196, 428, 660];       // 箭头起点（框右边缘）
-  const AL = [260, 492, 724];       // 箭头终点（下一个框左边缘）
+  const CX = [155, 460, 765];          /* 三个袋子的中心 x */
+  const TOPY = 56, BOTY = 246;         /* 袋口、袋底 */
+  const HMAX = 184;                    /* 184px = 120 千克（满袋）*/
+  const K2H = kg => kg / 120 * HMAX;
 
   const s4 = $('s4');
-  const g4 = { boxes:[], nums:[], lbls:[], fw:[], bw:[], fwLbl:[], bwLbl:[] };
 
-  /* 标题行 */
-  s4.appendChild(mk('text', {x:24, y:32, class:'box-lbl', style:'font-size:16px;fill:#64748b'}))
-    .textContent = '正向：题目说的三件事';
+  /* 米色渐变 */
+  const defs4 = mk('defs');
+  const lgR = mk('linearGradient', {id:'riceg', x1:0, y1:0, x2:0, y2:1});
+  lgR.appendChild(mk('stop', {offset:'0', 'stop-color':'#fadf9b'}));
+  lgR.appendChild(mk('stop', {offset:'1', 'stop-color':'#e4af3f'}));
+  defs4.appendChild(lgR);
+  s4.appendChild(defs4);
 
-  /* 四个方框 */
-  ['原来','第一次后','第二次后','最后'].forEach((lab, i) => {
-    const r = mk('rect', {
-      x:BX[i], y:BY, width:BW, height:BH, rx:16,
-      fill:'#f8fafc', stroke:'#cbd5e1', 'stroke-width':2
+  const bagPath = cx =>
+    'M ' + (cx-85) + ' ' + TOPY +
+    ' L ' + (cx-71) + ' ' + (BOTY-10) +
+    ' Q ' + (cx-69) + ' ' + BOTY + ' ' + (cx-57) + ' ' + BOTY +
+    ' L ' + (cx+57) + ' ' + BOTY +
+    ' Q ' + (cx+69) + ' ' + BOTY + ' ' + (cx+71) + ' ' + (BOTY-10) +
+    ' L ' + (cx+85) + ' ' + TOPY + ' Z';
+
+  const g4 = { body:[], rice:[], ghost:[], mouth:[], lbl:[], val:[], fw:[], bw:[], half:[], foot:null };
+
+  CX.forEach((cx, i) => {
+    const cp = mk('clipPath', {id:'bagc' + i});
+    cp.appendChild(mk('path', {d:bagPath(cx)}));
+    defs4.appendChild(cp);
+
+    const body = mk('path', {
+      d:bagPath(cx), fill:'#fbfcfe', stroke:'#cbd5e1', 'stroke-width':2.5, 'stroke-linejoin':'round'
     });
-    s4.appendChild(r);
-    g4.boxes.push(r);
+    s4.appendChild(body);
+    g4.body.push(body);
 
-    const t1 = mk('text', {x:BX[i]+BW/2, y:BY+42, 'text-anchor':'middle', class:'box-lbl'});
-    t1.textContent = lab;
-    s4.appendChild(t1);
-    g4.lbls.push(t1);
+    /* 虚影米：题目说的那个量，浅灰，表示「有这么多但不知道数字」*/
+    const gh = mk('rect', {
+      x:cx-92, y:BOTY, width:184, height:0, fill:'#e4eaf3', 'clip-path':'url(#bagc' + i + ')'
+    });
+    s4.appendChild(gh);
+    g4.ghost.push(gh);
 
-    const t2 = mk('text', {x:BX[i]+BW/2, y:BY+92, 'text-anchor':'middle', class:'box-num'});
-    t2.textContent = '?';
-    s4.appendChild(t2);
-    g4.nums.push(t2);
+    /* 实心米 */
+    const rc = mk('rect', {
+      x:cx-92, y:BOTY, width:184, height:0, fill:'url(#riceg)', 'clip-path':'url(#bagc' + i + ')'
+    });
+    s4.appendChild(rc);
+    g4.rice.push(rc);
+
+    /* 袋口 */
+    const mo = mk('ellipse', {cx:cx, cy:TOPY, rx:85, ry:9, fill:'#eef2f8', stroke:'#cbd5e1', 'stroke-width':2.5});
+    s4.appendChild(mo);
+    g4.mouth.push(mo);
+
+    const lb = mk('text', {x:cx, y:40, 'text-anchor':'middle', class:'bag-lbl'});
+    s4.appendChild(lb);
+    g4.lbl.push(lb);
+
+    const vl = mk('text', {x:cx, y:276, 'text-anchor':'middle', class:'bag-val'});
+    s4.appendChild(vl);
+    g4.val.push(vl);
   });
 
-  /* 正向箭头 + 标签 */
-  ['拿走一半','再拿一半','多拿 10'].forEach((lab, i) => {
+  /* 袋 2 内部那条「这一半 = 30」的虚线 */
+  const HM_Y = BOTY - K2H(30);
+  CX.forEach((cx, i) => {
+    const g = mk('g', {opacity:0});
+    g.appendChild(mk('line', {x1:cx-86, y1:HM_Y, x2:cx+86, y2:HM_Y, class:'halfmark'}));
+    const t = mk('text', {x:cx+52, y:HM_Y-9, 'text-anchor':'middle', class:'halfmark-txt'});
+    g.appendChild(t);
+    s4.appendChild(g);
+    g4.half.push(g);
+  });
+
+  /* 正向箭头（上排，向右）*/
+  ['拿走一半', '再拿走一半多 10'].forEach((lab, i) => {
     const g = mk('g');
-    const y = BY + BH/2;
-    const x1 = AR[i] + 4, x2 = AL[i] - 10;
+    const y = 110;
+    const x1 = [250, 555][i], x2 = [365, 670][i];
     g.appendChild(mk('line', {x1:x1, y1:y, x2:x2, y2:y, class:'arw'}));
-    g.appendChild(mk('path', {d:`M ${x2+8} ${y} L ${x2-2} ${y-7} M ${x2+8} ${y} L ${x2-2} ${y+7}`, class:'arw'}));
-    const t = mk('text', {x:(x1+x2)/2, y:y-16, 'text-anchor':'middle', class:'arw-lbl'});
+    g.appendChild(mk('path', {d:'M ' + (x2+8) + ' ' + y + ' L ' + (x2-2) + ' ' + (y-7) + ' M ' + (x2+8) + ' ' + y + ' L ' + (x2-2) + ' ' + (y+7), class:'arw'}));
+    const t = mk('text', {x:(x1+x2)/2, y:y-14, 'text-anchor':'middle', class:'arw-lbl'});
     t.textContent = lab;
     g.appendChild(t);
     s4.appendChild(g);
     g4.fw.push(g);
-    g4.fwLbl.push(t);
   });
 
-  /* 反向箭头（从右往左） */
-  s4.appendChild(mk('text', {x:24, y:222, class:'box-lbl', style:'font-size:16px;fill:#ef4444'}))
-    .textContent = '倒推：动作全部反过来';
-
-  ['+10','×2','×2'].forEach((lab, i) => {
+  /* 反向箭头（下排，向左）—— 倒推，所以方向反的 */
+  ['×2', '+10'].forEach((lab, i) => {
     const g = mk('g');
-    const y = 264;
-    const x1 = BX[3-i] + 4, x2 = BX[2-i] + BW - 10;
+    const y = 196;
+    const x1 = [365, 670][i], x2 = [250, 555][i];
     g.appendChild(mk('line', {x1:x1, y1:y, x2:x2, y2:y, class:'arw back'}));
-    g.appendChild(mk('path', {d:`M ${x2-8} ${y} L ${x2+2} ${y-7} M ${x2-8} ${y} L ${x2+2} ${y+7}`, class:'arw back'}));
-    const t = mk('text', {x:(x1+x2)/2, y:y+34, 'text-anchor':'middle', class:'arw-lbl back'});
+    g.appendChild(mk('path', {d:'M ' + (x2-8) + ' ' + y + ' L ' + (x2+2) + ' ' + (y-7) + ' M ' + (x2-8) + ' ' + y + ' L ' + (x2+2) + ' ' + (y+7), class:'arw back'}));
+    const t = mk('text', {x:(x1+x2)/2, y:y+30, 'text-anchor':'middle', class:'arw-lbl back'});
     t.textContent = lab;
     g.appendChild(t);
     s4.appendChild(g);
     g4.bw.push(g);
-    g4.bwLbl.push(t);
   });
 
-  /* 底部验算行 */
-  const f4 = mk('text', {x:460, y:350, 'text-anchor':'middle', class:'foot-txt'});
+  /* 袋 2 内部：从「一半」涨到「整袋」的竖向箭头 */
+  const v2 = mk('g', {opacity:0});
+  v2.appendChild(mk('line', {x1:460, y1:200, x2:460, y2:158, stroke:'#ef4444', 'stroke-width':3, 'stroke-linecap':'round'}));
+  v2.appendChild(mk('path', {d:'M 460 150 L 453 163 M 460 150 L 467 163', stroke:'#ef4444', 'stroke-width':3, fill:'none', 'stroke-linecap':'round'}));
+  const v2t = mk('text', {x:472, y:186, class:'arw-lbl back on'});
+  v2t.textContent = '×2';
+  v2.appendChild(v2t);
+  s4.appendChild(v2);
+  g4.v2 = v2;
+
+  const f4 = mk('text', {x:460, y:340, 'text-anchor':'middle', class:'foot-txt'});
   s4.appendChild(f4);
   g4.foot = f4;
+
+  /* 虚影米固定高度：120 / 60 / 20 千克 */
+  const GHOST = [120, 60, 20];
 
   const S4 = [
     {
       t:'正着算，卡住了',
-      h:'题目给的是<b>一路拿走</b>的过程：先拿一半，再拿一半多 10，最后剩 20。<br><br>' +
-        '要知道原来多少，得先知道中间剩了多少 —— 可中间那两步剩多少，<b>题目一个字都没说</b>。<br><br>' +
+      h:'题目给的是一路拿走的过程：先拿一半，再拿一半多 10，最后剩 20。<br><br>' +
+        '三个袋子摆在这儿。要算左边那两个装了多少，得先知道中间剩了多少 —— 可中间那两步剩多少，<b>题目一个字都没说</b>。<br><br>' +
         '正着走，每一步都缺一个数。那就不正着走了。',
-      eq:'原来 ?\n第一次后 ?\n第二次后 ?\n最后 20',
-      nums:['?','?','?','20'], on:[3], bw:[],
+      eq:'原来 ?\n第一次后 ?\n最后 20',
+      solid:[0,0,0], txt:['?','?','?'], st:['ghost','ghost','ghost'],
+      bw:[], v2:false, half:[false,false,false],
       foot:'正向：每一步都需要一个题目没给的数'
     },
     {
-      t:'倒着走：最后一个框是已知的',
-      h:'唯一能确定的是<b>最后剩下 20 千克</b>。这个数是真的，从这儿出发。<br><br>' +
+      t:'倒着走：右边这个袋子是已知的',
+      h:'唯一能确定的，是<b>最后剩下 20 千克</b>。这个数是真的，从这儿出发。<br><br>' +
         '倒着走有个规矩：<em>正着是什么动作，倒着就做相反的动作</em>。<br>' +
         '正着「减」，倒着「加」；正着「乘」，倒着「除」。',
       eq:'只有 20 是知道的\n从这里往回推',
-      nums:['?','?','?','20'], on:[3], bw:[],
+      solid:[0,0,20], txt:['?','?','20'], st:['ghost','ghost','done'],
+      bw:[], v2:false, half:[false,false,false],
       foot:'起点：最后剩 20 千克'
     },
     {
       t:'第一步：把多拿的 10 加回来',
-      h:'第二次是「拿走一半，<b>再多拿 10 千克</b>」，所以最后才剩 20。<br><br>' +
+      h:'第二次拿的是「剩下的一半，<b>再多 10 千克</b>」，所以最后才剩 20。<br><br>' +
         '倒回去，就要把这 10 千克<em>还回来</em>：<b>20 + 10 = 30</b>。<br><br>' +
-        '这个 30 是什么？是第二次拿走之前，袋子里那「一半」。',
-      eq:'20 + 10 = 30\n30 是「剩下的一半」',
-      nums:['?','?','30','20'], on:[2,3], bw:[0],
+        '这 30 是什么？看中间那个袋子 —— 它是那半袋里的<b>一半</b>。',
+      eq:'20 + 10 = 30\n30 是「剩下一半」的一半',
+      solid:[0,0,20], txt:['?','30','20'], st:['ghost','ghost','done'],
+      bw:[1], v2:false, half:[false,true,false],
       foot:'20 加回 10 → 30'
     },
     {
-      t:'第二步：一半 ×2 就是整个',
-      h:'30 只是那半袋。倒回去，<b>一半要乘回 2 倍</b>：<b>30 × 2 = 60</b>。<br><br>' +
-        '60 是第一次拿完之后剩下的 —— 也就是第二次动手之前，袋子里真实的数量。',
+      t:'第二步：这一半乘 2，就是一整袋',
+      h:'中间那个袋子只剩一半（就是 30），倒回去<b>乘 2 倍</b>：<b>30 × 2 = 60</b>。<br><br>' +
+        '看那个袋子怎么长高的 —— 从一半涨到齐口，那才是第二次动手之前的全部。',
       eq:'30 × 2 = 60\n第一次拿完，剩 60',
-      nums:['?','60','30','20'], on:[1,2,3], bw:[0,1],
+      solid:[0,60,20], txt:['?','60','20'], st:['ghost','done','done'],
+      bw:[1], v2:true, half:[false,false,false],
       foot:'30 × 2 → 60'
     },
     {
       t:'第三步：再乘一次 2',
-      h:'第一次拿走的是<b>整袋的一半</b>，剩下那 60 也是整袋的一半。<br><br>' +
-        '所以整袋是：<b>60 × 2 = 120</b>。<br><br>' +'两次「一半」，就是两次乘 2。',
+      h:'第一次拿走的是<b>整袋的一半</b>，剩的那 60 也是整袋的一半。<br><br>' +
+        '所以整袋是：<b>60 × 2 = 120</b>。<br><br>' +
+        '<em>看最左边那个袋子 —— 米涨到袋口，正好装满一整袋。</em>',
       eq:'60 × 2 = 120\n原来有 120 千克',
-      nums:['120','60','30','20'], on:[0,1,2,3], done:[0], bw:[0,1,2],
-      foot:'60 × 2 → 120　答案出来了'
+      solid:[120,60,20], txt:['120','60','20'], st:['done','done','done'],
+      bw:[0,1], v2:false, half:[false,false,false],
+      foot:'60 × 2 → 120　袋子满了，就是这个数'
     },
     {
       t:'回头验一遍',
       h:'倒推算出来的数，<em>必须正着走一遍</em>才能作数。<br><br>' +
         '120 拿一半 → 60；60 拿一半是 30，再多拿 10 → 40；60 − 40 = <b>20</b>。<br><br>' +
-        '跟题目对上了。倒推的答案，一定验算。',
+        '三个袋子正好对回去。倒推的答案，一定验算。',
       eq:'120 →拿一半→ 60\n60 →拿 30+10→ 剩 20 ✓',
-      nums:['120','60','30','20'], on:[0,1,2,3], done:[0,1,2,3], bw:[0,1,2],
+      solid:[120,60,20], txt:['120','60','20'], st:['done','done','done'],
+      bw:[0,1], v2:false, half:[false,false,false],
       foot:'验算：120 → 60 → 20　对上了 ✓'
     }
   ];
+
+  let t5 = null;
+
+  function setBag(i, kg){
+    const h = K2H(kg);
+    g4.rice[i].setAttribute('height', h);
+    g4.rice[i].setAttribute('y', BOTY - h);
+  }
+  function setGhost(i, kg){
+    const h = K2H(kg);
+    g4.ghost[i].setAttribute('height', h);
+    g4.ghost[i].setAttribute('y', BOTY - h);
+  }
 
   function render4(i){
     const s = S4[i];
     s4.setAttribute('class', '');
     $('s6').setAttribute('class', 'hide');
 
-    s.nums.forEach((v, k) => {
-      const known = v !== '?';
-      const done = !!(s.done && s.done.includes(k));
-      g4.nums[k].textContent = v;
-      g4.nums[k].setAttribute('class', 'box-num' + (done ? ' done' : (known ? ' on' : '')));
-      /* fill 必须走 style，presentation attribute 压不过 .box-lbl 的类选择器 */
-      g4.lbls[k].style.fill = done ? '#0d9488' : (known ? '#475569' : '#94a3b8');
-      g4.boxes[k].setAttribute('fill', done ? '#f0fdfa' : (known ? '#eff6ff' : '#f8fafc'));
-      g4.boxes[k].setAttribute('stroke', done ? '#5eead4' : (known ? '#93b4f5' : '#cbd5e1'));
+    clearTimeout(t5);
+
+    const LBLS = ['原来', '第一次后', '最后'];
+    s.st.forEach((st, k) => {
+      const done = st === 'done', on = st === 'on' || done;
+      g4.lbl[k].textContent = LBLS[k];
+
+      if(st === 'ghost'){
+        setGhost(k, GHOST[k]);
+        setBag(k, 0);
+      }else{
+        setGhost(k, 0);
+        /* 第 5 步的袋 1 先停在一半，等下再涨满 */
+        setBag(k, (i === 4 && k === 0) ? 60 : s.solid[k]);
+      }
+
+      g4.body[k].style.fill = done ? '#f0fdfa' : '#fbfcfe';
+      g4.body[k].style.stroke = done ? '#5eead4' : (st === 'ghost' ? '#cbd5e1' : '#93b4f5');
+
+      g4.val[k].textContent = s.txt[k];
+      g4.val[k].setAttribute('class', 'bag-val' + (done ? ' done' : (on ? ' on' : '')));
     });
 
-    /* 反向箭头：点亮时把 class 切到 .on，红箭头才真的红 */
+    /* 第 5 步：最左边那个袋子从一半（60）涨满（120）*/
+    if(i === 4){
+      t5 = setTimeout(() => setBag(0, 120), 760);
+    }
+
+    /* 「这一半 = 30」虚线 */
+    s.half.forEach((on, k) => {
+      const g = g4.half[k];
+      g.style.opacity = on ? 1 : 0;
+      if(on) g.querySelector('text').textContent = '30';
+    });
+
+    /* 反向箭头 */
     g4.bw.forEach((g, k) => {
       const on = s.bw.includes(k);
       g.style.opacity = on ? 1 : .34;
@@ -430,8 +526,10 @@ svg rect, svg text, svg g, svg path, svg line{
       });
     });
 
-    /* 第 6 步验算：正向一路走通，正箭头才亮成蓝色 */
-    const allBack = !!(s.done && s.done.length === 4);
+    g4.v2.style.opacity = s.v2 ? 1 : 0;
+
+    /* 第 6 步：正向箭头亮蓝，表示「正着再走一遍」*/
+    const allBack = s.bw.length === 2;
     g4.fw.forEach(g => {
       g.style.opacity = 1;
       g.querySelectorAll('line,path,text').forEach(el => {
@@ -439,6 +537,7 @@ svg rect, svg text, svg g, svg path, svg line{
         el.setAttribute('class', allBack ? base + ' on' : base);
       });
     });
+
     g4.foot.textContent = s.foot;
     g4.foot.style.fill = i >= 4 ? '#0d9488' : '#475569';
   }
