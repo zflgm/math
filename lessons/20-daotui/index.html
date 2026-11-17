@@ -283,7 +283,7 @@ svg rect, svg text, svg g, svg path, svg line{
      ========================================================= */
   const CX = [155, 460, 765];          /* 三个袋子的中心 x */
   const TOPY = 56, BOTY = 246;         /* 袋口、袋底 */
-  const HMAX = 184;                    /* 184px = 120 千克（满袋）*/
+  const HMAX = 190;                    /* = 桶内高，所以 120 千克正好装满、60 千克正好一半 */
   const K2H = kg => kg / 120 * HMAX;
 
   const s4 = $('s4');
@@ -296,13 +296,15 @@ svg rect, svg text, svg g, svg path, svg line{
   defs4.appendChild(lgR);
   s4.appendChild(defs4);
 
+  /* 直筒：上下等宽。梯形会让「高度一半」不等于「体积一半」，讲分数时误导 */
+  const BAGW = 85;
   const bagPath = cx =>
-    'M ' + (cx-85) + ' ' + TOPY +
-    ' L ' + (cx-71) + ' ' + (BOTY-10) +
-    ' Q ' + (cx-69) + ' ' + BOTY + ' ' + (cx-57) + ' ' + BOTY +
-    ' L ' + (cx+57) + ' ' + BOTY +
-    ' Q ' + (cx+69) + ' ' + BOTY + ' ' + (cx+71) + ' ' + (BOTY-10) +
-    ' L ' + (cx+85) + ' ' + TOPY + ' Z';
+    'M ' + (cx-BAGW) + ' ' + TOPY +
+    ' L ' + (cx-BAGW) + ' ' + (BOTY-7) +
+    ' Q ' + (cx-BAGW) + ' ' + BOTY + ' ' + (cx-BAGW+7) + ' ' + BOTY +
+    ' L ' + (cx+BAGW-7) + ' ' + BOTY +
+    ' Q ' + (cx+BAGW) + ' ' + BOTY + ' ' + (cx+BAGW) + ' ' + (BOTY-7) +
+    ' L ' + (cx+BAGW) + ' ' + TOPY + ' Z';
 
   const g4 = { body:[], rice:[], ghost:[], mouth:[], lbl:[], val:[], fw:[], bw:[], half:[], foot:null };
 
@@ -319,14 +321,14 @@ svg rect, svg text, svg g, svg path, svg line{
 
     /* 虚影米：题目说的那个量，浅灰，表示「有这么多但不知道数字」*/
     const gh = mk('rect', {
-      x:cx-92, y:BOTY, width:184, height:0, fill:'#e4eaf3', 'clip-path':'url(#bagc' + i + ')'
+      x:cx-87, y:BOTY, width:174, height:0, fill:'#e4eaf3', 'clip-path':'url(#bagc' + i + ')'
     });
     s4.appendChild(gh);
     g4.ghost.push(gh);
 
     /* 实心米 */
     const rc = mk('rect', {
-      x:cx-92, y:BOTY, width:184, height:0, fill:'url(#riceg)', 'clip-path':'url(#bagc' + i + ')'
+      x:cx-87, y:BOTY, width:174, height:0, fill:'url(#riceg)', 'clip-path':'url(#bagc' + i + ')'
     });
     s4.appendChild(rc);
     g4.rice.push(rc);
