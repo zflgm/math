@@ -87,9 +87,12 @@ h1 .q-mark{color:var(--d)}
   border-radius:20px;
   padding:14px 16px;
   box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
-  display:flex;align-items:center;justify-content:center;
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  align-items:center;
 }
-svg{display:block;width:100%;height:auto;overflow:visible}
+/* min-width:0 必须写 —— 否则 svg 的固有宽度(viewBox 920) 会撑破容器 */
+svg{display:block;width:100%;min-width:0;height:auto;overflow:visible}
 
 .side{
   background:var(--card);
@@ -420,7 +423,7 @@ svg rect, svg text, svg g, svg path, svg line{
     /* 反向箭头：点亮时把 class 切到 .on，红箭头才真的红 */
     g4.bw.forEach((g, k) => {
       const on = s.bw.includes(k);
-      g.style.opacity = on ? 1 : .22;
+      g.style.opacity = on ? 1 : .34;
       g.querySelectorAll('line,path,text').forEach(el => {
         const base = el.getAttribute('class').replace(/\s+on\b/g, '');
         el.setAttribute('class', on ? base + ' on' : base);
