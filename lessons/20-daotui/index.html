@@ -77,7 +77,7 @@ h1 .q-mark{color:var(--d)}
   display:grid;
   grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
   gap:20px;
-  align-items:start;
+  align-items:stretch;
 }
 @media (max-width:1040px){ .main{grid-template-columns:1fr} }
 
@@ -85,8 +85,9 @@ h1 .q-mark{color:var(--d)}
   background:var(--card);
   border:1px solid var(--line);
   border-radius:20px;
-  padding:14px 16px 8px;
+  padding:14px 16px;
   box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  display:flex;align-items:center;justify-content:center;
 }
 svg{display:block;width:100%;height:auto;overflow:visible}
 
@@ -96,7 +97,7 @@ svg{display:block;width:100%;height:auto;overflow:visible}
   border-radius:20px;
   padding:22px 22px 20px;
   box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
-  min-height:340px;
+  min-height:380px;
   display:flex;flex-direction:column;
 }
 .steptag{
@@ -174,31 +175,31 @@ svg rect, svg text, svg g, svg path, svg line{
 .hide{opacity:0}
 
 /* 四年级方框 */
-.box-lbl{font-size:14px;font-weight:800;fill:#94a3b8;letter-spacing:.02em}
-.box-num{font-size:31px;font-weight:800;fill:#94a3b8;font-variant-numeric:tabular-nums}
+.box-lbl{font-size:15px;font-weight:800;fill:#94a3b8;letter-spacing:.02em}
+.box-num{font-size:34px;font-weight:800;fill:#a8b2c2;font-variant-numeric:tabular-nums}
 .box-num.on{fill:#1d4ed8}
 .box-num.done{fill:#0d9488}
 
 /* 箭头 */
-.arw{stroke:#cbd5e1;stroke-width:2.5;fill:none;stroke-linecap:round}
+.arw{stroke:#94a3b8;stroke-width:2.5;fill:none;stroke-linecap:round}
 .arw.on{stroke:#2563eb}
-.arw.back{stroke:#f0b8b8}
+.arw.back{stroke:#e5a3a3}
 .arw.back.on{stroke:#ef4444}
-.arw-lbl{font-size:14px;font-weight:800;fill:#a3aebf}
+.arw-lbl{font-size:15px;font-weight:800;fill:#64748b}
 .arw-lbl.on{fill:#2563eb}
-.arw-lbl.back{fill:#d9a5a5}
+.arw-lbl.back{fill:#c99494}
 .arw-lbl.back.on{fill:#ef4444}
 
 /* 六年级条块 */
-.seg{transition:fill .4s ease, opacity .4s ease}
-.seg-txt{font-size:20px;font-weight:800;fill:#fff;font-variant-numeric:tabular-nums}
-.seg-sub{font-size:14px;font-weight:800;fill:#ffffff;opacity:.85}
+.seg{transition:fill .4s ease, opacity .4s ease;stroke:#fff;stroke-width:3}
+.seg-txt{font-size:25px;font-weight:800;fill:#fff;font-variant-numeric:tabular-nums}
+.seg-sub{font-size:15px;font-weight:800;fill:#ffffff;opacity:.9}
 .brace{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 .brace.on{stroke:#0d9488}
-.brace-txt{font-size:15px;font-weight:800;fill:#a3aebf}
+.brace-txt{font-size:17px;font-weight:800;fill:#a3aebf}
 .brace-txt.on{fill:#0d9488}
 .divline{stroke:#fff;stroke-width:3;stroke-linecap:round}
-.foot-txt{font-size:19px;font-weight:800;fill:#475569}
+.foot-txt{font-size:20px;font-weight:800;fill:#475569}
 </style>
 </head>
 <body>
@@ -233,9 +234,9 @@ svg rect, svg text, svg g, svg path, svg line{
 
     <section class="stage-card">
       <!-- ============ 四年级：倒推 ============ -->
-      <svg id="s4" viewBox="0 0 920 430" preserveAspectRatio="xMidYMid meet"></svg>
+      <svg id="s4" viewBox="0 0 920 380" preserveAspectRatio="xMidYMid meet"></svg>
       <!-- ============ 六年级：份数 ============ -->
-      <svg id="s6" viewBox="0 0 920 430" preserveAspectRatio="xMidYMid meet" class="hide"></svg>
+      <svg id="s6" viewBox="0 0 920 380" preserveAspectRatio="xMidYMid meet" class="hide"></svg>
     </section>
 
     <aside class="side">
@@ -275,16 +276,16 @@ svg rect, svg text, svg g, svg path, svg line{
   /* =========================================================
      四年级：四个方框 + 反向箭头
      ========================================================= */
-  const BX = [26, 262, 498, 734];   // 四个方框的 x
-  const BW = 160, BY = 112, BH = 104;
-  const AR = [186, 422, 658];       // 箭头起点（框右边缘）
-  const AL = [262, 498, 734];       // 箭头终点（下一个框左边缘）
+  const BX = [28, 260, 492, 724];   // 四个方框的 x
+  const BW = 168, BY = 62, BH = 124;
+  const AR = [196, 428, 660];       // 箭头起点（框右边缘）
+  const AL = [260, 492, 724];       // 箭头终点（下一个框左边缘）
 
   const s4 = $('s4');
   const g4 = { boxes:[], nums:[], lbls:[], fw:[], bw:[], fwLbl:[], bwLbl:[] };
 
   /* 标题行 */
-  s4.appendChild(mk('text', {x:26, y:44, class:'box-lbl', style:'font-size:16px;fill:#64748b'}))
+  s4.appendChild(mk('text', {x:24, y:32, class:'box-lbl', style:'font-size:16px;fill:#64748b'}))
     .textContent = '正向：题目说的三件事';
 
   /* 四个方框 */
@@ -296,12 +297,12 @@ svg rect, svg text, svg g, svg path, svg line{
     s4.appendChild(r);
     g4.boxes.push(r);
 
-    const t1 = mk('text', {x:BX[i]+BW/2, y:BY+40, 'text-anchor':'middle', class:'box-lbl'});
+    const t1 = mk('text', {x:BX[i]+BW/2, y:BY+42, 'text-anchor':'middle', class:'box-lbl'});
     t1.textContent = lab;
     s4.appendChild(t1);
     g4.lbls.push(t1);
 
-    const t2 = mk('text', {x:BX[i]+BW/2, y:BY+84, 'text-anchor':'middle', class:'box-num'});
+    const t2 = mk('text', {x:BX[i]+BW/2, y:BY+92, 'text-anchor':'middle', class:'box-num'});
     t2.textContent = '?';
     s4.appendChild(t2);
     g4.nums.push(t2);
@@ -314,7 +315,7 @@ svg rect, svg text, svg g, svg path, svg line{
     const x1 = AR[i] + 4, x2 = AL[i] - 10;
     g.appendChild(mk('line', {x1:x1, y1:y, x2:x2, y2:y, class:'arw'}));
     g.appendChild(mk('path', {d:`M ${x2+8} ${y} L ${x2-2} ${y-7} M ${x2+8} ${y} L ${x2-2} ${y+7}`, class:'arw'}));
-    const t = mk('text', {x:(x1+x2)/2, y:y+32, 'text-anchor':'middle', class:'arw-lbl'});
+    const t = mk('text', {x:(x1+x2)/2, y:y-16, 'text-anchor':'middle', class:'arw-lbl'});
     t.textContent = lab;
     g.appendChild(t);
     s4.appendChild(g);
@@ -323,16 +324,16 @@ svg rect, svg text, svg g, svg path, svg line{
   });
 
   /* 反向箭头（从右往左） */
-  s4.appendChild(mk('text', {x:26, y:274, class:'box-lbl', style:'font-size:16px;fill:#ef4444'}))
+  s4.appendChild(mk('text', {x:24, y:222, class:'box-lbl', style:'font-size:16px;fill:#ef4444'}))
     .textContent = '倒推：动作全部反过来';
 
   ['+10','×2','×2'].forEach((lab, i) => {
     const g = mk('g');
-    const y = 318;
+    const y = 264;
     const x1 = BX[3-i] + 4, x2 = BX[2-i] + BW - 10;
     g.appendChild(mk('line', {x1:x1, y1:y, x2:x2, y2:y, class:'arw back'}));
     g.appendChild(mk('path', {d:`M ${x2-8} ${y} L ${x2+2} ${y-7} M ${x2-8} ${y} L ${x2+2} ${y+7}`, class:'arw back'}));
-    const t = mk('text', {x:(x1+x2)/2, y:y+32, 'text-anchor':'middle', class:'arw-lbl back'});
+    const t = mk('text', {x:(x1+x2)/2, y:y+34, 'text-anchor':'middle', class:'arw-lbl back'});
     t.textContent = lab;
     g.appendChild(t);
     s4.appendChild(g);
@@ -341,7 +342,7 @@ svg rect, svg text, svg g, svg path, svg line{
   });
 
   /* 底部验算行 */
-  const f4 = mk('text', {x:460, y:400, 'text-anchor':'middle', class:'foot-txt'});
+  const f4 = mk('text', {x:460, y:350, 'text-anchor':'middle', class:'foot-txt'});
   s4.appendChild(f4);
   g4.foot = f4;
 
@@ -406,21 +407,37 @@ svg rect, svg text, svg g, svg path, svg line{
     $('s6').setAttribute('class', 'hide');
 
     s.nums.forEach((v, k) => {
-      g4.nums[k].textContent = v;
       const known = v !== '?';
-      g4.nums[k].setAttribute('class', 'box-num' + (s.done && s.done.includes(k) ? ' done' : (known ? ' on' : '')));
-      g4.boxes[k].setAttribute('fill', s.done && s.done.includes(k) ? '#f0fdfa' : (known ? '#eff6ff' : '#f8fafc'));
-      g4.boxes[k].setAttribute('stroke', s.done && s.done.includes(k) ? '#0d9488' : (known ? '#93b4f5' : '#cbd5e1'));
+      const done = !!(s.done && s.done.includes(k));
+      g4.nums[k].textContent = v;
+      g4.nums[k].setAttribute('class', 'box-num' + (done ? ' done' : (known ? ' on' : '')));
+      /* fill 必须走 style，presentation attribute 压不过 .box-lbl 的类选择器 */
+      g4.lbls[k].style.fill = done ? '#0d9488' : (known ? '#475569' : '#94a3b8');
+      g4.boxes[k].setAttribute('fill', done ? '#f0fdfa' : (known ? '#eff6ff' : '#f8fafc'));
+      g4.boxes[k].setAttribute('stroke', done ? '#5eead4' : (known ? '#93b4f5' : '#cbd5e1'));
     });
 
+    /* 反向箭头：点亮时把 class 切到 .on，红箭头才真的红 */
     g4.bw.forEach((g, k) => {
       const on = s.bw.includes(k);
-      g.style.opacity = on ? 1 : .18;
+      g.style.opacity = on ? 1 : .22;
+      g.querySelectorAll('line,path,text').forEach(el => {
+        const base = el.getAttribute('class').replace(/\s+on\b/g, '');
+        el.setAttribute('class', on ? base + ' on' : base);
+      });
     });
 
-    g4.fw.forEach(g => g.style.opacity = 1);
+    /* 第 6 步验算：正向一路走通，正箭头才亮成蓝色 */
+    const allBack = !!(s.done && s.done.length === 4);
+    g4.fw.forEach(g => {
+      g.style.opacity = 1;
+      g.querySelectorAll('line,path,text').forEach(el => {
+        const base = el.getAttribute('class').replace(/\s+on\b/g, '');
+        el.setAttribute('class', allBack ? base + ' on' : base);
+      });
+    });
     g4.foot.textContent = s.foot;
-    g4.foot.setAttribute('fill', i >= 4 ? '#0d9488' : '#475569');
+    g4.foot.style.fill = i >= 4 ? '#0d9488' : '#475569';
   }
 
   /* =========================================================
@@ -428,7 +445,7 @@ svg rect, svg text, svg g, svg path, svg line{
      ========================================================= */
   const s6 = $('s6');
   const X0 = 60, X1 = 860, BARW = X1 - X0;   // 800
-  const BY6 = 128, BH6 = 108;
+  const BY6 = 92, BH6 = 148;
 
   /* 四段的边界（比例来自 60 / 30 / 10 / 20）*/
   const EDGE = [0, 0.5, 0.75, 0.83333, 1].map(p => X0 + BARW * p);
@@ -439,7 +456,7 @@ svg rect, svg text, svg g, svg path, svg line{
   const g6 = { segs:[], txts:[], subs:[], divs:[], braces:[], braceTxt:[], foot:null };
 
   /* 顶：整袋标签 */
-  const top6 = mk('text', {x:460, y:52, 'text-anchor':'middle', style:'font-size:17px;font-weight:800;fill:#64748b'});
+  const top6 = mk('text', {x:460, y:50, 'text-anchor':'middle', style:'font-size:19px;font-weight:800;fill:#475569'});
   s6.appendChild(top6);
   g6.top = top6;
 
@@ -453,21 +470,21 @@ svg rect, svg text, svg g, svg path, svg line{
     g6.segs.push(r);
 
     const t = mk('text', {
-      x:(EDGE[i]+EDGE[i+1])/2, y:BY6+BH6/2 + 8, 'text-anchor':'middle', class:'seg-txt'
+      x:(EDGE[i]+EDGE[i+1])/2, y:BY6+BH6/2 + 9, 'text-anchor':'middle', class:'seg-txt'
     });
     s6.appendChild(t);
     g6.txts.push(t);
 
     const st = mk('text', {
-      x:(EDGE[i]+EDGE[i+1])/2, y:BY6+BH6-18, 'text-anchor':'middle', class:'seg-sub'
+      x:(EDGE[i]+EDGE[i+1])/2, y:BY6+BH6-20, 'text-anchor':'middle', class:'seg-sub'
     });
     s6.appendChild(st);
     g6.subs.push(st);
   }
 
-  /* 三条分隔线 */
+  /* 三条分隔线：永久可见，四个块才不会糊成一条 */
   for(let i = 1; i < 4; i++){
-    const l = mk('line', {x1:EDGE[i], y1:BY6, x2:EDGE[i], y2:BY6+BH6, class:'divline', opacity:0});
+    const l = mk('line', {x1:EDGE[i], y1:BY6, x2:EDGE[i], y2:BY6+BH6, class:'divline'});
     s6.appendChild(l);
     g6.divs.push(l);
   }
@@ -488,13 +505,16 @@ svg rect, svg text, svg g, svg path, svg line{
     g6.braceTxt.push(t);
   }
 
-  /* 第一份内部的 10 / 20 细分线 */
-  const fine = mk('line', {x1:EDGE[3], y1:BY6, x2:EDGE[3], y2:BY6+BH6, stroke:'#fff', 'stroke-width':3, opacity:0});
-  s6.appendChild(fine);
-  g6.fine = fine;
+  /* 第一块内部 25% 处的等分线：把 60 切成 2 份 */
+  const half = mk('line', {
+    x1:X0 + BARW * .25, y1:BY6, x2:X0 + BARW * .25, y2:BY6 + BH6,
+    class:'divline', opacity:0
+  });
+  s6.appendChild(half);
+  g6.fine = half;
 
   /* 底部提示 */
-  const f6 = mk('text', {x:460, y:400, 'text-anchor':'middle', class:'foot-txt'});
+  const f6 = mk('text', {x:460, y:350, 'text-anchor':'middle', class:'foot-txt'});
   s6.appendChild(f6);
   g6.foot = f6;
 
@@ -577,7 +597,7 @@ svg rect, svg text, svg g, svg path, svg line{
     }
   ];
 
-  const FILL = { off:'#eef2f7', taken:'#94a3b8', grab:'#64748b', extra:'#cbd5e1', left:'#0d9488' };
+  const FILL = { off:'#dbe3ee', taken:'#94a3b8', grab:'#64748b', extra:'#cbd5e1', left:'#0d9488' };
 
   function render6(i){
     const s = S6[i];
@@ -590,13 +610,13 @@ svg rect, svg text, svg g, svg path, svg line{
 
     g6.txts.forEach((t, k) => {
       t.textContent = s.tags[k] || '';
-      t.setAttribute('fill', s.tags[k] ? '#fff' : 'transparent');
+      t.style.fill = s.tags[k] ? '#fff' : 'transparent';
     });
 
     g6.subs.forEach((t, k) => t.textContent = s.subs[k] || '');
 
-    g6.divs.forEach(l => l.setAttribute('opacity', 0));
-    g6.fine.setAttribute('opacity', 0);
+    /* 第 3 步起「四份」出现，把第一块里的 60 也切成两份 */
+    g6.fine.style.opacity = i >= 2 ? 1 : 0;
 
     g6.braceTxt.forEach((t, k) => t.textContent = s.braces[k] || '');
     g6.braces.forEach((g, k) => {
@@ -606,7 +626,7 @@ svg rect, svg text, svg g, svg path, svg line{
     });
 
     g6.foot.textContent = s.foot;
-    g6.foot.setAttribute('fill', i === 5 ? '#0d9488' : '#475569');
+    g6.foot.style.fill = i === 5 ? '#0d9488' : '#475569';
   }
 
 
