@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 20 课 · 还原问题（倒推）</title>
+<style>
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+header{margin-bottom:14px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- 版本切换 ---------- */
+.tabs{display:flex;gap:10px;margin:18px 0 16px;flex-wrap:wrap}
+.tabs button{
+  appearance:none;font-family:inherit;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--muted);
+  font-size:16px;font-weight:800;padding:12px 22px;border-radius:12px;
+  transition:.16s;display:flex;flex-direction:column;gap:3px;align-items:flex-start;
+}
+.tabs button small{font-size:12px;font-weight:700;color:#a3aebf;letter-spacing:.02em}
+.tabs button:hover{border-color:#cbd5e1;background:#fbfcfe}
+.tabs button.on{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 8px 20px -10px rgba(37,99,235,.75);
+}
+.tabs button.on small{color:#c7d9fb}
+
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+.try{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.try .lab{font-size:15px;font-weight:800;color:var(--muted)}
+.try .unit{font-size:15px;font-weight:700;color:#5b6779;line-height:1.6}
+.try .unit b{color:var(--a)}
+
+/* ---------- 动画 ---------- */
+svg rect, svg text, svg g, svg path, svg line{
+  transition: width .6s cubic-bezier(.5,0,.2,1),
+              height .6s cubic-bezier(.5,0,.2,1),
+              x .6s cubic-bezier(.5,0,.2,1),
+              y .6s cubic-bezier(.5,0,.2,1),
+              opacity .4s ease,
+              fill .32s ease,
+              stroke .32s ease,
+              stroke-width .32s ease;
+}
+.hide{opacity:0}
+
+/* 四年级方框 */
+.box-lbl{font-size:14px;font-weight:800;fill:#94a3b8;letter-spacing:.02em}
+.box-num{font-size:31px;font-weight:800;fill:#94a3b8;font-variant-numeric:tabular-nums}
+.box-num.on{fill:#1d4ed8}
+.box-num.done{fill:#0d9488}
+
+/* 箭头 */
+.arw{stroke:#cbd5e1;stroke-width:2.5;fill:none;stroke-linecap:round}
+.arw.on{stroke:#2563eb}
+.arw.back{stroke:#f0b8b8}
+.arw.back.on{stroke:#ef4444}
+.arw-lbl{font-size:14px;font-weight:800;fill:#a3aebf}
+.arw-lbl.on{fill:#2563eb}
+.arw-lbl.back{fill:#d9a5a5}
+.arw-lbl.back.on{fill:#ef4444}
+
+/* 六年级条块 */
+.seg{transition:fill .4s ease, opacity .4s ease}
+.seg-txt{font-size:20px;font-weight:800;fill:#fff;font-variant-numeric:tabular-nums}
+.seg-sub{font-size:14px;font-weight:800;fill:#ffffff;opacity:.85}
+.brace{fill:none;stroke:#cbd5e1;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.brace.on{stroke:#0d9488}
+.brace-txt{font-size:15px;font-weight:800;fill:#a3aebf}
+.brace-txt.on{fill:#0d9488}
+.divline{stroke:#fff;stroke-width:3;stroke-linecap:round}
+.foot-txt{font-size:19px;font-weight:800;fill:#475569}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">第 20 课 · 还原问题</span>
+    <span class="sp"></span>
+    <a href="../19-woshou/index.html">← 上一课</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">小学数学 · 经典模型 20</div>
+    <h1>还原问题：<span class="q-mark">从结果倒着走回去</span></h1>
+    <p class="q">一袋大米，第一次拿走<em>一半</em>，第二次拿走<em>剩下的一半多 10 千克</em>，最后还剩 <em>20 千克</em>。原来有多少千克？</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-v="p4">
+      四年级 · 倒推法
+      <small>正着走不动，就倒着走</small>
+    </button>
+    <button class="tab" data-v="p6">
+      六年级 · 份数法
+      <small>先看整袋能切成几份</small>
+    </button>
+  </div>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <!-- ============ 四年级：倒推 ============ -->
+      <svg id="s4" viewBox="0 0 920 430" preserveAspectRatio="xMidYMid meet"></svg>
+      <!-- ============ 六年级：份数 ============ -->
+      <svg id="s6" viewBox="0 0 920 430" preserveAspectRatio="xMidYMid meet" class="hide"></svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag"></div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="try">
+    <span class="lab">看出来了吗</span>
+    <span class="unit">两种办法算出来都是 <b>120 千克</b> —— 四年级不讲分数，只倒着算；六年级不急着算，先数整袋被切成了几份。同一道题，两条路。</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (t, a) => {
+    const e = document.createElementNS(NS, t);
+    if(a) for(const k in a) e.setAttribute(k, a[k]);
+    return e;
+  };
+
+  /* =========================================================
+     四年级：四个方框 + 反向箭头
+     ========================================================= */
+  const BX = [26, 262, 498, 734];   // 四个方框的 x
+  const BW = 160, BY = 112, BH = 104;
+  const AR = [186, 422, 658];       // 箭头起点（框右边缘）
+  const AL = [262, 498, 734];       // 箭头终点（下一个框左边缘）
+
+  const s4 = $('s4');
+  const g4 = { boxes:[], nums:[], lbls:[], fw:[], bw:[], fwLbl:[], bwLbl:[] };
+
+  /* 标题行 */
+  s4.appendChild(mk('text', {x:26, y:44, class:'box-lbl', style:'font-size:16px;fill:#64748b'}))
+    .textContent = '正向：题目说的三件事';
+
+  /* 四个方框 */
+  ['原来','第一次后','第二次后','最后'].forEach((lab, i) => {
+    const r = mk('rect', {
+      x:BX[i], y:BY, width:BW, height:BH, rx:16,
+      fill:'#f8fafc', stroke:'#cbd5e1', 'stroke-width':2
+    });
+    s4.appendChild(r);
+    g4.boxes.push(r);
+
+    const t1 = mk('text', {x:BX[i]+BW/2, y:BY+40, 'text-anchor':'middle', class:'box-lbl'});
+    t1.textContent = lab;
+    s4.appendChild(t1);
+    g4.lbls.push(t1);
+
+    const t2 = mk('text', {x:BX[i]+BW/2, y:BY+84, 'text-anchor':'middle', class:'box-num'});
+    t2.textContent = '?';
+    s4.appendChild(t2);
+    g4.nums.push(t2);
+  });
+
+  /* 正向箭头 + 标签 */
+  ['拿走一半','再拿一半','多拿 10'].forEach((lab, i) => {
+    const g = mk('g');
+    const y = BY + BH/2;
+    const x1 = AR[i] + 4, x2 = AL[i] - 10;
+    g.appendChild(mk('line', {x1:x1, y1:y, x2:x2, y2:y, class:'arw'}));
+    g.appendChild(mk('path', {d:`M ${x2+8} ${y} L ${x2-2} ${y-7} M ${x2+8} ${y} L ${x2-2} ${y+7}`, class:'arw'}));
+    const t = mk('text', {x:(x1+x2)/2, y:y+32, 'text-anchor':'middle', class:'arw-lbl'});
+    t.textContent = lab;
+    g.appendChild(t);
+    s4.appendChild(g);
+    g4.fw.push(g);
+    g4.fwLbl.push(t);
+  });
+
+  /* 反向箭头（从右往左） */
+  s4.appendChild(mk('text', {x:26, y:274, class:'box-lbl', style:'font-size:16px;fill:#ef4444'}))
+    .textContent = '倒推：动作全部反过来';
+
+  ['+10','×2','×2'].forEach((lab, i) => {
+    const g = mk('g');
+    const y = 318;
+    const x1 = BX[3-i] + 4, x2 = BX[2-i] + BW - 10;
+    g.appendChild(mk('line', {x1:x1, y1:y, x2:x2, y2:y, class:'arw back'}));
+    g.appendChild(mk('path', {d:`M ${x2-8} ${y} L ${x2+2} ${y-7} M ${x2-8} ${y} L ${x2+2} ${y+7}`, class:'arw back'}));
+    const t = mk('text', {x:(x1+x2)/2, y:y+32, 'text-anchor':'middle', class:'arw-lbl back'});
+    t.textContent = lab;
+    g.appendChild(t);
+    s4.appendChild(g);
+    g4.bw.push(g);
+    g4.bwLbl.push(t);
+  });
+
+  /* 底部验算行 */
+  const f4 = mk('text', {x:460, y:400, 'text-anchor':'middle', class:'foot-txt'});
+  s4.appendChild(f4);
+  g4.foot = f4;
+
+  const S4 = [
+    {
+      t:'正着算，卡住了',
+      h:'题目给的是<b>一路拿走</b>的过程：先拿一半，再拿一半多 10，最后剩 20。<br><br>' +
+        '要知道原来多少，得先知道中间剩了多少 —— 可中间那两步剩多少，<b>题目一个字都没说</b>。<br><br>' +
+        '正着走，每一步都缺一个数。那就不正着走了。',
+      eq:'原来 ?\n第一次后 ?\n第二次后 ?\n最后 20',
+      nums:['?','?','?','20'], on:[3], bw:[],
+      foot:'正向：每一步都需要一个题目没给的数'
+    },
+    {
+      t:'倒着走：最后一个框是已知的',
+      h:'唯一能确定的是<b>最后剩下 20 千克</b>。这个数是真的，从这儿出发。<br><br>' +
+        '倒着走有个规矩：<em>正着是什么动作，倒着就做相反的动作</em>。<br>' +
+        '正着「减」，倒着「加」；正着「乘」，倒着「除」。',
+      eq:'只有 20 是知道的\n从这里往回推',
+      nums:['?','?','?','20'], on:[3], bw:[],
+      foot:'起点：最后剩 20 千克'
+    },
+    {
+      t:'第一步：把多拿的 10 加回来',
+      h:'第二次是「拿走一半，<b>再多拿 10 千克</b>」，所以最后才剩 20。<br><br>' +
+        '倒回去，就要把这 10 千克<em>还回来</em>：<b>20 + 10 = 30</b>。<br><br>' +
+        '这个 30 是什么？是第二次拿走之前，袋子里那「一半」。',
+      eq:'20 + 10 = 30\n30 是「剩下的一半」',
+      nums:['?','?','30','20'], on:[2,3], bw:[0],
+      foot:'20 加回 10 → 30'
+    },
+    {
+      t:'第二步：一半 ×2 就是整个',
+      h:'30 只是那半袋。倒回去，<b>一半要乘回 2 倍</b>：<b>30 × 2 = 60</b>。<br><br>' +
+        '60 是第一次拿完之后剩下的 —— 也就是第二次动手之前，袋子里真实的数量。',
+      eq:'30 × 2 = 60\n第一次拿完，剩 60',
+      nums:['?','60','30','20'], on:[1,2,3], bw:[0,1],
+      foot:'30 × 2 → 60'
+    },
+    {
+      t:'第三步：再乘一次 2',
+      h:'第一次拿走的是<b>整袋的一半</b>，剩下那 60 也是整袋的一半。<br><br>' +
+        '所以整袋是：<b>60 × 2 = 120</b>。<br><br>' +'两次「一半」，就是两次乘 2。',
+      eq:'60 × 2 = 120\n原来有 120 千克',
+      nums:['120','60','30','20'], on:[0,1,2,3], done:[0], bw:[0,1,2],
+      foot:'60 × 2 → 120　答案出来了'
+    },
+    {
+      t:'回头验一遍',
+      h:'倒推算出来的数，<em>必须正着走一遍</em>才能作数。<br><br>' +
+        '120 拿一半 → 60；60 拿一半是 30，再多拿 10 → 40；60 − 40 = <b>20</b>。<br><br>' +
+        '跟题目对上了。倒推的答案，一定验算。',
+      eq:'120 →拿一半→ 60\n60 →拿 30+10→ 剩 20 ✓',
+      nums:['120','60','30','20'], on:[0,1,2,3], done:[0,1,2,3], bw:[0,1,2],
+      foot:'验算：120 → 60 → 20　对上了 ✓'
+    }
+  ];
+
+  function render4(i){
+    const s = S4[i];
+    s4.setAttribute('class', '');
+    $('s6').setAttribute('class', 'hide');
+
+    s.nums.forEach((v, k) => {
+      g4.nums[k].textContent = v;
+      const known = v !== '?';
+      g4.nums[k].setAttribute('class', 'box-num' + (s.done && s.done.includes(k) ? ' done' : (known ? ' on' : '')));
+      g4.boxes[k].setAttribute('fill', s.done && s.done.includes(k) ? '#f0fdfa' : (known ? '#eff6ff' : '#f8fafc'));
+      g4.boxes[k].setAttribute('stroke', s.done && s.done.includes(k) ? '#0d9488' : (known ? '#93b4f5' : '#cbd5e1'));
+    });
+
+    g4.bw.forEach((g, k) => {
+      const on = s.bw.includes(k);
+      g.style.opacity = on ? 1 : .18;
+    });
+
+    g4.fw.forEach(g => g.style.opacity = 1);
+    g4.foot.textContent = s.foot;
+    g4.foot.setAttribute('fill', i >= 4 ? '#0d9488' : '#475569');
+  }
+
+  /* =========================================================
+     六年级：整条 → 四份
+     ========================================================= */
+  const s6 = $('s6');
+  const X0 = 60, X1 = 860, BARW = X1 - X0;   // 800
+  const BY6 = 128, BH6 = 108;
+
+  /* 四段的边界（比例来自 60 / 30 / 10 / 20）*/
+  const EDGE = [0, 0.5, 0.75, 0.83333, 1].map(p => X0 + BARW * p);
+  /* 四份的边界（跟色块边界不是一个东西：最后一份跨了 10 和 20 两块）*/
+  const FPX = [0, 0.25, 0.5, 0.75, 1].map(p => X0 + BARW * p);
+  const SEGC = ['#94a3b8', '#64748b', '#cbd5e1', '#0d9488'];
+
+  const g6 = { segs:[], txts:[], subs:[], divs:[], braces:[], braceTxt:[], foot:null };
+
+  /* 顶：整袋标签 */
+  const top6 = mk('text', {x:460, y:52, 'text-anchor':'middle', style:'font-size:17px;font-weight:800;fill:#64748b'});
+  s6.appendChild(top6);
+  g6.top = top6;
+
+  /* 四个色块 */
+  for(let i = 0; i < 4; i++){
+    const r = mk('rect', {
+      x:EDGE[i], y:BY6, width:EDGE[i+1]-EDGE[i], height:BH6,
+      fill:SEGC[i], 'class':'seg'
+    });
+    s6.appendChild(r);
+    g6.segs.push(r);
+
+    const t = mk('text', {
+      x:(EDGE[i]+EDGE[i+1])/2, y:BY6+BH6/2 + 8, 'text-anchor':'middle', class:'seg-txt'
+    });
+    s6.appendChild(t);
+    g6.txts.push(t);
+
+    const st = mk('text', {
+      x:(EDGE[i]+EDGE[i+1])/2, y:BY6+BH6-18, 'text-anchor':'middle', class:'seg-sub'
+    });
+    s6.appendChild(st);
+    g6.subs.push(st);
+  }
+
+  /* 三条分隔线 */
+  for(let i = 1; i < 4; i++){
+    const l = mk('line', {x1:EDGE[i], y1:BY6, x2:EDGE[i], y2:BY6+BH6, class:'divline', opacity:0});
+    s6.appendChild(l);
+    g6.divs.push(l);
+  }
+
+  /* 下方四个括号：每份 30 */
+  const braceY = BY6 + BH6 + 26;
+  for(let i = 0; i < 4; i++){
+    const g = mk('g');
+    const x1 = FPX[i] + 4, x2 = FPX[i+1] - 4, y = braceY;
+    g.appendChild(mk('path', {
+      d:`M ${x1} ${y} L ${x1} ${y+10} L ${x2} ${y+10} L ${x2} ${y}`,
+      class:'brace'
+    }));
+    const t = mk('text', {x:(x1+x2)/2, y:y+34, 'text-anchor':'middle', class:'brace-txt'});
+    g.appendChild(t);
+    s6.appendChild(g);
+    g6.braces.push(g);
+    g6.braceTxt.push(t);
+  }
+
+  /* 第一份内部的 10 / 20 细分线 */
+  const fine = mk('line', {x1:EDGE[3], y1:BY6, x2:EDGE[3], y2:BY6+BH6, stroke:'#fff', 'stroke-width':3, opacity:0});
+  s6.appendChild(fine);
+  g6.fine = fine;
+
+  /* 底部提示 */
+  const f6 = mk('text', {x:460, y:400, 'text-anchor':'middle', class:'foot-txt'});
+  s6.appendChild(f6);
+  g6.foot = f6;
+
+
+  const S6 = [
+    {
+      t:'先把整袋当成「1」',
+      h:'六年级不急着算，先看<b>结构</b>。<br><br>' +
+        '整袋米不知道多少千克，但它是一个<b>完整的整体</b> —— 我们把它当成一条完整的条子。<br><br>' +
+        '题目里所有的「一半」，都是拿某个东西当尺子量出来的。先看清楚<b>尺子是哪一条</b>。',
+      top:'整 袋 = ? 千克　（先当成整体「1」）',
+      states:['off','off','off','off'],
+      tags:['','','',''], subs:['','','',''],
+      braces:['','','',''],
+      foot:'整袋是一条完整的条子，长度还不知道',
+      eq:'整袋 = 1\n（不知道具体多重）'
+    },
+    {
+      t:'第一次：砍掉一半',
+      h:'「拿走一半」，就是把整条<b>从中间切开</b>，左边那半拿走了。<br><br>' +
+        '右边剩下这半，就是<b>剩下的 ½</b>。<br><br>' +
+        '注意：从此以后，题目里再出现的「一半」，<em>量的都是右边这半</em>，不是整条了。',
+      top:'第一次拿走 ½　→　剩下 ½',
+      states:['taken','off','off','off'],
+      tags:['拿走 ½','','',''], subs:['','','',''],
+      braces:['','','',''],
+      foot:'左边拿走，右边这半成了新的整体',
+      eq:'整袋 1\n拿走 ½ → 剩 ½'
+    },
+    {
+      t:'关键一步：尺子换人了',
+      h:'第二次又说「拿走剩下的<b>一半</b>」。<br><br>' +
+        '这个「一半」量的不是整袋，是<em>右边剩下的那半</em>。<br><br>' +
+        '所以把右边这半再切一刀 —— 整条就被切成了<b>四份</b>，每份一样大。<br>' +
+        '看下面四个括号，那就是四份。',
+      top:'剩下的 ½ 再切一半　→　整条分成 4 份',
+      states:['taken','grab','off','off'],
+      tags:['2 份','1 份','',''], subs:['','','',''],
+      braces:['1 份','1 份','1 份','1 份'],
+      foot:'尺子从「整袋」换成了「剩下的 ½」—— 整条变成 4 份',
+      eq:'整袋 1\n第一次拿走 2 份，剩 2 份\n其中 1 份被第二次拿走'
+    },
+    {
+      t:'第二次：1 份，再加 10',
+      h:'第二次拿走的是「剩下的一半」= <b>1 份</b>，<b>再多 10 千克</b>。<br><br>' +
+        '这 10 千克从哪来？只能从最后那一份里割。<br><br>' +
+        '所以最后那份被切成两块：一块 10（也被拿走了），一块才是真正剩下的。',
+      top:'第二次拿走 1 份 + 10 千克',
+      states:['taken','grab','extra','left'],
+      tags:['2 份','1 份','10','?'], subs:['第一次拿走','第二次拿走','多拿',''],
+      braces:['1 份','1 份','1 份','1 份'],
+      foot:'最后一份被切掉 10 千克，剩下的那块还不知道',
+      eq:'第二次拿走 = 1 份 + 10\n最后剩 = 1 份 − 10'
+    },
+    {
+      t:'倒过来看：那一份是 30',
+      h:'现在看图的最右边 —— 那一份被切成了 <b>10</b> 和 <b>20</b>。<br><br>' +
+        '所以<b>一整份 = 10 + 20 = 30 千克</b>。<br><br>' +
+        '这一步是整道题的关键：<em>不列方程，直接从图上读出一份是多少</em>。<br>' +
+        '题目给的最后那个 20，就是用来干这个的。',
+      top:'一份 = 10 + 20 = 30 千克',
+      states:['taken','grab','extra','left'],
+      tags:['2 份','1 份','10','20'], subs:['第一次拿走','第二次拿走','多拿','剩下'],
+      braces:['30','30','30','30'],
+      foot:'一份就是 30 千克',
+      eq:'1 份 = 10 + 20 = 30'
+    },
+    {
+      t:'四份加起来',
+      h:'整袋是 <b>4 份</b>，每份 30 千克：<br><br>' +
+        '<b>30 × 4 = 120 千克</b><br><br>' +
+        '跟四年级倒推算出来的<b>一模一样</b>。<br><br>' +
+        '区别是：四年级一路倒着减、倒着乘；六年级先看清<b>整袋被切成几份</b>，一份一份算。',
+      top:'整袋 = 4 份 × 30 = 120 千克',
+      states:['taken','grab','extra','left'],
+      tags:['60','30','10','20'], subs:['第一次拿走','第二次拿走','多拿','剩下'],
+      braces:['30','30','30','30'],
+      foot:'30 × 4 = 120　两种办法答案一致 ✓',
+      eq:'30 × 4 = 120\n原来有 120 千克'
+    }
+  ];
+
+  const FILL = { off:'#eef2f7', taken:'#94a3b8', grab:'#64748b', extra:'#cbd5e1', left:'#0d9488' };
+
+  function render6(i){
+    const s = S6[i];
+    $('s4').setAttribute('class', 'hide');
+    s6.setAttribute('class', '');
+
+    g6.top.textContent = s.top;
+
+    g6.segs.forEach((r, k) => r.setAttribute('fill', FILL[s.states[k]]));
+
+    g6.txts.forEach((t, k) => {
+      t.textContent = s.tags[k] || '';
+      t.setAttribute('fill', s.tags[k] ? '#fff' : 'transparent');
+    });
+
+    g6.subs.forEach((t, k) => t.textContent = s.subs[k] || '');
+
+    g6.divs.forEach(l => l.setAttribute('opacity', 0));
+    g6.fine.setAttribute('opacity', 0);
+
+    g6.braceTxt.forEach((t, k) => t.textContent = s.braces[k] || '');
+    g6.braces.forEach((g, k) => {
+      g.style.opacity = s.braces[k] ? 1 : 0;
+      g.querySelector('path').setAttribute('class', 'brace' + (s.braces[k] ? ' on' : ''));
+      g.querySelector('text').setAttribute('class', 'brace-txt' + (s.braces[k] ? ' on' : ''));
+    });
+
+    g6.foot.textContent = s.foot;
+    g6.foot.setAttribute('fill', i === 5 ? '#0d9488' : '#475569');
+  }
+
+
+  /* =========================================================
+     控制
+     ========================================================= */
+  const VER = {
+    p4:{ steps:S4, render:render4, idx:0 },
+    p6:{ steps:S6, render:render6, idx:0 }
+  };
+  let cur = 'p4';
+
+  function draw(){
+    const v = VER[cur];
+    const steps = v.steps;
+    const i = Math.min(v.idx, steps.length - 1);
+    const s = steps[i];
+
+    v.render(i);
+
+    $('steptag').textContent = `第 ${i+1} 步 / 共 ${steps.length} 步　·　${
+      cur === 'p4' ? '四年级 · 倒推法' : '六年级 · 份数法'}`;
+    $('t').textContent = s.t;
+    $('h').innerHTML = s.h;
+    $('eq').innerHTML = s.eq.replace(/✓/g, '<span class="ok">✓</span>');
+
+    $('prev').disabled = i === 0;
+    $('next').disabled = i === steps.length - 1;
+
+    const box = $('dots');
+    if(box.children.length !== steps.length){
+      box.innerHTML = '';
+      steps.forEach((_, k) => {
+        const d = document.createElement('span');
+        d.className = 'dot';
+        d.addEventListener('click', () => { VER[cur].idx = k; draw(); });
+        box.appendChild(d);
+      });
+    }
+    [...box.children].forEach((d, k) => d.classList.toggle('on', k === i));
+  }
+
+  $('prev').addEventListener('click', () => { VER[cur].idx = Math.max(0, VER[cur].idx - 1); draw(); });
+  $('next').addEventListener('click', () => {
+    VER[cur].idx = Math.min(VER[cur].steps.length - 1, VER[cur].idx + 1); draw();
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.key === 'ArrowRight') $('next').click();
+    if(e.key === 'ArrowLeft')  $('prev').click();
+  });
+
+  document.querySelectorAll('.tab').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      cur = b.dataset.v;
+      draw();
+    });
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>
