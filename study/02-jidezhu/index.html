@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第二课 · 记得住 —— 在对的时间学，脑子才肯记</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- 底部提醒条 ---------- */
+.foot{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.foot .lab{font-size:15px;font-weight:800;color:var(--muted);white-space:nowrap}
+.foot .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.foot .dbox{
+  font-size:16px;font-weight:800;padding:7px 14px;border-radius:9px;
+  background:#f5f7fa;border:1px solid var(--line);color:#94a3b8;
+  transition:.3s ease;
+}
+.foot .dbox.on{background:#eff6ff;border-color:#bfdbfe;color:var(--a);box-shadow:0 4px 12px -6px rgba(37,99,235,.5)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 本页补充 ---------- */
+.scene{opacity:0;pointer-events:none;transition:opacity .45s ease}
+.scene.on{opacity:1;pointer-events:auto}
+.lbl{font-size:19px;font-weight:700;fill:#64748b}
+.lbl.dk{fill:#334155}
+.lbl.wt{fill:#ffffff}
+.big{font-size:30px;font-weight:800;fill:#0f172a}
+.num{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.note{font-size:17px;font-weight:700;fill:#94a3b8}
+.axis{stroke:#cbd5e1;stroke-width:2}
+svg line{transition:opacity .44s ease, stroke .34s ease, x1 .5s ease, x2 .5s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .4s ease both}
+@keyframes draw{to{stroke-dashoffset:0}}
+.draw{stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.5s cubic-bezier(.4,0,.2,1) forwards}
+.draw.d1{animation-delay:.15s}
+.draw.d2{animation-delay:.45s}
+.draw.d3{animation-delay:.75s}
+.draw.d4{animation-delay:1.05s}
+.draw.d5{animation-delay:1.35s}
+.sw{cursor:pointer}
+.sw rect.body{transition:fill .3s ease, stroke .3s ease}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">附赠学法课 · 第二课</span>
+    <span class="sp"></span>
+    <a href="../01-xuededui/index.html">第一课：学得对</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">附赠学法课 · 第二课</div>
+    <h1>记得住：<span class="q-mark">在对的时间学，脑子才肯记</span></h1>
+    <p class="q">同样背 <b>20 分钟</b>，为什么有人第二天还记得，有人第二天就没了？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 455" preserveAspectRatio="xMidYMid meet">
+
+        <!-- ===== S1 遗忘曲线 ===== -->
+        <g class="scene" id="sc1">
+          <line class="axis" x1="90" y1="60" x2="90" y2="392"/>
+          <line class="axis" x1="90" y1="392" x2="872" y2="392"/>
+          <text x="76" y="66" text-anchor="end" font-size="16" fill="#94a3b8">100%</text>
+          <text x="76" y="230" text-anchor="end" font-size="16" fill="#94a3b8">50%</text>
+          <text x="76" y="398" text-anchor="end" font-size="16" fill="#94a3b8">0</text>
+          <text x="90" y="422" text-anchor="middle" font-size="16" fill="#94a3b8">刚背完</text>
+          <text x="220" y="422" text-anchor="middle" font-size="16" fill="#94a3b8">1 天后</text>
+          <text x="480" y="422" text-anchor="middle" font-size="16" fill="#94a3b8">3 天后</text>
+          <text x="862" y="422" text-anchor="middle" font-size="16" fill="#94a3b8">6 天后</text>
+          <path id="c1" fill="none" stroke="#2563eb" stroke-width="5" stroke-linecap="round" class="draw"/>
+          <path id="c1fill" fill="#eff6ff" stroke="none" opacity="0" class="fi"/>
+          <g class="fi">
+            <rect x="600" y="300" width="212" height="54" rx="12" fill="#fef2f2" stroke="#fecaca"/>
+            <text x="616" y="325" font-size="17" font-weight="800" fill="#b91c1c">6 天后</text>
+            <text x="616" y="345" font-size="17" font-weight="800" fill="#b91c1c">只剩两成</text>
+          </g>
+          <text x="150" y="150" font-size="18" font-weight="800" fill="#b91c1c" class="fi">20 分钟就掉一半</text>
+        </g>
+
+        <!-- ===== S2 门卫 ===== -->
+        <g class="scene" id="sc2">
+          <text x="70" y="60" font-size="18" font-weight="800" fill="#334155">进来的东西</text>
+          <text x="470" y="60" text-anchor="middle" font-size="18" font-weight="800" fill="#334155">门卫</text>
+          <text x="860" y="60" text-anchor="end" font-size="18" font-weight="800" fill="#334155">留下来的</text>
+
+          <rect x="470" y="80" width="4" height="320" fill="#cbd5e1"/>
+          <g id="gate">
+            <rect x="432" y="196" width="80" height="88" rx="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2.5"/>
+            <circle cx="472" cy="226" r="13" fill="#94a3b8"/>
+            <rect x="458" y="246" width="28" height="20" rx="9" fill="#94a3b8"/>
+            <text x="472" y="278" text-anchor="middle" font-size="15" font-weight="800" fill="#64748b">只放行</text>
+          </g>
+          <text x="472" y="176" text-anchor="middle" font-size="17" font-weight="800" fill="#b91c1c">不记住会死吗</text>
+
+          <g id="cardsL"></g>
+          <g id="cardsR"></g>
+        </g>
+
+        <!-- ===== S3 看得多 vs 调得多 ===== -->
+        <g class="scene" id="sc3">
+          <text x="70" y="56" font-size="18" font-weight="800" fill="#94a3b8">看起来在做同一件事</text>
+          <g id="railA"></g>
+          <g id="railB"></g>
+
+          <line x1="70" y1="248" x2="860" y2="248" stroke="#eef1f6" stroke-width="2" stroke-dasharray="8 10"/>
+          <text x="466" y="240" text-anchor="middle" font-size="16" font-weight="800" fill="#cbd5e1">差别在里子</text>
+        </g>
+
+        <!-- ===== S4 四个时间点 ===== -->
+        <g class="scene" id="sc4">
+          <line class="axis" x1="80" y1="72" x2="80" y2="392"/>
+          <line class="axis" x1="80" y1="392" x2="880" y2="392"/>
+          <text x="70" y="66" text-anchor="end" font-size="15" fill="#94a3b8">100%</text>
+          <text x="70" y="398" text-anchor="end" font-size="15" fill="#94a3b8">0</text>
+          <text x="80" y="420" text-anchor="middle" font-size="15" fill="#94a3b8">学完</text>
+          <text x="120" y="420" text-anchor="middle" font-size="14" fill="#94a3b8">2 天</text>
+          <text x="213" y="420" text-anchor="middle" font-size="14" fill="#94a3b8">+1 周</text>
+          <text x="400" y="420" text-anchor="middle" font-size="14" fill="#94a3b8">+2 周</text>
+          <text x="800" y="420" text-anchor="middle" font-size="14" fill="#94a3b8">+1 月</text>
+
+          <g id="s4lines"></g>
+          <g id="s4marks"></g>
+          <g id="s4paths"></g>
+
+          <g class="fi">
+            <rect x="600" y="86" width="266" height="66" rx="12" fill="#f0fdfa" stroke="#99f6e4"/>
+            <text x="618" y="112" font-size="18" font-weight="800" fill="#0d9488">走完四轮</text>
+            <text x="618" y="136" font-size="17" font-weight="700" fill="#0f766e">两个月后还剩八成以上</text>
+          </g>
+          <text x="96" y="330" font-size="16" font-weight="800" fill="#94a3b8">不复习</text>
+        </g>
+
+        <!-- ===== S5 别换书 ===== -->
+        <g class="scene" id="sc5">
+          <g id="s5"></g>
+        </g>
+
+        <!-- ===== S6 比例 ===== -->
+        <g class="scene" id="sc6">
+          <g id="s6"></g>
+        </g>
+
+        <!-- ===== S7 睡眠 ===== -->
+        <g class="scene" id="sc7">
+          <rect x="46" y="100" width="250" height="290" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2.5" stroke-dasharray="10 8"/>
+          <text x="171" y="88" text-anchor="middle" font-size="18" font-weight="800" fill="#64748b">白天：临时堆着</text>
+
+          <rect x="624" y="100" width="250" height="290" rx="16" fill="#f0fdfa" stroke="#5eead4" stroke-width="2.5"/>
+          <text x="749" y="88" text-anchor="middle" font-size="18" font-weight="800" fill="#0d9488">睡着后：搬进仓库</text>
+
+          <g id="sleepL"></g>
+          <g id="sleepR"></g>
+
+          <g id="moon">
+            <circle cx="460" cy="212" r="42" fill="#e0e7ff"/>
+            <circle cx="476" cy="200" r="36" fill="#ffffff"/>
+            <text x="460" y="288" text-anchor="middle" font-size="19" font-weight="800" fill="#4f46e5">睡着</text>
+          </g>
+          <path d="M330 330 L590 330" stroke="#94a3b8" stroke-width="3" stroke-dasharray="9 8" marker-end="url(#arw)"/>
+          <text x="460" y="366" text-anchor="middle" font-size="17" font-weight="700" fill="#64748b">分拣 · 归类 · 搬运</text>
+
+          <defs>
+            <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+            </marker>
+          </defs>
+        </g>
+
+        <!-- ===== S8 睡前 ===== -->
+        <g class="scene" id="sc8">
+          <g id="s8"></g>
+        </g>
+
+        <!-- ===== S9 三开关 ===== -->
+        <g class="scene" id="sc9">
+          <g id="switches"></g>
+          <text x="820" y="88" text-anchor="middle" font-size="17" font-weight="800" fill="#64748b">记忆效率</text>
+          <rect x="780" y="106" width="80" height="282" rx="14" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="2"/>
+          <rect id="effbar" x="780" y="352" width="80" height="36" rx="14" fill="#2563eb"/>
+          <text id="effnum" x="820" y="378" text-anchor="middle" font-size="20" font-weight="800" fill="#ffffff">30</text>
+          <text x="420" y="430" text-anchor="middle" font-size="17" font-weight="700" fill="#94a3b8">点开关试试 —— 三个都打开，效率条就满了</text>
+        </g>
+
+        <!-- ===== S10 行动兴奋 ===== -->
+        <g class="scene" id="sc10">
+          <line class="axis" x1="100" y1="90" x2="100" y2="380"/>
+          <line class="axis" x1="100" y1="380" x2="860" y2="380"/>
+          <text x="88" y="96" text-anchor="end" font-size="15" fill="#94a3b8">干劲</text>
+          <text x="100" y="406" text-anchor="middle" font-size="15" fill="#94a3b8">刚坐下</text>
+          <text x="480" y="406" text-anchor="middle" font-size="15" fill="#94a3b8">10 分钟</text>
+          <text x="860" y="406" text-anchor="middle" font-size="15" fill="#94a3b8">20 分钟</text>
+          <g id="s10"></g>
+        </g>
+
+        <!-- ===== S11 一本书 ===== -->
+        <g class="scene" id="sc11">
+          <g id="s11"></g>
+        </g>
+
+        <!-- ===== S12 强科 ===== -->
+        <g class="scene" id="sc12">
+          <g id="s12"></g>
+        </g>
+
+        <!-- ===== S13 拆块 ===== -->
+        <g class="scene" id="sc13">
+          <g id="s13"></g>
+        </g>
+
+        <!-- ===== S14 收尾 ===== -->
+        <g class="scene" id="sc14">
+          <text x="460" y="120" text-anchor="middle" font-size="20" font-weight="800" fill="#94a3b8">考试考完之后，还剩什么</text>
+          <g id="s14"></g>
+          <text x="460" y="392" text-anchor="middle" font-size="34" font-weight="800" fill="#0f172a">忘掉之后，剩下的才是学到的</text>
+        </g>
+
+        <!-- ===== S15 第二张表 ===== -->
+        <g class="scene" id="sc15">
+          <g id="s15"></g>
+        </g>
+
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 15 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="foot">
+    <span class="lab">本课唯一的硬产出</span>
+    <span class="unit">当堂把四个日期写在他自己的本子上 →</span>
+    <span class="dbox" id="d1">第 1 次 · 第 2 天</span>
+    <span class="dbox" id="d2">第 2 次 · +1 周</span>
+    <span class="dbox" id="d3">第 3 次 · +2 周</span>
+    <span class="dbox" id="d4">第 4 次 · +1 月</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function mk(tag, a, p){
+    const e = document.createElementNS(NS, tag);
+    for(const k in a) e.setAttribute(k, a[k]);
+    if(p) p.appendChild(e);
+    return e;
+  }
+  function tx(p, x, y, s, o){
+    o = o || {};
+    const t = mk('text', {
+      x, y,
+      'text-anchor': o.anchor || 'middle',
+      'font-size': o.size || 18,
+      'font-weight': o.w || 700,
+      fill: o.fill || '#64748b'
+    }, p);
+    t.textContent = s;
+    return t;
+  }
+  // Catmull-Rom → 贝塞尔，把点列连成平滑曲线
+  function smooth(pts){
+    if(pts.length < 2) return '';
+    let d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
+    for(let i = 0; i < pts.length - 1; i++){
+      const p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || p2;
+      const c1x = p1[0] + (p2[0]-p0[0])/6, c1y = p1[1] + (p2[1]-p0[1])/6;
+      const c2x = p2[0] - (p3[0]-p1[0])/6, c2y = p2[1] - (p3[1]-p1[1])/6;
+      d += ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' +
+                  c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' +
+                  p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
+    }
+    return d;
+  }
+
+  /* =========================================================
+     S1　遗忘曲线
+     ========================================================= */
+  (function(){
+    const pts = [[0,100],[0.01,74],[0.03,59],[0.07,50],[0.15,44],[0.3,39],[0.6,36],[1,33],[2,28],[4,24],[6,21]];
+    const XY = pts.map(p => [90 + p[0]*130, 60 + (100-p[1])*3.3]);
+    $('c1').setAttribute('d', smooth(XY));
+    // 面积
+    const area = smooth(XY) + ' L870,392 L90,392 Z';
+    $('c1fill').setAttribute('d', area);
+  })();
+
+  /* =========================================================
+     S2　门卫
+     ========================================================= */
+  (function(){
+    const L = $('cardsL'), R = $('cardsR');
+    const items = [
+      {y: 96,  s: '路边几棵树', ok: false},
+      {y: 168, s: '昨天午饭',   ok: false},
+      {y: 240, s: '游戏攻略',   ok: false},
+      {y: 312, s: '课文',       ok: true}
+    ];
+    items.forEach(it => {
+      // 左边卡片
+      mk('rect', {
+        x: 70, y: it.y, width: 200, height: 56, rx: 12,
+        fill: it.ok ? '#eff6ff' : '#f8fafc',
+        stroke: it.ok ? '#bfdbfe' : '#e2e8f0',
+        'stroke-width': 2
+      }, L);
+      tx(L, 170, it.y + 25, it.s, {size: 18, w: 800, fill: it.ok ? '#1d4ed8' : '#94a3b8'});
+      tx(L, 170, it.y + 45, it.ok ? '出现第 4 次' : '出现 1 次',
+         {size: 14, w: 700, fill: it.ok ? '#60a5fa' : '#cbd5e1'});
+
+      // 右边结果
+      if(it.ok){
+        mk('rect', {x: 660, y: it.y, width: 200, height: 56, rx: 12,
+          fill: '#ccfbf1', stroke: '#5eead4', 'stroke-width': 2.5}, R);
+        tx(R, 760, it.y + 25, '课文', {size: 18, w: 800, fill: '#0d9488'});
+        tx(R, 760, it.y + 45, '放行', {size: 14, w: 800, fill: '#0d9488'});
+      }else{
+        mk('rect', {x: 660, y: it.y, width: 200, height: 56, rx: 12,
+          fill: '#ffffff', stroke: '#eef1f6', 'stroke-width': 2, 'stroke-dasharray': '8 6'}, R);
+        tx(R, 760, it.y + 25, it.s, {size: 18, w: 700, fill: '#cbd5e1'});
+        tx(R, 760, it.y + 45, '扔掉', {size: 14, w: 700, fill: '#e2e8f0'});
+      }
+    });
+    // 虚线路径
+    [0,1,2,3].forEach(i => {
+      const y = 96 + i*72 + 28;
+      mk('path', {d: `M276,${y} L660,${y}`, stroke: i===3 ? '#bfdbfe' : '#f1f5f9',
+        'stroke-width': 2.5, 'stroke-dasharray': '7 9', fill: 'none'}, L);
+    });
+  })();
+
+  /* =========================================================
+     S3　两条轨道
+     ========================================================= */
+  (function(){
+    const A = $('railA'), B = $('railB');
+
+    // ---- 上轨：读 5 遍 ----
+    tx(A, 76, 108, '① 同一页，反复读 5 遍', {anchor:'start', size:20, w:800, fill:'#334155'});
+    for(let i = 0; i < 5; i++){
+      const x = 76 + i*82;
+      mk('rect', {x, y: 132, width: 52, height: 64, rx: 6, fill: '#f1f5f9', stroke: '#e2e8f0', 'stroke-width': 2}, A);
+      mk('rect', {x: x+7, y: 140, width: 38, height: 6, rx: 3, fill: '#e2e8f0'}, A);
+      mk('rect', {x: x+7, y: 154, width: 30, height: 6, rx: 3, fill: '#e2e8f0'}, A);
+      mk('rect', {x: x+7, y: 168, width: 34, height: 6, rx: 3, fill: '#e2e8f0'}, A);
+      tx(A, x+26, 212, '第' + (i+1) + '遍', {size: 14, w: 700, fill: '#cbd5e1'});
+    }
+    tx(A, 512, 152, '眼睛认得这些字了', {anchor:'start', size:17, w:700, fill:'#94a3b8'});
+    tx(A, 512, 180, '脑子没动', {anchor:'start', size:17, w:800, fill:'#b91c1c'});
+    mk('rect', {x: 690, y: 136, width: 170, height: 56, rx: 10, fill: '#f1f5f9'}, A);
+    tx(A, 700, 172, '记住约 30%', {anchor:'start', size:18, w:800, fill:'#94a3b8'});
+
+    // ---- 下轨：读 1 + 回想 4 ----
+    tx(B, 76, 288, '② 读 1 遍，然后合书回想 4 次', {anchor:'start', size:20, w:800, fill:'#1d4ed8'});
+    // 一本书
+    mk('rect', {x:76, y:312, width:52, height:64, rx:6, fill:'#eff6ff', stroke:'#bfdbfe', 'stroke-width':2.5}, B);
+    mk('rect', {x:83, y:320, width:38, height:6, rx:3, fill:'#bfdbfe'}, B);
+    mk('rect', {x:83, y:334, width:30, height:6, rx:3, fill:'#bfdbfe'}, B);
+    mk('rect', {x:83, y:348, width:34, height:6, rx:3, fill:'#bfdbfe'}, B);
+    tx(B, 102, 392, '读 1 遍', {size: 14, w: 800, fill: '#60a5fa'});
+    // 四个脑
+    for(let i = 0; i < 4; i++){
+      const x = 172 + i*72;
+      mk('circle', {cx: x+26, cy: 344, r: 26, fill: '#dbeafe', stroke: '#93c5fd', 'stroke-width': 2.5}, B);
+      tx(B, x+26, 351, '回想', {size: 13, w: 800, fill: '#1d4ed8'});
+      tx(B, x+26, 392, '第' + (i+1) + '次', {size: 14, w: 700, fill: '#93c5fd'});
+    }
+    tx(B, 512, 332, '每次都从里面取出来', {anchor:'start', size:17, w:700, fill:'#3b82f6'});
+    tx(B, 512, 360, '门卫看到的是「被调用」', {anchor:'start', size:17, w:800, fill:'#1d4ed8'});
+    mk('rect', {x: 690, y: 316, width: 170, height: 56, rx: 10, fill: '#dbeafe'}, B);
+    tx(B, 700, 352, '记住约 82%', {anchor:'start', size:18, w:800, fill:'#1d4ed8'});
+  })();
+
+  /* =========================================================
+     S4　四个时间点
+     ========================================================= */
+  (function(){
+    const KX = 800/60, X0 = 80, Y0 = 60, KH = 3.3;
+    const pts = marks => marks.map(m => [X0 + m[0]*KX, Y0 + (100-m[1])*KH]);
+
+    // 灰线：完全不复习
+    const grey = [];
+    for(let t = 0; t <= 60; t += 0.35){
+      grey.push([t, 20 + 80*Math.exp(-t/0.9)]);
+    }
+    mk('path', {d: smooth(pts(grey)), fill: 'none', stroke: '#cbd5e1',
+      'stroke-width': 3.5, 'stroke-dasharray': '11 9'}, $('s4lines'));
+
+    // 四段彩色
+    const segs = [
+      {a: 0,  b: 2,  tau: 1.2, c: '#93c5fd', cls: 'draw d1'},
+      {a: 2,  b: 9,  tau: 5,   c: '#60a5fa', cls: 'draw d2'},
+      {a: 9,  b: 23, tau: 11,  c: '#3b82f6', cls: 'draw d3'},
+      {a: 23, b: 53, tau: 24,  c: '#2563eb', cls: 'draw d4'},
+      {a: 53, b: 60, tau: 40,  c: '#0d9488', cls: 'draw d5'}
+    ];
+    segs.forEach(s => {
+      const arr = [];
+      for(let t = s.a; t <= s.b + 0.01; t += (s.b-s.a)/40){
+        const tt = Math.min(t, s.b);
+        arr.push([tt, 100*Math.exp(-(tt - s.a)/s.tau)]);
+      }
+      mk('path', {d: smooth(pts(arr)), fill: 'none', stroke: s.c,
+        'stroke-width': 5, 'stroke-linecap': 'round', class: s.cls}, $('s4paths'));
+    });
+
+    // 四个复习点
+    const MARK = [
+      {t: 2,  label: '第 2 天', y: 44},
+      {t: 9,  label: '+1 周',  y: 44},
+      {t: 23, label: '+2 周',  y: 44},
+      {t: 53, label: '+1 月',  y: 44}
+    ];
+    MARK.forEach((m, i) => {
+      const x = X0 + m.t*KX;
+      mk('line', {x1: x, y1: 76, x2: x, y2: 392,
+        stroke: '#bfdbfe', 'stroke-width': 2.5, 'stroke-dasharray': '7 7'},
+        $('s4marks'));
+      mk('circle', {cx: x, cy: 60, r: 8, fill: '#ffffff', stroke: '#2563eb', 'stroke-width': 3},
+        $('s4marks'));
+      tx($('s4marks'), x, 40, m.label, {size: 16, w: 800, fill: '#1d4ed8'});
+    });
+  })();
+
+  /* =========================================================
+     S5　别换书
+     ========================================================= */
+  (function(){
+    const G = $('s5');
+    // 主路
+    mk('rect', {x: 96, y: 218, width: 66, height: 52, rx: 8, fill: '#dbeafe', stroke: '#93c5fd', 'stroke-width': 2.5}, G);
+    tx(G, 129, 252, '书', {size: 22, w: 800, fill: '#1d4ed8'});
+    mk('path', {d: 'M164,244 L792,244', stroke: '#2563eb', 'stroke-width': 9,
+      'stroke-linecap': 'round', fill: 'none', class: 'draw'}, G);
+    mk('path', {d: 'M792,244 l-18,-11 l0,22 z', fill: '#2563eb'}, G);
+    // 脚印
+    for(let i = 0; i < 7; i++){
+      mk('circle', {cx: 230 + i*82, cy: 244, r: 8, fill: '#ffffff', opacity: .9}, G);
+    }
+    tx(G, 470, 208, '同一条痕迹，反复踩', {size: 21, w: 800, fill: '#1d4ed8'});
+    tx(G, 470, 292, '越来越深，最后变成条件反射', {size: 17, w: 700, fill: '#60a5fa'});
+
+    // 两条岔路
+    mk('path', {d: 'M164,236 C 380,236 520,130 792,110', stroke: '#e2e8f0',
+      'stroke-width': 5, 'stroke-dasharray': '10 10', fill: 'none'}, G);
+    mk('path', {d: 'M164,252 C 380,252 520,360 792,382', stroke: '#e2e8f0',
+      'stroke-width': 5, 'stroke-dasharray': '10 10', fill: 'none'}, G);
+    mk('rect', {x: 792, y: 84, width: 66, height: 52, rx: 8, fill: '#f8fafc', stroke: '#e2e8f0', 'stroke-width': 2, 'stroke-dasharray': '7 5'}, G);
+    tx(G, 825, 118, '书 2', {size: 17, w: 800, fill: '#cbd5e1'});
+    mk('rect', {x: 792, y: 356, width: 66, height: 52, rx: 8, fill: '#f8fafc', stroke: '#e2e8f0', 'stroke-width': 2, 'stroke-dasharray': '7 5'}, G);
+    tx(G, 825, 390, '书 3', {size: 17, w: 800, fill: '#cbd5e1'});
+    tx(G, 470, 120, '换一本，就换了一条痕迹', {size: 17, w: 700, fill: '#94a3b8'});
+    tx(G, 470, 372, '旧的没踩深，新的又占地方', {size: 17, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S6　比例
+     ========================================================= */
+  (function(){
+    const G = $('s6');
+    const X0 = 100, W = 720, U = W/21;
+
+    // 预习 1 份
+    mk('rect', {x: X0, y: 170, width: U, height: 96, fill: '#e2e8f0'}, G);
+    // 上课 4 份
+    mk('rect', {x: X0 + U, y: 170, width: U*4, height: 96, fill: '#93c5fd'}, G);
+    // 复习 16 份
+    mk('rect', {x: X0 + U*5, y: 170, width: U*16, height: 96, fill: '#2563eb'}, G);
+
+    tx(G, X0 + U/2, 152, '预习', {size: 16, w: 800, fill: '#94a3b8'});
+    tx(G, X0 + U*3, 152, '上课', {size: 18, w: 800, fill: '#3b82f6'});
+    tx(G, X0 + U*13, 152, '复习', {size: 20, w: 800, fill: '#1d4ed8'});
+
+    tx(G, X0 + U*13, 226, '记忆真正发生的地方', {size: 24, w: 800, fill: '#ffffff'});
+    tx(G, X0 + U*3, 232, '输入', {size: 17, w: 800, fill: '#ffffff'});
+
+    tx(G, X0 + U/2, 300, '1', {size: 22, w: 800, fill: '#94a3b8'});
+    tx(G, X0 + U*3, 300, '4', {size: 22, w: 800, fill: '#3b82f6'});
+    tx(G, X0 + U*13, 300, '16', {size: 22, w: 800, fill: '#1d4ed8'});
+
+    tx(G, 460, 372, '听课只是第一次输入 —— 它本身不产生记忆', {size: 19, w: 700, fill: '#64748b'});
+  })();
+
+  /* =========================================================
+     S7　睡眠整理
+     ========================================================= */
+  (function(){
+    const L = $('sleepL'), R = $('sleepR');
+    // 左边散乱
+    const posL = [[90,140],[160,128],[212,168],[104,206],[176,214],[230,250],[118,290],[186,320]];
+    posL.forEach((p, i) => {
+      mk('circle', {cx: p[0], cy: p[1], r: 15, fill: '#cbd5e1', opacity: .85}, L);
+    });
+    tx(L, 171, 372, '一堆散件', {size: 17, w: 700, fill: '#94a3b8'});
+
+    // 右边整齐 4x2
+    for(let r = 0; r < 2; r++){
+      for(let c = 0; c < 4; c++){
+        mk('rect', {x: 660 + c*50, y: 160 + r*56, width: 36, height: 36, rx: 9,
+          fill: '#5eead4'}, R);
+      }
+    }
+    tx(R, 749, 300, '整整齐齐', {size: 17, w: 700, fill: '#0d9488'});
+    tx(R, 749, 330, '随时能取出来用', {size: 16, w: 700, fill: '#14b8a6'});
+  })();
+
+  /* =========================================================
+     S8　睡前
+     ========================================================= */
+  (function(){
+    const G = $('s8');
+    const X0 = 90, W = 770, H = 18, N = 6;  // 18:00 - 24:00
+    const PX = W/6;
+
+    // 时间轴
+    mk('rect', {x: X0, y: 150, width: W, height: 62, rx: 10, fill: '#f1f5f9', stroke: '#e2e8f0', 'stroke-width': 2}, G);
+    for(let h = 0; h <= 6; h++){
+      mk('line', {x1: X0 + h*PX, y1: 150, x2: X0 + h*PX, y2: 212, stroke: '#e2e8f0', 'stroke-width': 2}, G);
+      tx(G, X0 + h*PX, 240, (18 + h) + ':00', {size: 15, w: 700, fill: '#94a3b8'});
+    }
+    // 黄金 30 分钟
+    const gx = X0 + 3.5*PX;
+    mk('rect', {x: gx, y: 138, width: PX*0.5, height: 86, rx: 8, fill: '#2563eb'}, G);
+    tx(G, gx + PX*0.25, 110, '睡前 30 分钟', {size: 19, w: 800, fill: '#1d4ed8'});
+    mk('path', {d: `M${gx + PX*0.25},122 L${gx + PX*0.25},134`, stroke: '#2563eb', 'stroke-width': 3}, G);
+
+    // 立刻睡
+    mk('text', {x: X0 + 5.2*PX, y: 186, 'text-anchor': 'middle', 'font-size': 19,
+      'font-weight': 800, fill: '#0f172a'}, G).textContent = '立刻睡';
+    tx(G, X0 + 5.2*PX, 240, '23:00 以后', {size: 15, w: 700, fill: '#94a3b8'});
+
+    // 三个条件
+    const cond = [
+      ['只过「当天要背的那一点」', '别开新内容'],
+      ['过完立刻躺下', '中间不碰手机'],
+      ['不用真的睡着', '安静躺着，脑子就开始整理']
+    ];
+    cond.forEach((c, i) => {
+      const y = 292 + i*46;
+      mk('circle', {cx: 112, cy: y, r: 12, fill: '#eff6ff', stroke: '#bfdbfe', 'stroke-width': 2}, G);
+      tx(G, 112, y + 6, String(i+1), {size: 14, w: 800, fill: '#2563eb'});
+      mk('text', {x: 138, y: y + 7, 'font-size': 19, 'font-weight': 800, fill: '#334155'}, G).textContent = c[0];
+      tx(G, 640, y + 7, c[1], {size: 17, w: 700, fill: '#94a3b8', anchor: 'start'});
+    });
+  })();
+
+  /* =========================================================
+     S9　三开关（可交互）
+     ========================================================= */
+  const SW = [
+    {x: 70,  key: '饿', sub: '饭前 20 分钟', desc: '有点饿，但别饿到发昏'},
+    {x: 300, key: '走', sub: '来回走、站着念', desc: '别瘫在椅子上'},
+    {x: 530, key: '凉', sub: '别把屋搞得太暖', desc: '暖了就想睡'}
+  ];
+  let swOn = [false, false, false];
+
+  (function(){
+    const G = $('switches');
+    SW.forEach((s, i) => {
+      const g = mk('g', {class: 'sw', 'data-i': i}, G);
+      mk('rect', {x: s.x, y: 150, width: 180, height: 180, rx: 16,
+        fill: '#f8fafc', stroke: '#e2e8f0', 'stroke-width': 2.5, class: 'body'}, g);
+      // 开关小钮
+      mk('rect', {x: s.x + 54, y: 288, width: 72, height: 26, rx: 13,
+        fill: '#dbe2ea', class: 'track'}, g);
+      mk('circle', {cx: s.x + 68, cy: 301, r: 10, fill: '#ffffff', class: 'knob'}, g);
+
+      tx(g, s.x + 90, 202, s.key, {size: 38, w: 800, fill: '#334155'});
+      tx(g, s.x + 90, 236, s.sub, {size: 16, w: 700, fill: '#94a3b8'});
+      tx(g, s.x + 90, 264, s.desc, {size: 14, w: 700, fill: '#cbd5e1'});
+    });
+
+    G.addEventListener('click', e => {
+      const g = e.target.closest('.sw');
+      if(!g) return;
+      const i = +g.getAttribute('data-i');
+      swOn[i] = !swOn[i];
+      paintSW();
+    });
+    paintSW();
+  })();
+
+  function paintSW(){
+    document.querySelectorAll('#switches .sw').forEach(g => {
+      const i = +g.getAttribute('data-i');
+      const on = swOn[i];
+      const body = g.querySelector('.body');
+      body.setAttribute('fill', on ? '#eff6ff' : '#f8fafc');
+      body.setAttribute('stroke', on ? '#93c5fd' : '#e2e8f0');
+      g.querySelector('.track').setAttribute('fill', on ? '#2563eb' : '#dbe2ea');
+      g.querySelector('.knob').setAttribute('cx', SW[i].x + (on ? 112 : 68));
+    });
+    const n = swOn.filter(Boolean).length;
+    const v = 30 + n*23;
+    const h = (v/100)*282;
+    $('effbar').setAttribute('y', 388 - h);
+    $('effbar').setAttribute('height', h);
+    $('effbar').setAttribute('fill', n === 3 ? '#0d9488' : '#2563eb');
+    $('effnum').setAttribute('y', 388 - h/2 + 7);
+    $('effnum').textContent = v;
+  }
+
+  /* =========================================================
+     S10　行动兴奋
+     ========================================================= */
+  (function(){
+    const G = $('s10');
+    // 一直等
+    mk('path', {d: 'M100,372 L860,372', stroke: '#e2e8f0', 'stroke-width': 5,
+      'stroke-linecap': 'round', 'stroke-dasharray': '12 10'}, G);
+    tx(G, 300, 350, '一直等「今天状态好」', {size: 18, w: 800, fill: '#cbd5e1', anchor: 'start'});
+
+    // 先坐下
+    const pts = [];
+    for(let m = 0; m <= 20; m += 0.5){
+      const p = 92*(1 - Math.exp(-m/5.2));
+      pts.push([100 + m*38, 380 - p*2.9]);
+    }
+    mk('path', {d: smooth(pts), fill: 'none', stroke: '#2563eb',
+      'stroke-width': 5.5, 'stroke-linecap': 'round', class: 'draw'}, G);
+    mk('circle', {cx: 480, cy: 380 - 92*(1-Math.exp(-10/5.2))*2.9, r: 9,
+      fill: '#ffffff', stroke: '#2563eb', 'stroke-width': 3.5}, G);
+    tx(G, 512, 200, '先坐下，10 分钟', {size: 19, w: 800, fill: '#1d4ed8', anchor: 'start'});
+    tx(G, 512, 228, '干劲自己起来', {size: 19, w: 800, fill: '#1d4ed8', anchor: 'start'});
+  })();
+
+  /* =========================================================
+     S11　一本书
+     ========================================================= */
+  (function(){
+    const G = $('s11');
+    // 左：一本用到底
+    tx(G, 230, 60, '一套教辅，用到期末', {size: 20, w: 800, fill: '#1d4ed8'});
+    mk('rect', {x: 176, y: 92, width: 108, height: 168, rx: 8, fill: '#2563eb'}, G);
+    mk('rect', {x: 190, y: 108, width: 80, height: 8, rx: 4, fill: '#93c5fd'}, G);
+    mk('rect', {x: 190, y: 126, width: 60, height: 8, rx: 4, fill: '#93c5fd'}, G);
+    for(let i = 0; i < 4; i++){
+      mk('circle', {cx: 340, cy: 118 + i*42, r: 15, fill: '#ccfbf1'}, G);
+      mk('path', {d: `M332,${118 + i*42} l6,7 l11,-13`, stroke: '#0d9488', 'stroke-width': 3.5,
+        fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, G);
+      tx(G, 372, 124 + i*42, '第 ' + (i+1) + ' 遍', {size: 16, w: 800, fill: '#0d9488', anchor: 'start'});
+    }
+
+    // 分隔
+    mk('line', {x1: 460, y1: 60, x2: 460, y2: 380, stroke: '#eef1f6', 'stroke-width': 2, 'stroke-dasharray': '8 10'}, G);
+
+    // 右：四本各一遍
+    tx(G, 690, 60, '四本书，各翻一遍', {size: 20, w: 800, fill: '#b91c1c'});
+    for(let i = 0; i < 4; i++){
+      mk('rect', {x: 520 + i*72, y: 92, width: 54, height: 100, rx: 7,
+        fill: '#f8fafc', stroke: '#e2e8f0', 'stroke-width': 2, 'stroke-dasharray': '7 5'}, G);
+      mk('circle', {cx: 547 + i*72, cy: 220, r: 14, fill: '#fef2f2'}, G);
+      mk('path', {d: `M${541 + i*72},214 l12,12 M${553 + i*72},214 l-12,12`,
+        stroke: '#ef4444', 'stroke-width': 3, 'stroke-linecap': 'round'}, G);
+    }
+    tx(G, 690, 280, '哪条痕迹都没踩深', {size: 18, w: 800, fill: '#f87171'});
+    tx(G, 690, 316, '白买四本', {size: 17, w: 700, fill: '#fca5a5'});
+  })();
+
+  /* =========================================================
+     S12　强科优先
+     ========================================================= */
+  (function(){
+    const G = $('s12');
+    const SUB = ['语文', '数学', '英语', '科学', '道法'];
+    const SCORE = [72, 95, 70, 68, 66];
+
+    function drive(cx, title, targetIdx, color, note){
+      tx(G, cx, 60, title, {size: 20, w: 800, fill: color});
+      SUB.forEach((s, i) => {
+        const x = cx - 200 + i*84;
+        const h = SCORE[i]*2.6;
+        const isT = i === targetIdx;
+        mk('rect', {x, y: 340 - h, width: 54, height: h, rx: 6,
+          fill: isT ? color : '#e2e8f0'}, G);
+        tx(G, x + 27, 340 - h - 12, String(SCORE[i]), {size: 16, w: 800, fill: isT ? color : '#94a3b8'});
+        tx(G, x + 27, 362, s, {size: 15, w: 700, fill: '#94a3b8'});
+      });
+      tx(G, cx, 400, note, {size: 16, w: 700, fill: '#94a3b8'});
+    }
+
+    drive(240, '把时间给最差的', 4, '#f87171', '每科都松一口气，哪科都不突出');
+    mk('line', {x1: 460, y1: 44, x2: 460, y2: 412, stroke: '#eef1f6', 'stroke-width': 2, 'stroke-dasharray': '8 10'}, G);
+    drive(690, '把时间给最好的', 1, '#2563eb', '一科做到很好，方法能搬到别的科');
+  })();
+
+  /* =========================================================
+     S13　拆块 7±2
+     ========================================================= */
+  (function(){
+    const G = $('s13');
+    // 七个格子
+    for(let i = 0; i < 7; i++){
+      const x = 70 + i*100;
+      mk('rect', {x, y: 120, width: 84, height: 84, rx: 12, fill: '#dbeafe', stroke: '#93c5fd', 'stroke-width': 2.5}, G);
+      tx(G, x + 42, 172, String(i+1), {size: 28, w: 800, fill: '#1d4ed8'});
+    }
+    // 第八个掉出来
+    mk('rect', {x: 770, y: 236, width: 84, height: 84, rx: 12, fill: '#fef2f2',
+      stroke: '#fecaca', 'stroke-width': 2.5, 'stroke-dasharray': '8 6', opacity: .9}, G);
+    tx(G, 812, 288, '8', {size: 28, w: 800, fill: '#f87171'});
+    tx(G, 812, 344, '装不下', {size: 16, w: 800, fill: '#f87171'});
+    tx(G, 400, 300, '脑子一次只能装七八样 —— 硬塞，它就掉出来', {size: 18, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S14　收尾
+     ========================================================= */
+  (function(){
+    const G = $('s14');
+    // 知识记忆：会掉
+    mk('rect', {x: 150, y: 158, width: 260, height: 118, rx: 16, fill: '#fff', stroke: '#e2e8f0', 'stroke-width': 2.5}, G);
+    tx(G, 280, 196, '知识记忆', {size: 22, w: 800, fill: '#64748b'});
+    tx(G, 280, 226, '公式 · 单词 · 年代', {size: 16, w: 700, fill: '#94a3b8'});
+    tx(G, 280, 258, '过几年多半用不上', {size: 16, w: 800, fill: '#f87171'});
+
+    // 方法记忆：留
+    mk('rect', {x: 510, y: 158, width: 260, height: 118, rx: 16, fill: '#f0fdfa', stroke: '#5eead4', 'stroke-width': 2.5}, G);
+    tx(G, 640, 196, '方法记忆', {size: 22, w: 800, fill: '#0d9488'});
+    tx(G, 640, 226, '怎么下手 · 怎么拆 · 怎么判断', {size: 15, w: 700, fill: '#14b8a6'});
+    tx(G, 640, 258, '几乎不退化', {size: 16, w: 800, fill: '#0d9488'});
+
+    mk('path', {d: 'M424,217 L496,217', stroke: '#cbd5e1', 'stroke-width': 3, 'stroke-dasharray': '8 7'}, G);
+    tx(G, 460, 208, '→', {size: 22, w: 800, fill: '#cbd5e1'});
+  })();
+
+  /* =========================================================
+     S15　第二张表
+     ========================================================= */
+  (function(){
+    const G = $('s15');
+    const ROWS = [
+      ['早上起床后 10 分钟', '回想昨天学的那一条'],
+      ['上课前 5 分钟', '把上次的错题看一遍，只看不做'],
+      ['饭前 20 分钟', '背最难的那张表'],
+      ['走动、散步的时候', '背口诀、背公式'],
+      ['睡前 30 分钟', '过一遍今天要背的，然后立刻睡'],
+      ['学完当天', '合书回想 1 分钟，讲给自己听'],
+      ['第 2 天 / 1 周 / 2 周 / 1 月', '各回看一次，每次不超过 5 分钟']
+    ];
+    ROWS.forEach((r, i) => {
+      const y = 46 + i*52;
+      const mine = (i === 1);
+      mk('rect', {x: 40, y, width: 840, height: 44, rx: 9,
+        fill: mine ? '#fff7ed' : (i % 2 ? '#fbfcfe' : '#ffffff'),
+        stroke: mine ? '#fed7aa' : '#eef1f6', 'stroke-width': 2}, G);
+      mk('text', {x: 58, y: y + 28, 'font-size': 17, 'font-weight': 800,
+        fill: mine ? '#c2410c' : '#334155'}, G).textContent = r[0];
+      mk('text', {x: 356, y: y + 28, 'font-size': 17, 'font-weight': 700,
+        fill: mine ? '#ea580c' : '#64748b'}, G).textContent = r[1];
+      mk('rect', {x: 806, y: y + 12, width: 20, height: 20, rx: 5,
+        fill: 'none', stroke: '#cbd5e1', 'stroke-width': 2.5}, G);
+    });
+    tx(G, 460, 428, '橙色那行不是书上的，是我给你加的规矩', {size: 16, w: 700, fill: '#fb923c'});
+  })();
+
+  /* =========================================================
+     步骤
+     ========================================================= */
+  const STEPS = [
+    {
+      sc: 'sc1',
+      t: '忘掉，才是默认设置',
+      h: '背完 20 分钟，脑子里还剩一半多一点；一天之后，只剩三成左右。<br><br>' +
+         '这<b>不是记性差</b>，是脑子在按规矩办事 —— 它每天收到的东西太多，全留下会撑爆，所以默认往外扔。',
+      eq: '不要问「怎么才能不忘」\n要问「怎么让它认为这条不能扔」'
+    },
+    {
+      sc: 'sc2',
+      t: '脑子里有个门卫',
+      h: '它的标准非常原始：<b>这条不记住，会不会死。</b>不会，就扔掉。<br><br>' +
+         '课本上的公式、英语单词，在它眼里跟「路边有几棵树」是<b>同一级别</b>。<br><br>' +
+         '所以后面所有方法，本质都是同一件事 —— 想办法骗过它。',
+      eq: '我们做的每一件事\n都是在骗这个门卫'
+    },
+    {
+      sc: 'sc3',
+      t: '它认的不是「看得多」',
+      h: '同一页读 5 遍，眼睛认得这些字了，脑子没动。<br>' +
+         '读 1 遍 + 合书回想 4 次，每一次都把它<b>从里面取出来</b>。<br><br>' +
+         '门卫判断的是「<b>这东西被调用了多少次</b>」，不是「你看了它多少眼」。',
+      eq: '反复「取出来」，才叫复习\n反复「看一遍」，只是眼熟'
+    },
+    {
+      sc: 'sc4',
+      t: '四次，两个月走完',
+      h: '第 2 天、第 1 周、第 2 周、第 1 个月。<br><br>' +
+         '每一次都正好落在「<b>快忘了但还没忘</b>」的位置 —— 这时候补一下，加固效果最好。' +
+         '太早没用（还没开始忘），太晚也白搭（已经忘干净了）。<br><br>' +
+         '书里明说：走完这四轮，<b>不必再多</b>。',
+      eq: '第 2 天 → +1 周 → +2 周 → +1 月\n当堂把这四个日期写下来'
+    },
+    {
+      sc: 'sc5',
+      t: '复习，别换书',
+      h: '大脑加固记忆，靠的是<b>同一条痕迹被反复踩</b>。<br><br>' +
+         '换一本参考书、换一种讲法，踩的就是另一条痕迹 —— 旧的没加固，新的又占地方，两边都不牢。',
+      eq: '一本书、一份笔记、一张表\n用到四轮走完'
+    },
+    {
+      sc: 'sc6',
+      t: '上课，只占很小一块',
+      h: '预习 : 上课 : 复习 = <b>1 : 4 : 16</b>。<br><br>' +
+         '听课只是「第一次输入」，<b>它本身不产生记忆</b>。<br><br>' +
+         '如果这周上了 4 小时课、复习 0 小时 —— 问题不在听课，在复习。',
+      eq: '真正该花时间的，是复习'
+    },
+    {
+      sc: 'sc7',
+      t: '睡着的时候，脑子在搬东西',
+      h: '白天塞进去的，先堆在临时区；<b>睡着之后才被分拣、归类、搬进仓库</b>。<br><br>' +
+         '不睡，这一步就没做 —— 第二天那些东西还是一堆散件，用不上。<br><br>' +
+         '熬夜背下来的，因为没有整理，很快就被清掉。',
+      eq: '睡觉不增加知识的量\n但能改变知识的质'
+    },
+    {
+      sc: 'sc8',
+      t: '睡前 30 分钟，最值钱',
+      h: '这是最后进大脑的东西，睡着之后马上被整理，中间没有新信息来挤。' +
+         '同样 20 分钟，放在睡前比放在下午值钱。<br><br>' +
+         '三个条件：只过<b>当天要背的那一点</b>；过完<b>立刻睡</b>，中间不碰手机；' +
+         '<b>不用真的睡着</b> —— 关键不是入睡，是停止往脑子里输新东西。',
+      eq: '把最难背的那张表\n挪到睡前 20 分钟'
+    },
+    {
+      sc: 'sc9',
+      t: '三个开关，打开就更肯记',
+      h: '<b>饭前</b>（有点饿，但别饿到发昏）、<b>走着</b>（来回走、站着念）、' +
+         '<b>凉一点</b>（别把屋子搞得又暖又闷）。<br><br>' +
+         '人在轻度饥饿、身体在动、环境偏冷的时候，警觉度高，脑子更适合记东西。' +
+         '<br><br>点一下开关，看效率条怎么涨。',
+      eq: '同一段时间，换个状态\n效果差一截'
+    },
+    {
+      sc: 'sc10',
+      t: '别等有干劲了才开始',
+      h: '干劲不是等来的，是<b>做出来的</b>。<br><br>' +
+         '顺序是反的：<b>先坐下学 10 分钟，干劲才起来</b>。<br><br>' +
+         '一直等「今天状态好」的人，永远等不到那一天。',
+      eq: '先坐下\n10 分钟后再评价'
+    },
+    {
+      sc: 'sc11',
+      t: '参考书，一本就够',
+      h: '跟「别换书」是同一个道理：<b>换得越多，哪条都不牢</b>。<br><br>' +
+         '一套教辅、一本错题本，用到期末。想加，只加<b>同一体系</b>的，别混着来。',
+      eq: '与其花时间找新书\n不如把这本多复习几遍'
+    },
+    {
+      sc: 'sc12',
+      t: '先把强的，做得更强',
+      h: '大多数人是「哪科差补哪科」，把时间平均分。书里的说法更狠：' +
+         '<b>发挥长处</b>，实在学不会的那部分，可以不去管它。<br><br>' +
+         '原因有两个：强科提分最快；一门课做到「很好」之后，<b>那套方法能搬到别的科目</b>。',
+      eq: '补差可以\n但别把强科的时间挪走'
+    },
+    {
+      sc: 'sc13',
+      t: '一大段，拆开背',
+      h: '脑子一次只能装<b>七八样</b>。一整段摆在那儿，光看着就累，还没开始就先泄气。<br><br>' +
+         '拆成 3–5 小段，<b>每段背完立刻合书说一遍</b>，说完再下一段。<br>' +
+         '别整段读完再回头。',
+      eq: '小段 + 立刻回想\n比整段硬啃快得多'
+    },
+    {
+      sc: 'sc14',
+      t: '忘掉之后，剩下的才是学到的',
+      h: '知识记忆会忘（公式、单词、年代），<b>方法记忆几乎不退化</b> —— ' +
+         '怎么看问题、怎么下手、怎么拆。<br><br>' +
+         '所以做题不是「检查」，它本身就是<b>巩固</b>：从脑子里取一次，痕迹就深一次。',
+      eq: '光看不做\n是最亏的学法'
+    },
+    {
+      sc: 'sc15',
+      t: '这一课的表：贴书桌',
+      h: '七行，全是动作，不讲道理。<br><br>' +
+         '橙色那行（课前看错题）<b>不是书上的</b>，是我给你加的规矩 —— ' +
+         '被问到出处，就说这是我带学生的做法。',
+      eq: '每天打钩\n下次课带过来'
+    }
+  ];
+
+  const SHOW_DATES = 3;   // 第 4 步点亮四个日期
+
+  let cur = 0;
+
+  function render(){
+    STEPS.forEach((s, i) => {
+      $(s.sc).classList.toggle('on', i === cur);
+    });
+    const s = STEPS[cur];
+    $('steptag').textContent = '第 ' + (cur + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('t').textContent = s.t;
+    $('h').innerHTML = s.h;
+    $('eq').innerHTML = s.eq;
+
+    $('prev').disabled = cur === 0;
+    $('next').disabled = cur === STEPS.length - 1;
+    $('next').textContent = cur === STEPS.length - 1 ? '讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === cur));
+
+    const on = cur >= SHOW_DATES;
+    ['d1','d2','d3','d4'].forEach(id => $(id).classList.toggle('on', on));
+
+    // 重播 CSS 动画
+    const sc = $(s.sc);
+    sc.querySelectorAll('.draw').forEach(el => {
+      el.style.animation = 'none';
+      el.getBoundingClientRect();
+      el.style.animation = '';
+    });
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === cur) return;
+    cur = k;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(cur - 1));
+  $('next').addEventListener('click', () => go(cur + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(cur + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(cur - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第一课 · 学得对 —— 不是不努力，是方法不对</title>
+<style>
+/* ===== 小学数学动画课 · 公共样式 ===== */
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e7eaf0;
+  --a:#2563eb;
+  --a-dk:#1d4ed8;
+  --a-lt:#dbeafe;
+  --d:#ef4444;
+  --d-dk:#b91c1c;
+  --b:#f59e0b;
+  --b-lt:#fde9c4;
+  --s:#94a3b8;
+  --ok:#0d9488;
+  --ok-lt:#ccfbf1;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding:18px 26px 32px;
+}
+.wrap{max-width:1400px;margin:0 auto}
+
+/* ---------- 顶部导航 ---------- */
+.topbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.topbar a{
+  color:var(--muted);text-decoration:none;font-size:14px;font-weight:800;
+  padding:7px 13px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;transition:.16s;white-space:nowrap;
+}
+.topbar a:hover{color:var(--ink);border-color:#cbd5e1;background:#fbfcfe}
+.topbar .pos{font-size:13px;font-weight:800;color:#9aa6b8;letter-spacing:.05em}
+.topbar .sp{flex:1}
+
+/* ---------- header ---------- */
+header{margin-bottom:18px}
+.kicker{
+  display:inline-block;
+  font-size:13px;font-weight:700;letter-spacing:.08em;
+  color:var(--a);background:#e8efff;
+  padding:5px 12px;border-radius:999px;
+  margin-bottom:11px;
+}
+h1{font-size:31px;font-weight:800;letter-spacing:-.01em;line-height:1.22}
+h1 .q-mark{color:var(--d)}
+.q{margin-top:10px;font-size:20px;line-height:1.7;color:#334155;font-weight:500}
+.q b{color:var(--a);font-weight:800}
+.q em{font-style:normal;color:var(--d);font-weight:800}
+
+/* ---------- layout ---------- */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1.62fr) minmax(330px,.9fr);
+  gap:20px;
+  align-items:start;
+}
+@media (max-width:1040px){ .main{grid-template-columns:1fr} }
+
+/* ---------- stage ---------- */
+.stage-card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px 16px 8px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+
+/* ---------- 通用 svg 文本 ---------- */
+.tag{font-size:22px;font-weight:800;fill:#0f172a}
+.tag.sm{font-size:17px;font-weight:700;fill:#64748b}
+.val{font-size:27px;font-weight:800;fill:#fff}
+.valDark{font-size:24px;font-weight:800;fill:#0f172a}
+.hintTxt{font-size:17px;font-weight:700;fill:#94a3b8}
+
+/* ---------- side panel ---------- */
+.side{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:22px 22px 20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 28px -18px rgba(15,23,42,.22);
+  min-height:340px;
+  display:flex;flex-direction:column;
+}
+.steptag{
+  font-size:13px;font-weight:800;letter-spacing:.06em;color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.side h2{margin-top:10px;font-size:23px;font-weight:800;line-height:1.4;letter-spacing:-.01em}
+.side p{margin-top:12px;font-size:17px;line-height:1.85;color:#3f4b5f}
+.side p b{color:var(--a);font-weight:800}
+.side p em{font-style:normal;color:var(--d);font-weight:800}
+.side p i{font-style:normal;color:var(--ok);font-weight:800}
+.eqbox{margin-top:auto;padding-top:18px}
+.eq{
+  background:#f8fafc;
+  border:1px solid #eef1f6;
+  border-left:4px solid var(--a);
+  border-radius:10px;
+  padding:14px 16px;
+  font-size:20px;font-weight:800;
+  line-height:1.85;
+  font-variant-numeric:tabular-nums;
+  color:#0f172a;
+  white-space:pre-line;
+}
+.eq .hl{color:var(--d)}
+.eq .ok{color:var(--ok)}
+
+/* ---------- controls ---------- */
+.controls{margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line);background:#fff;
+  color:var(--ink);font-size:16px;font-weight:800;
+  padding:11px 20px;border-radius:11px;cursor:pointer;
+  transition:all .16s ease;font-family:inherit;
+}
+.btn:hover:not(:disabled){border-color:#cbd5e1;background:#f8fafc}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn.primary{
+  background:var(--a);border-color:var(--a);color:#fff;
+  box-shadow:0 6px 16px -8px rgba(37,99,235,.7);
+}
+.btn.primary:hover:not(:disabled){background:var(--a-dk);border-color:var(--a-dk)}
+.dots{display:flex;gap:7px;margin-left:4px;flex-wrap:wrap}
+.dot{width:9px;height:9px;border-radius:50%;background:#d7dce5;cursor:pointer;transition:all .2s ease}
+.dot:hover{background:#b6bfcd}
+.dot.on{background:var(--a);width:24px;border-radius:5px}
+.spacer{flex:1}
+.kbd{font-size:13px;color:#94a3b8;font-weight:600}
+.kbd b{
+  display:inline-block;background:#fff;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;
+  font-family:inherit;color:#64748b;margin:0 2px;
+}
+
+/* ---------- 底部提醒条 ---------- */
+.foot{
+  margin-top:16px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 20px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.foot .lab{font-size:15px;font-weight:800;color:var(--muted);white-space:nowrap}
+.foot .unit{font-size:15px;font-weight:700;color:var(--muted)}
+.foot .chip{
+  font-size:15px;font-weight:800;padding:7px 14px;border-radius:9px;
+  background:#f5f7fa;border:1px solid var(--line);color:#94a3b8;
+}
+.foot .chip.hot{background:#eff6ff;border-color:#bfdbfe;color:var(--a)}
+
+/* ---------- 动画（全站统一） ---------- */
+svg rect, svg text, svg g, svg circle{
+  transition: width .72s cubic-bezier(.5,0,.2,1),
+              height .72s cubic-bezier(.5,0,.2,1),
+              x .72s cubic-bezier(.5,0,.2,1),
+              y .72s cubic-bezier(.5,0,.2,1),
+              opacity .42s ease,
+              fill .3s ease,
+              stroke .3s ease;
+}
+.no-anim *{transition:none !important}
+
+/* ---------- 本页补充 ---------- */
+.scene{opacity:0;pointer-events:none;transition:opacity .45s ease}
+.scene.on{opacity:1;pointer-events:auto}
+svg line{transition:opacity .44s ease, stroke .34s ease, x1 .5s ease, x2 .5s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.fi{animation:fi .4s ease both}
+@keyframes draw{to{stroke-dashoffset:0}}
+.draw{stroke-dasharray:2000;stroke-dashoffset:2000;animation:draw 1.4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../../index.html">← 全部课程</a>
+    <span class="pos">附赠学法课 · 第一课</span>
+    <span class="sp"></span>
+    <a href="../02-jidezhu/index.html">第二课：记得住</a>
+    <a href="../../index.html">回到目录 →</a>
+  </div>
+
+  <header>
+    <div class="kicker">附赠学法课 · 第一课</div>
+    <h1>学得对：<span class="q-mark">合上书，能说出来才算会</span></h1>
+    <p class="q">同样读了 <b>三遍</b>，为什么有人合上书能讲，有人只会说「看过」？</p>
+  </header>
+
+  <div class="main">
+
+    <section class="stage-card">
+      <svg id="stage" viewBox="0 0 920 455" preserveAspectRatio="xMidYMid meet">
+
+        <!-- ===== S1 读几遍没用 ===== -->
+        <g class="scene" id="sc1">
+          <g id="s1"></g>
+        </g>
+
+        <!-- ===== S2 抄写 ===== -->
+        <g class="scene" id="sc2">
+          <g id="s2"></g>
+        </g>
+
+        <!-- ===== S3 学习风格 ===== -->
+        <g class="scene" id="sc3">
+          <g id="s3"></g>
+        </g>
+
+        <!-- ===== S4 记忆是拉线 ===== -->
+        <g class="scene" id="sc4">
+          <g id="s4"></g>
+        </g>
+
+        <!-- ===== S5 三段记忆 ===== -->
+        <g class="scene" id="sc5">
+          <g id="s5"></g>
+        </g>
+
+        <!-- ===== S6 组块化 ===== -->
+        <g class="scene" id="sc6">
+          <g id="s6"></g>
+        </g>
+
+        <!-- ===== S7 费曼三步 ===== -->
+        <g class="scene" id="sc7">
+          <g id="s7"></g>
+        </g>
+
+        <!-- ===== S8 交错实验 ===== -->
+        <g class="scene" id="sc8">
+          <g id="s8"></g>
+        </g>
+
+        <!-- ===== S9 莱特纳五盒 ===== -->
+        <g class="scene" id="sc9">
+          <g id="s9"></g>
+          <text x="460" y="430" text-anchor="middle" font-size="17" font-weight="700" fill="#94a3b8">答对往右挪一格，答错往左退一格 —— 卡片自己会安排复习</text>
+        </g>
+
+        <!-- ===== S10 SQ3R ===== -->
+        <g class="scene" id="sc10">
+          <g id="s10"></g>
+        </g>
+
+        <!-- ===== S11 学生综合征 ===== -->
+        <g class="scene" id="sc11">
+          <g id="s11"></g>
+        </g>
+
+        <!-- ===== S12 番茄钟 ===== -->
+        <g class="scene" id="sc12">
+          <g id="s12"></g>
+        </g>
+
+        <!-- ===== S13 灰心平台 ===== -->
+        <g class="scene" id="sc13">
+          <g id="s13"></g>
+        </g>
+
+        <!-- ===== S14 三层 ===== -->
+        <g class="scene" id="sc14">
+          <g id="s14"></g>
+        </g>
+
+        <!-- ===== S15 第一张表 ===== -->
+        <g class="scene" id="sc15">
+          <g id="s15"></g>
+        </g>
+
+      </svg>
+    </section>
+
+    <aside class="side">
+      <div class="steptag" id="steptag">第 1 步 / 共 15 步</div>
+      <h2 id="t"></h2>
+      <p id="h"></p>
+      <div class="eqbox"><div class="eq" id="eq"></div></div>
+    </aside>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 上一步</button>
+    <button class="btn primary" id="next">下一步 →</button>
+    <div class="dots" id="dots"></div>
+    <div class="spacer"></div>
+    <div class="kbd">键盘 <b>←</b> <b>→</b> 翻页</div>
+  </div>
+
+  <div class="foot">
+    <span class="lab">这一课的动作</span>
+    <span class="unit">每个方法讲完，当场拿他正在背的东西试一遍 ——</span>
+    <span class="chip hot">合书</span>
+    <span class="chip hot">说出来</span>
+    <span class="chip">卡住的做记号</span>
+    <span class="chip">只重背记号那几条</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function mk(tag, a, p){
+    const e = document.createElementNS(NS, tag);
+    for(const k in a) e.setAttribute(k, a[k]);
+    if(p) p.appendChild(e);
+    return e;
+  }
+  function tx(p, x, y, s, o){
+    o = o || {};
+    const t = mk('text', {
+      x, y,
+      'text-anchor': o.anchor || 'middle',
+      'font-size': o.size || 18,
+      'font-weight': o.w || 700,
+      fill: o.fill || '#64748b'
+    }, p);
+    t.textContent = s;
+    return t;
+  }
+  function smooth(pts){
+    if(pts.length < 2) return '';
+    let d = 'M' + pts[0][0].toFixed(1) + ',' + pts[0][1].toFixed(1);
+    for(let i = 0; i < pts.length - 1; i++){
+      const p0 = pts[i-1] || pts[i], p1 = pts[i], p2 = pts[i+1], p3 = pts[i+2] || p2;
+      const c1x = p1[0] + (p2[0]-p0[0])/6, c1y = p1[1] + (p2[1]-p0[1])/6;
+      const c2x = p2[0] - (p3[0]-p1[0])/6, c2y = p2[1] - (p3[1]-p1[1])/6;
+      d += ' C' + c1x.toFixed(1) + ',' + c1y.toFixed(1) + ' ' +
+                  c2x.toFixed(1) + ',' + c2y.toFixed(1) + ' ' +
+                  p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
+    }
+    return d;
+  }
+
+  /* =========================================================
+     S1　读 1 遍 vs 读 4 遍
+     ========================================================= */
+  (function(){
+    const G = $('s1');
+    tx(G, 460, 54, '同一个实验：读完就考，成绩几乎一样', {size: 20, w: 800, fill: '#334155'});
+
+    const BARS = [
+      {x: 150, h: 176, v: 62, lab: '读 1 遍', c: '#93c5fd', cf: '#1d4ed8'},
+      {x: 380, h: 181, v: 64, lab: '读 4 遍', c: '#93c5fd', cf: '#1d4ed8'},
+      {x: 610, h: 268, v: 95, lab: '读 1 遍 + 合书回想', c: '#0d9488', cf: '#0d9488'}
+    ];
+    const BASE = 372;
+    BARS.forEach(b => {
+      mk('rect', {x: b.x, y: BASE - b.h, width: 150, height: b.h, rx: 10, fill: b.c}, G);
+      tx(G, b.x + 75, BASE - b.h - 16, b.v + ' 分', {size: 24, w: 800, fill: b.cf});
+      tx(G, b.x + 75, BASE + 32, b.lab, {size: 17, w: 800, fill: '#475569'});
+    });
+    mk('line', {x1: 100, y1: BASE, x2: 860, y2: BASE, stroke: '#e2e8f0', 'stroke-width': 2.5}, G);
+
+    tx(G, 280, 296, '几乎没差', {size: 18, w: 800, fill: '#f87171'});
+    mk('path', {d: 'M280,306 L280,318', stroke: '#fecaca', 'stroke-width': 3}, G);
+    tx(G, 700, 92, '差别在这儿', {size: 18, w: 800, fill: '#0d9488'});
+  })();
+
+  /* =========================================================
+     S2　抄写
+     ========================================================= */
+  (function(){
+    const G = $('s2');
+    // 左：复印机
+    tx(G, 220, 58, '只抄，不过脑', {size: 20, w: 800, fill: '#b91c1c'});
+    for(let i = 0; i < 3; i++){
+      const y = 92 + i*76;
+      mk('rect', {x: 96 + i*8, y, width: 210, height: 62, rx: 8,
+        fill: '#ffffff', stroke: '#e2e8f0', 'stroke-width': 2}, G);
+      for(let l = 0; l < 3; l++){
+        mk('rect', {x: 112 + i*8, y: y + 12 + l*15, width: 170 - l*28, height: 6, rx: 3, fill: '#e2e8f0'}, G);
+      }
+    }
+    tx(G, 220, 340, '纸上写满了', {size: 17, w: 800, fill: '#94a3b8'});
+    tx(G, 220, 372, '脑子里空的', {size: 19, w: 800, fill: '#ef4444'});
+
+    // 右：加工
+    tx(G, 690, 58, '抄完，加一句自己的话', {size: 20, w: 800, fill: '#0d9488'});
+    mk('rect', {x: 566, y: 92, width: 250, height: 190, rx: 10,
+      fill: '#ffffff', stroke: '#5eead4', 'stroke-width': 2.5}, G);
+    for(let l = 0; l < 4; l++){
+      mk('rect', {x: 588, y: 116 + l*22, width: 200 - l*22, height: 7, rx: 3, fill: '#cbd5e1'}, G);
+    }
+    mk('rect', {x: 588, y: 226, width: 206, height: 40, rx: 8, fill: '#ccfbf1'}, G);
+    tx(G, 691, 252, '这句话的意思是……', {size: 17, w: 800, fill: '#0d9488'});
+    tx(G, 690, 340, '抄是搬运', {size: 17, w: 700, fill: '#94a3b8'});
+    tx(G, 690, 372, '加工才是学', {size: 19, w: 800, fill: '#0d9488'});
+
+    mk('line', {x1: 460, y1: 60, x2: 460, y2: 386, stroke: '#eef1f6', 'stroke-width': 2, 'stroke-dasharray': '8 10'}, G);
+  })();
+
+  /* =========================================================
+     S3　学习风格
+     ========================================================= */
+  (function(){
+    const G = $('s3');
+    tx(G, 460, 50, '「我是 ×× 型」—— 这个说法没有依据', {size: 20, w: 800, fill: '#b91c1c'});
+
+    ['视觉型', '听觉型', '动觉型'].forEach((s, i) => {
+      const x = 110 + i*230;
+      mk('rect', {x, y: 78, width: 190, height: 66, rx: 33,
+        fill: '#f8fafc', stroke: '#e2e8f0', 'stroke-width': 2.5, 'stroke-dasharray': '9 6'}, G);
+      tx(G, x + 95, 120, s, {size: 22, w: 800, fill: '#cbd5e1'});
+      mk('path', {d: `M${x + 62},84 l126,54 M${x + 188},84 l-126,54`,
+        stroke: '#f87171', 'stroke-width': 4, 'stroke-linecap': 'round'}, G);
+    });
+
+    tx(G, 460, 186, '没有任何实验能证明「按风格教，成绩会变好」', {size: 18, w: 700, fill: '#94a3b8'});
+
+    // 内容挑形式
+    tx(G, 460, 236, '真正决定用图还是用字的，是内容本身', {size: 21, w: 800, fill: '#1d4ed8'});
+    const IT = [
+      {x: 96,  k: '地形', v: '画图'},
+      {x: 356, k: '公式', v: '写符号'},
+      {x: 616, k: '故事', v: '用文字'}
+    ];
+    IT.forEach(it => {
+      mk('rect', {x: it.x, y: 268, width: 208, height: 84, rx: 12,
+        fill: '#eff6ff', stroke: '#bfdbfe', 'stroke-width': 2.5}, G);
+      tx(G, it.x + 104, 304, it.k, {size: 21, w: 800, fill: '#1d4ed8'});
+      tx(G, it.x + 104, 332, '→ ' + it.v, {size: 17, w: 700, fill: '#60a5fa'});
+    });
+    tx(G, 460, 392, '是内容挑形式，不是你挑形式', {size: 18, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S4　记忆是拉线
+     ========================================================= */
+  (function(){
+    const G = $('s4');
+    // 已有网络
+    const NODES = [
+      [300,140],[420,96],[540,150],[600,240],[470,268],[350,250]
+    ];
+    const EDGES = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,4],[1,5]];
+    EDGES.forEach(e => {
+      mk('line', {x1: NODES[e[0]][0], y1: NODES[e[0]][1],
+                  x2: NODES[e[1]][0], y2: NODES[e[1]][1],
+                  stroke: '#bfdbfe', 'stroke-width': 3.5}, G);
+    });
+    NODES.forEach(n => {
+      mk('circle', {cx: n[0], cy: n[1], r: 17, fill: '#dbeafe', stroke: '#93c5fd', 'stroke-width': 2.5}, G);
+    });
+    tx(G, 460, 200, '已经会的', {size: 18, w: 800, fill: '#60a5fa'});
+
+    // 新知识：挂住
+    mk('circle', {cx: 760, cy: 240, r: 19, fill: '#ccfbf1', stroke: '#5eead4', 'stroke-width': 3}, G);
+    tx(G, 760, 247, '新', {size: 16, w: 800, fill: '#0d9488'});
+    mk('path', {d: 'M618,240 C 660,240 700,240 738,240', stroke: '#0d9488',
+      'stroke-width': 6, 'stroke-linecap': 'round', fill: 'none', class: 'draw'}, G);
+    tx(G, 690, 214, '挂上去', {size: 17, w: 800, fill: '#0d9488'});
+
+    // 挂不住
+    mk('circle', {cx: 790, cy: 372, r: 19, fill: '#fef2f2', stroke: '#fecaca', 'stroke-width': 2.5}, G);
+    tx(G, 790, 379, '新', {size: 16, w: 800, fill: '#ef4444'});
+    mk('path', {d: 'M790,346 L790,300', stroke: '#fecaca', 'stroke-width': 3, 'stroke-dasharray': '6 8'}, G);
+    tx(G, 700, 388, '挂不住，就掉了', {size: 17, w: 800, fill: '#f87171', anchor: 'end'});
+
+    tx(G, 130, 120, '脑子是', {size: 18, w: 700, fill: '#94a3b8', anchor: 'start'});
+    tx(G, 130, 152, '一张网', {size: 22, w: 800, fill: '#334155', anchor: 'start'});
+    tx(G, 130, 182, '不是仓库', {size: 18, w: 700, fill: '#94a3b8', anchor: 'start'});
+  })();
+
+  /* =========================================================
+     S5　三段记忆
+     ========================================================= */
+  (function(){
+    const G = $('s5');
+    const BOX = [
+      {x: 70,  w: 210, t: '感觉记忆', s: '眼睛耳朵刚收到', e: '几秒钟就散', c: '#f1f5f9', b: '#e2e8f0', f: '#94a3b8'},
+      {x: 320, w: 210, t: '工作记忆', s: '当下正在想的', e: '只能放 5–9 样', c: '#eff6ff', b: '#93c5fd', f: '#1d4ed8'},
+      {x: 570, w: 210, t: '长期记忆', s: '真正存下来的', e: '几乎没上限', c: '#f0fdfa', b: '#5eead4', f: '#0d9488'}
+    ];
+    BOX.forEach((b, i) => {
+      mk('rect', {x: b.x, y: 140, width: b.w, height: 170, rx: 16, fill: b.c, stroke: b.b, 'stroke-width': 3}, G);
+      tx(G, b.x + b.w/2, 184, b.t, {size: 21, w: 800, fill: b.f});
+      tx(G, b.x + b.w/2, 218, b.s, {size: 16, w: 700, fill: '#94a3b8'});
+      tx(G, b.x + b.w/2, 256, b.e, {size: 17, w: 800, fill: b.f});
+      if(i < 2){
+        mk('path', {d: `M${b.x + b.w + 12},225 L${b.x + b.w + 28},225`, stroke: '#cbd5e1',
+          'stroke-width': 3, 'marker-end': 'url(#ar2)'}, G);
+      }
+    });
+    mk('defs', {}, G).innerHTML =
+      '<marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="#cbd5e1"/></marker>';
+
+    // 中间那段最窄
+    mk('path', {d: 'M280,352 L280,376 L530,376 L530,352', stroke: '#fca5a5',
+      'stroke-width': 3, 'fill': 'none', 'stroke-linecap': 'round'}, G);
+    tx(G, 405, 404, '瓶颈就在这一段 —— 谁都一样，不是你不专心', {size: 19, w: 800, fill: '#ef4444'});
+    tx(G, 405, 108, '记忆分三段', {size: 20, w: 800, fill: '#334155'});
+  })();
+
+  /* =========================================================
+     S6　组块化
+     ========================================================= */
+  (function(){
+    const G = $('s6');
+    // 散的
+    tx(G, 460, 52, '20 个孤立的，装不下', {size: 20, w: 800, fill: '#b91c1c'});
+    for(let i = 0; i < 20; i++){
+      const c = i % 10, r = Math.floor(i/10);
+      mk('circle', {cx: 300 + c*32, cy: 92 + r*34, r: 12,
+        fill: '#fef2f2', stroke: '#fecaca', 'stroke-width': 2}, G);
+    }
+    tx(G, 620, 122, '= 20 块', {size: 20, w: 800, fill: '#f87171', anchor: 'start'});
+    tx(G, 620, 152, '超过 7±2，进不来', {size: 16, w: 700, fill: '#fca5a5', anchor: 'start'});
+
+    // 打包
+    tx(G, 460, 216, '打包成 5 个有意义的块', {size: 20, w: 800, fill: '#1d4ed8'});
+    const PK = ['苹果', '香蕉', '橙子', '葡萄', '西瓜'];
+    PK.forEach((s, i) => {
+      const x = 96 + i*152;
+      mk('rect', {x, y: 244, width: 128, height: 72, rx: 14,
+        fill: '#dbeafe', stroke: '#93c5fd', 'stroke-width': 2.5}, G);
+      tx(G, x + 64, 290, s, {size: 21, w: 800, fill: '#1d4ed8'});
+    });
+    tx(G, 460, 356, '5 块，轻松装下', {size: 20, w: 800, fill: '#0d9488'});
+    tx(G, 460, 388, '分组那 30 秒不是浪费，是省时间', {size: 17, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S7　费曼三步
+     ========================================================= */
+  (function(){
+    const G = $('s7');
+    const ST = [
+      {x: 66,  n: '1', t: '挑一样', s: '今天学的\n任何一个点', c: '#dbeafe', b: '#93c5fd', f: '#1d4ed8'},
+      {x: 356, n: '2', t: '讲给人听', s: '家长、同学\n或者对着空气', c: '#dbeafe', b: '#93c5fd', f: '#1d4ed8'},
+      {x: 646, n: '3', t: '卡住就记下', s: '回去只看\n卡住的那几处', c: '#ccfbf1', b: '#5eead4', f: '#0d9488'}
+    ];
+    ST.forEach((s, i) => {
+      mk('rect', {x: s.x, y: 106, width: 208, height: 188, rx: 18,
+        fill: s.c, stroke: s.b, 'stroke-width': 3}, G);
+      mk('circle', {cx: s.x + 40, cy: 146, r: 19, fill: '#ffffff'}, G);
+      tx(G, s.x + 40, 154, s.n, {size: 20, w: 800, fill: s.f});
+      tx(G, s.x + 104, 154, s.t, {size: 21, w: 800, fill: s.f, anchor: 'middle'});
+      s.s.split('\n').forEach((line, j) => {
+        tx(G, s.x + 104, 210 + j*30, line, {size: 17, w: 700, fill: '#64748b'});
+      });
+      if(i < 2){
+        mk('path', {d: `M${s.x + 220},200 L${s.x + 278},200`, stroke: '#cbd5e1', 'stroke-width': 3.5,
+          'marker-end': 'url(#ar3)'}, G);
+      }
+    });
+    mk('defs', {}, G).innerHTML =
+      '<marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="#cbd5e1"/></marker>';
+
+    tx(G, 460, 344, '第三步才是关键', {size: 22, w: 800, fill: '#0d9488'});
+    tx(G, 460, 380, '大部分人讲完就完了 —— 卡住的地方，下次还卡', {size: 18, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S8　交错实验
+     ========================================================= */
+  (function(){
+    const G = $('s8');
+    const BASE = 372, MAXH = 250;
+
+    tx(G, 236, 48, '当场考', {size: 22, w: 800, fill: '#334155'});
+    tx(G, 676, 48, '一周后再考', {size: 22, w: 800, fill: '#334155'});
+
+    // 当场
+    mk('rect', {x: 150, y: BASE - MAXH*0.89, width: 74, height: MAXH*0.89, rx: 8, fill: '#93c5fd'}, G);
+    tx(G, 187, BASE - MAXH*0.89 - 14, '89%', {size: 22, w: 800, fill: '#1d4ed8'});
+    tx(G, 187, BASE + 28, '分块练', {size: 15, w: 700, fill: '#94a3b8'});
+    mk('rect', {x: 248, y: BASE - MAXH*0.60, width: 74, height: MAXH*0.60, rx: 8, fill: '#fdba74'}, G);
+    tx(G, 285, BASE - MAXH*0.60 - 14, '60%', {size: 22, w: 800, fill: '#ea580c'});
+    tx(G, 285, BASE + 28, '交错练', {size: 15, w: 700, fill: '#94a3b8'});
+
+    // 一周后
+    mk('rect', {x: 590, y: BASE - MAXH*0.20, width: 74, height: MAXH*0.20, rx: 8, fill: '#bfdbfe'}, G);
+    tx(G, 627, BASE - MAXH*0.20 - 14, '20%', {size: 22, w: 800, fill: '#3b82f6'});
+    tx(G, 627, BASE + 28, '分块练', {size: 15, w: 700, fill: '#94a3b8'});
+    mk('rect', {x: 688, y: BASE - MAXH*0.63, width: 74, height: MAXH*0.63, rx: 8, fill: '#0d9488'}, G);
+    tx(G, 725, BASE - MAXH*0.63 - 14, '63%', {size: 22, w: 800, fill: '#0d9488'});
+    tx(G, 725, BASE + 28, '交错练', {size: 15, w: 700, fill: '#94a3b8'});
+
+    mk('line', {x1: 110, y1: BASE, x2: 850, y2: BASE, stroke: '#e2e8f0', 'stroke-width': 2.5}, G);
+    mk('line', {x1: 460, y1: 64, x2: 460, y2: 400, stroke: '#eef1f6', 'stroke-width': 2, 'stroke-dasharray': '8 10'}, G);
+    tx(G, 460, 210, '一周', {size: 17, w: 800, fill: '#cbd5e1'});
+    tx(G, 460, 236, '→', {size: 24, w: 800, fill: '#cbd5e1'});
+
+    // 翻转标注
+    mk('path', {d: 'M300,286 C 400,240 520,240 600,286', stroke: '#0d9488',
+      'stroke-width': 3, 'stroke-dasharray': '9 8', fill: 'none'}, G);
+    mk('text', {x: 460, y: 226, 'text-anchor': 'middle', 'font-size': 17, 'font-weight': 800,
+      fill: '#0d9488'}, G).textContent = '翻过来了';
+  })();
+
+  /* =========================================================
+     S9　莱特纳五盒
+     ========================================================= */
+  (function(){
+    const G = $('s9');
+    const BOX = ['第 1 盒', '第 2 盒', '第 3 盒', '第 4 盒', '第 5 盒'];
+    const GAP = ['每天', '每 2 天', '每 4 天', '每 8 天', '不用再看了'];
+    const W = 156, Y = 132;
+
+    BOX.forEach((b, i) => {
+      const x = 62 + i*166;
+      const last = (i === 4);
+      mk('rect', {x, y: Y, width: W, height: 168, rx: 14,
+        fill: last ? '#f0fdfa' : '#f8fafc',
+        stroke: last ? '#5eead4' : '#e2e8f0', 'stroke-width': 3}, G);
+      tx(G, x + W/2, Y + 30, b, {size: 17, w: 800, fill: last ? '#0d9488' : '#94a3b8'});
+      tx(G, x + W/2, Y + 144, GAP[i], {size: 16, w: 800, fill: last ? '#0d9488' : '#64748b'});
+
+      // 卡片
+      const n = 3 - Math.min(i, 3);
+      for(let k = 0; k < Math.max(n, 1); k++){
+        mk('rect', {x: x + 30, y: Y + 52 + k*24, width: 96, height: 18, rx: 5,
+          fill: last ? '#99f6e4' : '#dbeafe'}, G);
+      }
+      if(i === 0) tx(G, x + W/2, Y + 118, '死活记不住的', {size: 13, w: 700, fill: '#93c5fd'});
+      if(last)    tx(G, x + W/2, Y + 118, '已经不用管', {size: 13, w: 700, fill: '#5eead4'});
+      if(last){
+        mk('path', {d: `M${x + W/2 - 14},${Y + 52} l12,14 l20,-24`, stroke: '#0d9488',
+          'stroke-width': 4, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}, G);
+      }
+    });
+
+    // 升盒箭头
+    mk('path', {d: 'M120,318 L760,318', stroke: '#0d9488', 'stroke-width': 3.5,
+      'marker-end': 'url(#ar9)', fill: 'none'}, G);
+    tx(G, 440, 344, '答对 → 升一盒，间隔翻倍', {size: 19, w: 800, fill: '#0d9488'});
+
+    // 退盒箭头
+    mk('path', {d: 'M760,372 L120,372', stroke: '#ef4444', 'stroke-width': 3.5,
+      'marker-end': 'url(#ar9r)', fill: 'none'}, G);
+    tx(G, 440, 398, '答错或不完整 → 退一盒', {size: 19, w: 800, fill: '#ef4444'});
+
+    mk('defs', {}, G).innerHTML =
+      '<marker id="ar9" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="#0d9488"/></marker>' +
+      '<marker id="ar9r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="#ef4444"/></marker>';
+
+    tx(G, 460, 84, '同一个盒子待得越久，间隔越长 —— 卡片自己会安排复习', {size: 18, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S10　SQ3R
+     ========================================================= */
+  (function(){
+    const G = $('s10');
+    const ST = ['观察', '提问', '阅读', '回想', '回顾'];
+    const SUB = ['看标题、图、黑体字', '猜要回答什么问题', '正式读', '合上，理一遍思路', '回去查漏补错'];
+    const HOT = 3;   // 前三个亮
+
+    ST.forEach((s, i) => {
+      const x = 40 + i*172;
+      const on = i < HOT;
+      mk('rect', {x, y: 100, width: 152, height: 92, rx: 14,
+        fill: on ? '#dbeafe' : '#f8fafc', stroke: on ? '#93c5fd' : '#e2e8f0', 'stroke-width': 3}, G);
+      tx(G, x + 76, 140, s, {size: 22, w: 800, fill: on ? '#1d4ed8' : '#cbd5e1'});
+      tx(G, x + 76, 172, String(i+1), {size: 15, w: 800, fill: on ? '#60a5fa' : '#e2e8f0'});
+      tx(G, x + 76, 222, SUB[i], {size: 14, w: 700, fill: on ? '#64748b' : '#cbd5e1'});
+    });
+
+    tx(G, 460, 68, '第一轮：只用前三步 —— 只求懂，不求记', {size: 20, w: 800, fill: '#1d4ed8'});
+
+    mk('path', {d: 'M488,262 L488,300 L700,300', stroke: '#0d9488', 'stroke-width': 3,
+      'stroke-dasharray': '9 7', fill: 'none'}, G);
+    tx(G, 594, 336, '回想 + 回顾，推到第二轮', {size: 19, w: 800, fill: '#0d9488'});
+
+    tx(G, 460, 396, '第一轮就逼自己记住，正是大多数人用错的地方', {size: 17, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S11　学生综合征
+     ========================================================= */
+  (function(){
+    const G = $('s11');
+    const DAYS = 14, X0 = 90, W = 760, DW = W/DAYS;
+
+    tx(G, 460, 52, '给你两周，你会怎么用', {size: 21, w: 800, fill: '#334155'});
+
+    // 实际
+    tx(G, 60, 108, '实际', {size: 17, w: 800, fill: '#b91c1c', anchor: 'start'});
+    for(let d = 0; d < DAYS; d++){
+      const late = d >= 11;
+      mk('rect', {x: X0 + d*DW + 2, y: 84, width: DW - 6, height: 52, rx: 5,
+        fill: late ? '#ef4444' : '#f1f5f9'}, G);
+    }
+    tx(G, 470, 76, '前 11 天：挑好玩的做，慢慢来', {size: 15, w: 700, fill: '#cbd5e1'});
+    tx(G, 800, 76, '最后 3 天：拼命', {size: 15, w: 800, fill: '#f87171', anchor: 'end'});
+    tx(G, 460, 160, '任务会自动膨胀，填满你给它的所有时间', {size: 18, w: 800, fill: '#ef4444'});
+
+    // 应该
+    tx(G, 60, 236, '改法', {size: 17, w: 800, fill: '#0d9488', anchor: 'start'});
+    for(let d = 0; d < DAYS; d++){
+      mk('rect', {x: X0 + d*DW + 2, y: 212, width: DW - 6, height: 52, rx: 5,
+        fill: '#5eead4'}, G);
+    }
+    tx(G, 460, 292, '每天的量写死：不写「这周看完第三章」，写「今天看两页」', {size: 18, w: 800, fill: '#0d9488'});
+
+    // 那条规矩
+    mk('rect', {x: 130, y: 328, width: 660, height: 72, rx: 14, fill: '#fff7ed', stroke: '#fed7aa', 'stroke-width': 2.5}, G);
+    tx(G, 460, 358, '没完成当日量，不上床', {size: 24, w: 800, fill: '#c2410c'});
+    tx(G, 460, 386, '这一条比任何计划表都管用', {size: 16, w: 700, fill: '#fb923c'});
+  })();
+
+  /* =========================================================
+     S12　番茄钟
+     ========================================================= */
+  (function(){
+    const G = $('s12');
+    // 左：25 分钟格子
+    tx(G, 240, 56, '被铃切断的一天', {size: 20, w: 800, fill: '#b91c1c'});
+    for(let i = 0; i < 6; i++){
+      const x = 62 + (i % 3)*118, y = 88 + Math.floor(i/3)*82;
+      mk('rect', {x, y, width: 104, height: 66, rx: 8,
+        fill: i === 2 ? '#fef2f2' : '#f8fafc',
+        stroke: i === 2 ? '#fecaca' : '#e2e8f0', 'stroke-width': 2.5}, G);
+      tx(G, x + 52, y + 30, '25 分', {size: 17, w: 800, fill: '#94a3b8'});
+      tx(G, x + 52, y + 52, i === 2 ? '正投入就被打断' : '坐着', {size: 12, w: 700, fill: i === 2 ? '#ef4444' : '#cbd5e1'});
+    }
+    tx(G, 240, 300, '铃决定你什么时候停', {size: 17, w: 800, fill: '#f87171'});
+    tx(G, 240, 330, '不是脑子决定', {size: 17, w: 700, fill: '#fca5a5'});
+
+    mk('line', {x1: 460, y1: 56, x2: 460, y2: 350, stroke: '#eef1f6', 'stroke-width': 2, 'stroke-dasharray': '8 10'}, G);
+
+    // 右：按节
+    tx(G, 690, 56, '按「这一节讲完没有」分段', {size: 20, w: 800, fill: '#0d9488'});
+    mk('rect', {x: 536, y: 96, width: 300, height: 74, rx: 12, fill: '#ccfbf1', stroke: '#5eead4', 'stroke-width': 2.5}, G);
+    tx(G, 686, 128, '一节讲透', {size: 19, w: 800, fill: '#0d9488'});
+    tx(G, 686, 154, '状态好就继续，不用停', {size: 14, w: 700, fill: '#14b8a6'});
+    mk('rect', {x: 536, y: 184, width: 178, height: 74, rx: 12, fill: '#ccfbf1', stroke: '#5eead4', 'stroke-width': 2.5}, G);
+    tx(G, 625, 216, '饱了就休息', {size: 17, w: 800, fill: '#0d9488'});
+    tx(G, 625, 242, '不看表', {size: 14, w: 700, fill: '#14b8a6'});
+
+    tx(G, 690, 306, '充满动力的 10 分钟', {size: 17, w: 800, fill: '#0d9488'});
+    tx(G, 690, 336, '胜过无精打采的 3 小时', {size: 19, w: 800, fill: '#0f172a'});
+  })();
+
+  /* =========================================================
+     S13　灰心平台
+     ========================================================= */
+  (function(){
+    const G = $('s13');
+    // 上升 → 平台 → 再上台阶
+    const SEG = [
+      [0, 60, 0.30], [60, 150, 0.55], [150, 250, 0.16],
+      [250, 350, 0.03], [350, 430, 0.03], [430, 520, 0.55], [520, 640, 0.30]
+    ];
+    const pts = [];
+    let base = 0;
+    SEG.forEach(s => {
+      const n = 24;
+      for(let i = 0; i <= n; i++){
+        const t = i/n;
+        pts.push([s[0] + (s[1]-s[0])*t, 380 - (base + s[2]*156*t)]);
+      }
+      base += s[2]*156;
+    });
+    mk('path', {d: smooth(pts), fill: 'none', stroke: '#2563eb',
+      'stroke-width': 5, 'stroke-linecap': 'round', class: 'draw'}, G);
+
+    // 平台区
+    mk('rect', {x: 300, y: 172, width: 220, height: 118, rx: 12,
+      fill: '#fff7ed', stroke: '#fed7aa', 'stroke-width': 3, 'stroke-dasharray': '9 7'}, G);
+    tx(G, 410, 206, '灰心平台', {size: 21, w: 800, fill: '#c2410c'});
+    tx(G, 410, 236, '平的，甚至有点往下掉', {size: 15, w: 700, fill: '#fb923c'});
+    tx(G, 410, 264, '最多人在这儿放弃', {size: 15, w: 800, fill: '#ef4444'});
+
+    tx(G, 106, 350, '第 1 轮', {size: 15, w: 700, fill: '#94a3b8'});
+    tx(G, 106, 372, '刚学完，觉得懂了', {size: 14, w: 700, fill: '#cbd5e1', anchor: 'start'});
+    tx(G, 700, 118, '第 2 轮：回头看，反而觉得空了', {size: 16, w: 800, fill: '#c2410c'});
+    tx(G, 800, 200, '再往前 → 下一级台阶', {size: 16, w: 800, fill: '#2563eb', anchor: 'end'});
+
+    tx(G, 460, 428, '判断有没有效果，别看分数 —— 看能不能讲出来、用时短没短、错误降级了没', {size: 16, w: 700, fill: '#94a3b8'});
+  })();
+
+  /* =========================================================
+     S14　三层
+     ========================================================= */
+  (function(){
+    const G = $('s14');
+    const LV = [
+      {x: 96,  y: 268, t: '被动', s: '人在场就行', e: '读、听、看', c: '#f1f5f9', b: '#e2e8f0', f: '#94a3b8', h: 56},
+      {x: 256, y: 210, t: '主动', s: '要真的动一下', e: '划线、做笔记、发言', c: '#dbeafe', b: '#93c5fd', f: '#1d4ed8', h: 114},
+      {x: 416, y: 130, t: '创造', s: '从自己口袋里掏东西', e: '自己出题、自己画表', c: '#ccfbf1', b: '#5eead4', f: '#0d9488', h: 194}
+    ];
+    LV.forEach(l => {
+      mk('rect', {x: l.x, y: l.y, width: 148, height: l.h, rx: 12,
+        fill: l.c, stroke: l.b, 'stroke-width': 3}, G);
+      tx(G, l.x + 74, l.y + 30, l.t, {size: 22, w: 800, fill: l.f});
+      tx(G, l.x + 74, l.y + 56, l.s, {size: 14, w: 700, fill: '#94a3b8'});
+    });
+    tx(G, 490, 300, '自己出题', {size: 16, w: 800, fill: '#0d9488', anchor: 'start'});
+    tx(G, 490, 326, '把两门课连起来', {size: 16, w: 800, fill: '#0d9488', anchor: 'start'});
+
+    // 老鼠实验
+    mk('rect', {x: 640, y: 96, width: 246, height: 150, rx: 14,
+      fill: '#ffffff', stroke: '#e2e8f0', 'stroke-width': 2.5}, G);
+    tx(G, 763, 128, '同一根胡须', {size: 16, w: 700, fill: '#94a3b8'});
+    tx(G, 763, 168, '主动去探', {size: 18, w: 800, fill: '#1d4ed8'});
+    tx(G, 763, 198, 'vs 等着被碰', {size: 18, w: 800, fill: '#94a3b8'});
+    tx(G, 763, 232, '脑活跃差 10 倍', {size: 19, w: 800, fill: '#ef4444'});
+
+    tx(G, 460, 396, '分数差得最大的地方，在第三层', {size: 20, w: 800, fill: '#0f172a'});
+  })();
+
+  /* =========================================================
+     S15　第一张表
+     ========================================================= */
+  (function(){
+    const G = $('s15');
+    const ROWS = [
+      ['读了一遍，没懂', '合上书，用自己的话讲一遍'],
+      ['觉得已经会了', '找一道变式题做，做对了才算会'],
+      ['背了好几遍还是忘', '先合书回想，想不起来再翻'],
+      ['一道题卡住超过 3 分钟', '做记号，跳过去，回头再看'],
+      ['一次要学的东西太多', '拆成 20 分钟一块'],
+      ['做错了，不知道为什么', '写下「我当时是怎么想的」'],
+      ['学完一节，不知道会不会', '合上书，讲给一个人听']
+    ];
+    ROWS.forEach((r, i) => {
+      const y = 40 + i*50;
+      const mine = (i === 3);
+      mk('rect', {x: 40, y, width: 840, height: 42, rx: 9,
+        fill: mine ? '#fff7ed' : (i % 2 ? '#fbfcfe' : '#ffffff'),
+        stroke: mine ? '#fed7aa' : '#eef1f6', 'stroke-width': 2}, G);
+      mk('text', {x: 58, y: y + 27, 'font-size': 17, 'font-weight': 800,
+        fill: mine ? '#c2410c' : '#334155'}, G).textContent = r[0];
+      mk('text', {x: 356, y: y + 27, 'font-size': 17, 'font-weight': 700,
+        fill: mine ? '#ea580c' : '#64748b'}, G).textContent = r[1];
+      mk('rect', {x: 806, y: y + 11, width: 20, height: 20, rx: 5,
+        fill: 'none', stroke: '#cbd5e1', 'stroke-width': 2.5}, G);
+    });
+    tx(G, 460, 418, '橙色那行不是书上的，是我要求你这么做 —— 说「我要求」，别说「书上说」', {size: 15, w: 700, fill: '#fb923c'});
+  })();
+
+  /* =========================================================
+     步骤
+     ========================================================= */
+  const STEPS = [
+    {
+      sc: 'sc1',
+      t: '读得顺，不等于想得起来',
+      h: '有个实验：一组只读 1 遍，一组读 4 遍，读完立刻考 —— <b>成绩几乎没差</b>。<br><br>' +
+         '因为读的时候眼睛认得这些字了，脑子会产生「我已经会了」的<b>错觉</b>。' +
+         '书里那句话很直白：重复阅读带给学生的，只是心理安慰。<br><br>' +
+         '信息其实一直在脑子里，出问题的是<b>取出来</b>。',
+      eq: '读完一节，立刻合上书\n用自己的话讲一遍'
+    },
+    {
+      sc: 'sc2',
+      t: '抄不是没用，是「只抄」不够',
+      h: '书里没有否定动笔，还把「做书面笔记」算作主动方法。但它补了一句狠的：' +
+         '<b>光靠这一种做法，效率低到令人咋舌</b>。<br><br>' +
+         '差在哪儿？抄是把别人的字搬到自己的纸上，<b>中间没有任何加工</b>。<br><br>' +
+         '有用的加工是：换个说法、找个例子、跟已经会的东西连起来。',
+      eq: '抄完，在旁边写一句\n「这说的是什么」'
+    },
+    {
+      sc: 'sc3',
+      t: '没有「视觉型、听觉型」这回事',
+      h: '这个说法流传很广，但书里明确讲它<b>缺乏科学依据</b> —— 没有任何实验能稳定测出' +
+         '「每个人都有固定的学习风格」，更没有证据说按风格教成绩会变好。<br><br>' +
+         '真正决定用图还是用字的，<b>是这条内容本身长什么样</b>：地形用图，公式用符号，故事用文字。<br><br>' +
+         '是内容挑形式，不是你挑形式。',
+      eq: '别给自己贴标签\n讲不清就换一种'
+    },
+    {
+      sc: 'sc4',
+      t: '记忆不是存文件，是拉线',
+      h: '大脑不是仓库，是<b>一张网</b>。<br><br>' +
+         '所谓「记住」，是几处之间连上了线；所谓「记得牢」，是这条线被走过很多次，走成了路。<br><br>' +
+         '所以新东西能不能记住，取决于它<b>能不能挂到你已有的东西上</b> —— 孤零零一条，挂不住，就掉了。',
+      eq: '学新的之前先问一句\n「这跟我已经会的什么像」'
+    },
+    {
+      sc: 'sc5',
+      t: '一次只能记七八样',
+      h: '记忆分三段：感觉记忆（几秒钟就散）、工作记忆（当下正在想的那一小块）、长期记忆。<br><br>' +
+         '卡在中间那一段，<b>容量是硬上限，谁都一样</b>。<br><br>' +
+         '所以不是你笨、也不是不专心 —— 是这一段真的就这么大。',
+      eq: '一次别塞超过七八样\n塞不进去就分组'
+    },
+    {
+      sc: 'sc6',
+      t: '塞不进去，就打包',
+      h: '工作记忆数的是<b>「块」</b>，不是「个」。<br><br>' +
+         '20 个孤立的字母是 20 块，装不下；装成 5 个词，5 块就很轻松。<br><br>' +
+         '背一串东西之前，先花 30 秒给它分组 —— 按意思分、按规律分、按读音分都行。',
+      eq: '分组那 30 秒\n不是浪费，是省时间'
+    },
+    {
+      sc: 'sc7',
+      t: '讲给一个不懂的人听',
+      h: '讲的时候你不能照念，必须<b>重新组织一遍</b> —— 这个组织就是加工。<br><br>' +
+         '而且哪里是含糊过去的，讲的时候立刻会露馅：你会突然说不下去。<br><br>' +
+         '关键在第三步：<b>把卡住的地方记下来，回去只看那几处</b>。大部分人讲完就完了。',
+      eq: '卡住的地方\n才是你没懂的地方'
+    },
+    {
+      sc: 'sc8',
+      t: '混着练，赢的是考试',
+      h: '同样四份讲义、四套题、一样的时间，只改练习顺序：<br><br>' +
+         'A 班学一份做一套（分块练），B 班四套打乱做（交错练）。<br>' +
+         '<b>当场考：89% 对 60%</b> —— 分块练看着赢麻了。<br>' +
+         '<b>一周后再考：20% 对 63%</b> —— 翻过来了。<br><br>' +
+         '当场做得顺，和一周后还记得，是两件事。',
+      eq: '分块练骗的是当下\n交错练赢的是考试'
+    },
+    {
+      sc: 'sc9',
+      t: '卡片怎么用才不白背',
+      h: '刚学完就重复，几乎没用（还没开始忘）；隔到<b>「快忘了但还没忘」</b>时再见到，那一下最加固。<br><br>' +
+         '莱特纳五盒：五个盒子，间隔分别是每天、2 天、4 天、8 天、<b>不用再看了</b>。<br><br>' +
+         '规则只有两条：<b>答对升一盒，答错退一盒</b>。',
+      eq: '一眼就会的，直接进第 5 盒\n时间全给第 1 盒里那些'
+    },
+    {
+      sc: 'sc10',
+      t: 'SQ3R：第一轮别逼自己记住',
+      h: '五步：观察、提问、阅读、回想、回顾。<br><br>' +
+         '书里说这套方法被证明有效，但<b>太费时间</b>，所以几乎没人在实际学习里用。' +
+         '作者做了个务实的修改：<b>第一轮只拿它来理解，不拿来记</b>。<br><br>' +
+         '把「回想、回顾」推到第二轮 —— 那时候做，正好是复习，一举两得。',
+      eq: '第一轮读完\n能说出「这节讲了什么」就过关'
+    },
+    {
+      sc: 'sc11',
+      t: '不是懒，是任务会膨胀',
+      h: '给你两周做一件事，你不会第一天做完 —— 前一周挑好玩的做，最后几天才开始拼命。<br><br>' +
+         '这不是你一个人的毛病，项目管理里管它叫<b>学生综合征</b>：任务会自动膨胀，填满你给它的所有时间。<br><br>' +
+         '解法跟「意志力」无关，只有两条。',
+      eq: '每天的量写死\n没完成当日量，不上床'
+    },
+    {
+      sc: 'sc12',
+      t: '番茄钟，弃掉',
+      h: '书里的态度比「少用」狠得多：<b>把计时器收进柜子，番茄钟一起弃掉。</b><br><br>' +
+         '逻辑是：番茄钟让一个<b>计时器</b>决定你什么时候该停，而该决定这件事的是兴趣和脑子饱没饱。' +
+         '学到正投入时被铃打断，刚坐下还没进去时又被逼着坐满 25 分钟 —— 两头都不对。<br><br>' +
+         '（「只用来逼自己坐下」这条是我加的，书里没有。）',
+      eq: '按「这一节讲完没有」分段\n不看表'
+    },
+    {
+      sc: 'sc13',
+      t: '努力两周没动静，可能是平台',
+      h: '进步不是一条斜线，是<b>台阶</b>。<br><br>' +
+         '书里特别提醒：<b>灰心平台最常出现在第二轮</b> —— 刚学完觉得懂了，回头复习第一遍，反而觉得什么都没剩下。' +
+         '那一段是平的，甚至有点往下掉。<b>最多人在这儿放弃。</b><br><br>' +
+         '判断有没有效果，别看分数，看三个更早的信号。',
+      eq: '合书能讲出来吗\n同一题第二次用时短了吗\n错误从「不会」变成「算错」了吗'
+    },
+    {
+      sc: 'sc14',
+      t: '天才强在顺序上',
+      h: '书里给了一条基本定理：<b>被动 ＜ 主动 ＜ 创造</b>。<br><br>' +
+         '被动：人在场就行，读、听、看。<br>' +
+         '主动：要真的动一下，划线、做笔记、发言。<br>' +
+         '创造：<b>从自己口袋里掏出一点面粉</b> —— 自己出题、自己画表、把两门课连起来。<br><br>' +
+         '书里引了老鼠实验：同样是胡须碰到东西，主动去探和等着被碰，<b>脑活跃差 10 倍</b>。',
+      eq: '每周让他自己出 3 道题考你\n出得出来，就站在第三层了'
+    },
+    {
+      sc: 'sc15',
+      t: '这一课的表：卡住的时候怎么办',
+      h: '七行，全是动作。<br><br>' +
+         '最后一行是总纲：<b>讲不出来 = 没学会</b>，前面六行都是为它服务的。<br><br>' +
+         '橙色那行（卡 3 分钟就跳过）<b>不是书上的</b>，是我要求你这么做的。',
+      eq: '表是空的\n让他自己把常用的动作填进去'
+    }
+  ];
+
+  let cur = 0;
+
+  function render(){
+    STEPS.forEach((s, i) => $(s.sc).classList.toggle('on', i === cur));
+    const s = STEPS[cur];
+    $('steptag').textContent = '第 ' + (cur + 1) + ' 步 / 共 ' + STEPS.length + ' 步';
+    $('t').textContent = s.t;
+    $('h').innerHTML = s.h;
+    $('eq').innerHTML = s.eq;
+
+    $('prev').disabled = cur === 0;
+    $('next').disabled = cur === STEPS.length - 1;
+    $('next').textContent = cur === STEPS.length - 1 ? '讲完了' : '下一步 →';
+    [...$('dots').children].forEach((d, i) => d.classList.toggle('on', i === cur));
+
+    const sc = $(s.sc);
+    sc.querySelectorAll('.draw').forEach(el => {
+      el.style.animation = 'none';
+      el.getBoundingClientRect();
+      el.style.animation = '';
+    });
+  }
+
+  function go(k){
+    k = Math.max(0, Math.min(STEPS.length - 1, k));
+    if(k === cur) return;
+    cur = k;
+    render();
+  }
+
+  $('prev').addEventListener('click', () => go(cur - 1));
+  $('next').addEventListener('click', () => go(cur + 1));
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.title = '第 ' + (i + 1) + ' 步';
+    d.addEventListener('click', () => go(i));
+    $('dots').appendChild(d);
+  });
+
+  document.addEventListener('keydown', e => {
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(cur + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(cur - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
